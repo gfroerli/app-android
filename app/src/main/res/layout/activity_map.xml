@@ -12,11 +12,15 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         mapbox:access_token="@string/mapbox_access_token"
-        mapbox:style_url="@string/style_satellite_streets"
-        mapbox:center_latitude="47.286640"
-        mapbox:center_longitude="8.731630"
-        mapbox:zoom="9"
+        mapbox:style_url="@string/mapbox_style"
+        mapbox:center_latitude="47.209587"
+        mapbox:center_longitude="8.823612"
+        mapbox:zoom="12"
         mapbox:tilt="0"
+        mapbox:logo_enabled="false"
+        mapbox:my_location_enabled="true"
+        mapbox:attribution_margin_left="3dp"
+        mapbox:attribution_margin_bottom="3dp"
         />
 
 </RelativeLayout>
