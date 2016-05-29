@@ -3,6 +3,8 @@ package ch.coredump.watertemp;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -32,6 +34,26 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
+
+        // Add markers
+        mMap.addMarker(
+                new MarkerOptions()
+                    .position(new LatLng(47.222331, 8.816589))
+                    .title("HSR Badewiese")
+                    .snippet("Wiese hinter der HSR.")
+        );
+        mMap.addMarker(
+                new MarkerOptions()
+                        .position(new LatLng(47.227723, 8.812858))
+                        .title("Seebad Rapperswil")
+                        .snippet("Gleich hinter dem Schloss.")
+        );
+        mMap.addMarker(
+                new MarkerOptions()
+                        .position(new LatLng(47.215407, 8.844550))
+                        .title("Strandbad Stampf")
+                        .snippet("21.8°C\nSponsored by HSR.")
+        );
     }
 
     @Override
