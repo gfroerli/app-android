@@ -18,7 +18,7 @@
         mapbox:zoom="12"
         mapbox:tilt="0"
         mapbox:logo_enabled="false"
-        mapbox:my_location_enabled="true"
+        mapbox:my_location_enabled="false"
         mapbox:attribution_margin_left="3dp"
         mapbox:attribution_margin_bottom="3dp"
         />
