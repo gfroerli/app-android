@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Water Temperatures</string>
+    <string name="title_activity_map">Map</string>
+    <string name="mapbox_access_token">***REMOVED***</string>
+</resources>
