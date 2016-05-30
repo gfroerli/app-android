@@ -25,7 +25,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
     private MapboxMap map;
     private MapView mapView;
-    private ApiClient apiClient;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +41,8 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
-        apiClient = new ApiClient();
-        ApiService apiService = apiClient.getApiService();
-
-        // Fetch sensors
-        Call<List<Sensor>> call = apiService.listSensors();
-        call.enqueue(onSensorsFetched());
+        final ApiClient apiClient = new ApiClient();
+        apiService = apiClient.getApiService();
     }
 
     /**
@@ -55,27 +51,12 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
+        // Save map as attribute
         map = mapboxMap;
 
-        // Add markers
-        map.addMarker(
-                new MarkerOptions()
-                    .position(new LatLng(47.222331, 8.816589))
-                    .title("HSR Badewiese")
-                    .snippet("Wiese hinter der HSR.")
-        );
-        map.addMarker(
-                new MarkerOptions()
-                        .position(new LatLng(47.227723, 8.812858))
-                        .title("Seebad Rapperswil")
-                        .snippet("Gleich hinter dem Schloss.")
-        );
-        map.addMarker(
-                new MarkerOptions()
-                        .position(new LatLng(47.215407, 8.844550))
-                        .title("Strandbad Stampf")
-                        .snippet("21.8°C\nSponsored by HSR.")
-        );
+        // Fetch sensors
+        Call<List<Sensor>> call = apiService.listSensors();
+        call.enqueue(onSensorsFetched());
     }
 
     private Callback<List<Sensor>> onSensorsFetched() {
@@ -85,7 +66,15 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 Log.i(TAG, "Response done!");
                 if (response != null) {
                     for (Sensor sensor : response.body()) {
-                        Log.i(TAG, "Sensor" + sensor.getDeviceName() + " at " + sensor.getLocation().toString());
+                        Log.i(TAG, "Add sensor" + sensor.getDeviceName());
+                        final float lat = sensor.getLocation().getLatitude();
+                        final float lng = sensor.getLocation().getLongitude();
+                        map.addMarker(
+                                new MarkerOptions()
+                                    .position(new LatLng(lat, lng))
+                                    .title(sensor.getDeviceName())
+                                    .snippet(sensor.getCaption())
+                        );
                     }
                 }
             }
