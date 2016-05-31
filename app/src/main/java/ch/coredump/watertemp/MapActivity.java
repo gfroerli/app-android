@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -143,17 +145,32 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     }
 
     private void updateMarkers() {
+        // Create bounding box builder
+        LatLngBounds.Builder boundingBoxBuilder = new LatLngBounds.Builder();
+
+        // Process sensors
         for (Sensor sensor : sensors.keySet()) {
             Log.i(TAG, "Add sensor" + sensor.getDeviceName());
+
+            // Create location object
             final float lat = sensor.getLocation().getLatitude();
             final float lng = sensor.getLocation().getLongitude();
+            final LatLng location = new LatLng(lat, lng);
+
+            // Add the marker to the map
             map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
                             .title(sensor.getDeviceName())
                             .snippet(sensor.getCaption())
             );
+
+            // Add the location to the bounding box
+            boundingBoxBuilder.include(location);
         }
+
+        // Change zoom to include all markers
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 50));
     }
 
 }
