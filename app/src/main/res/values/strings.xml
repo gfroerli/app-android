@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Water Temperatures</string>
-    <string name="title_activity_map">Map</string>
+    <string name="title_activity_map">Lake Zürich Temperatures</string>
     <string name="mapbox_access_token">***REMOVED***</string>
     <string name="mapbox_style">mapbox://styles/mapbox/outdoors-v9</string>
 </resources>
