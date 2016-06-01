@@ -170,7 +170,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         }
 
         // Change zoom to include all markers
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 50));
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100));
     }
 
 }
