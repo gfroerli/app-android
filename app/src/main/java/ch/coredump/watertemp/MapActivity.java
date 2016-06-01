@@ -13,12 +13,15 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ch.coredump.watertemp.rest.ApiClient;
 import ch.coredump.watertemp.rest.ApiService;
+import ch.coredump.watertemp.rest.SensorMeasurements;
 import ch.coredump.watertemp.rest.models.Measurement;
 import ch.coredump.watertemp.rest.models.Sensor;
 import retrofit2.Call;
@@ -32,7 +35,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
     private MapboxMap map;
     private MapView mapView;
     private ApiService apiService;
-    private Map<Sensor, List<Measurement>> sensors = new HashMap<>();
+    private Map<Integer, SensorMeasurements> sensors = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,17 +75,21 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
             public void onResponse(Call<List<Sensor>> call, Response<List<Sensor>> response) {
                 Log.i(TAG, "Sensor response done!");
                 if (response != null) {
+                    // Clear old sensor list
+                    sensors.clear();
+
+                    // Prepare list for sensor IDs
+                    List<String> idList = new ArrayList<>();
+
+                    // Extract sensor information
                     for (Sensor sensor : response.body()) {
-                        sensors.put(sensor, new ArrayList<Measurement>());
+                        sensors.put(sensor.getId(), new SensorMeasurements(sensor));
+                        idList.add(String.valueOf(sensor.getId()));
                     }
 
                     // Fetch measurements
-                    List<String> idList = new ArrayList<>();
-                    for (Sensor sensor : sensors.keySet()) { // Oh,verbose Java! Where is your .map()?
-                        idList.add(String.valueOf(sensor.getId()));
-                    }
                     final String ids = Utils.join(",", idList);
-                    Call<List<Measurement>> measurementCall = apiService.listMeasurements(ids, 10);
+                    Call<List<Measurement>> measurementCall = apiService.listMeasurements(ids, idList.size() * 5);
                     measurementCall.enqueue(onMeasurementsFetched());
                 }
             }
@@ -102,6 +109,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
                 if (response != null) {
                     for (Measurement measurement : response.body()) {
                         Log.i(TAG, "Measurement: " + measurement.getTemperature());
+                        sensors.get(measurement.getSensorId()).addMeasurement(measurement);
                     }
                     updateMarkers();
                 }
@@ -149,20 +157,41 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         LatLngBounds.Builder boundingBoxBuilder = new LatLngBounds.Builder();
 
         // Process sensors
-        for (Sensor sensor : sensors.keySet()) {
+        for (SensorMeasurements sensorMeasurement : sensors.values()) {
+            final Sensor sensor = sensorMeasurement.getSensor();
+            final List<Measurement> measurements = sensorMeasurement.getMeasurements();
             Log.i(TAG, "Add sensor" + sensor.getDeviceName());
+
+            // Sort measurements by ID
+            Collections.sort(measurements, new Comparator<Measurement>() {
+                @Override
+                public int compare(Measurement lhs, Measurement rhs) {
+                    final Integer leftId = new Integer(lhs.getId());
+                    final Integer rightId = new Integer(rhs.getId());
+                    return leftId.compareTo(rightId);
+                }
+            });
 
             // Create location object
             final float lat = sensor.getLocation().getLatitude();
             final float lng = sensor.getLocation().getLongitude();
             final LatLng location = new LatLng(lat, lng);
 
+            // Build caption
+            final StringBuilder captionBuilder = new StringBuilder();
+            captionBuilder.append(sensor.getCaption());
+            if (measurements.size() > 0) {
+                captionBuilder.append('\n');
+                captionBuilder.append(measurements.get(measurements.size() - 1).getTemperature());
+                captionBuilder.append("°C");
+            }
+
             // Add the marker to the map
             map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
                             .title(sensor.getDeviceName())
-                            .snippet(sensor.getCaption())
+                            .snippet(captionBuilder.toString())
             );
 
             // Add the location to the bounding box
