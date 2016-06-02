@@ -23,4 +23,11 @@
         mapbox:attribution_margin_bottom="3dp"
         />
 
+    <fragment
+        android:name="ch.coredump.watertemp.DetailsFragment"
+        android:id="@+id/fragment_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
 </RelativeLayout>
