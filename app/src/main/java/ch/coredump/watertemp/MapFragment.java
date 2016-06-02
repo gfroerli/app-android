@@ -2,12 +2,16 @@ package ch.coredump.watertemp;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.google.android.gms.vision.text.Text;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -197,12 +201,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
             // Add the marker to the map
-            map.addMarker(
+            final Marker marker = map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
                             .title(sensor.getDeviceName())
                             .snippet(captionBuilder.toString())
             );
+
+            map.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(@NonNull Marker marker) {
+                    Log.i(TAG, "Marker ID: " + marker.getId());
+                    final TextView title = (TextView) getActivity().findViewById(R.id.details_title);
+                    final TextView measurement = (TextView) getActivity().findViewById(R.id.details_measurement);
+                    title.setText(marker.getTitle());
+                    measurement.setText(marker.getSnippet());
+                    return true;
+                }
+            });
 
             // Add the location to the bounding box
             boundingBoxBuilder.include(location);
