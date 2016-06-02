@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_map"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        mapbox:access_token="@string/mapbox_access_token"
-        mapbox:style_url="@string/mapbox_style"
-        mapbox:center_latitude="47.209587"
-        mapbox:center_longitude="8.823612"
-        mapbox:zoom="12"
-        mapbox:tilt="0"
-        mapbox:logo_enabled="false"
-        mapbox:my_location_enabled="false"
-        mapbox:attribution_margin_left="3dp"
-        mapbox:attribution_margin_bottom="3dp"
-        />
+    <fragment
+        android:name="ch.coredump.watertemp.MapFragment"
+        android:id="@+id/fragment_map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
 
     <fragment
         android:name="ch.coredump.watertemp.DetailsFragment"

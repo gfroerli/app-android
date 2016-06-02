@@ -43,7 +43,7 @@ public class MapActivity extends Activity implements OnMapReadyCallback {
         setContentView(R.layout.activity_map);
 
         // Create map view
-        mapView = (MapView) findViewById(R.id.mapview);
+        mapView = (MapView) findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
 
         // Initialize map
