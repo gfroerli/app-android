@@ -10,7 +10,6 @@
         android:id="@+id/map_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        mapbox:access_token="@string/mapbox_access_token"
         mapbox:attribution_margin_bottom="3dp"
         mapbox:attribution_margin_left="3dp"
         mapbox:center_latitude="47.209587"
