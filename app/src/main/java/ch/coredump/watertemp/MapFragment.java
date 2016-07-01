@@ -1,9 +1,12 @@
 package ch.coredump.watertemp;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.text.Text;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -44,11 +49,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     private ApiService apiService;
     private Map<Integer, SensorMeasurements> sensors = new HashMap<>();
+    private Marker activeMarker;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         Log.i(TAG, "Initializing fragment");
 
         // Inflate view
@@ -200,22 +206,43 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 captionBuilder.append("°C");
             }
 
+            // Initialize icons
+            Context context = getActivity().getApplicationContext();
+            IconFactory iconFactory = IconFactory.getInstance(context);
+            Drawable defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker);
+            Drawable activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.yellow_marker);
+            final Icon defaultIcon = iconFactory.fromDrawable(defaultIconDrawable);
+            final Icon activeIcon = iconFactory.fromDrawable(activeIconDrawable);
+
             // Add the marker to the map
             final Marker marker = map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
                             .title(sensor.getCaption())
                             .snippet(captionBuilder.toString())
+                            .icon(defaultIcon)
             );
 
             map.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
-                public boolean onMarkerClick(@NonNull Marker marker) {
+                public boolean onMarkerClick(Marker marker) {
                     Log.i(TAG, "Marker ID: " + marker.getId());
+
+                    // Update active marker icon
+                    if (MapFragment.this.activeMarker != null) {
+                        MapFragment.this.activeMarker.setIcon(defaultIcon);
+                    }
+                    marker.setIcon(activeIcon);
+
+                    // Update detail pane
                     final TextView title = (TextView) getActivity().findViewById(R.id.details_title);
                     final TextView measurement = (TextView) getActivity().findViewById(R.id.details_measurement);
                     title.setText(marker.getTitle());
                     measurement.setText(marker.getSnippet());
+
+                    // Set active marker
+                    MapFragment.this.activeMarker = marker;
+
                     return true;
                 }
             });
