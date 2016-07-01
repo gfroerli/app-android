@@ -174,7 +174,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (SensorMeasurements sensorMeasurement : sensors.values()) {
             final Sensor sensor = sensorMeasurement.getSensor();
             final List<Measurement> measurements = sensorMeasurement.getMeasurements();
-            Log.i(TAG, "Add sensor" + sensor.getDeviceName());
+            Log.i(TAG, "Add sensor" + sensor.getCaption());
 
             // Sort measurements by ID
             Collections.sort(measurements, new Comparator<Measurement>() {
@@ -204,7 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             final Marker marker = map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
-                            .title(sensor.getDeviceName())
+                            .title(sensor.getCaption())
                             .snippet(captionBuilder.toString())
             );
 
