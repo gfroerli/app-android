@@ -226,7 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             map.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    Log.i(TAG, "Marker ID: " + marker.getId());
+                    Log.d(TAG, "Marker ID: " + marker.getId());
 
                     // Update active marker icon
                     if (MapFragment.this.activeMarker != null) {
@@ -244,6 +244,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     MapFragment.this.activeMarker = marker;
 
                     return true;
+                }
+            });
+            map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng point) {
+                    Log.d(TAG,  "Clicked on map");
+
+                    if (MapFragment.this.activeMarker != null) {
+                        MapFragment.this.activeMarker.setIcon(defaultIcon);
+                        MapFragment.this.activeMarker = null;
+                    }
                 }
             });
 
