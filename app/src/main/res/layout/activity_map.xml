@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_map"
+    android:id="@+id/fragment_bottom_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".MapActivity">
 
-    <fragment
-        android:name="ch.coredump.watertemp.MapFragment"
-        android:id="@+id/fragment_map"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        mapbox:attribution_margin_bottom="3dp"
+        mapbox:attribution_margin_left="3dp"
+        mapbox:center_latitude="47.209587"
+        mapbox:center_longitude="8.823612"
+        mapbox:logo_enabled="false"
+        mapbox:my_location_enabled="false"
+        mapbox:style_url="@string/mapbox_style"
+        mapbox:tilt="0"
+        mapbox:zoom="12" />
 
-    <fragment
-        android:name="ch.coredump.watertemp.DetailsFragment"
-        android:id="@+id/fragment_details"
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/details_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/colorBackground"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:id="@+id/details_title"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="DETAILS"
+                      style="@style/TextAppearance.AppCompat.Headline" />
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:id="@+id/details_measurement"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Current temperature: 42.23°C"
+                      style="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
