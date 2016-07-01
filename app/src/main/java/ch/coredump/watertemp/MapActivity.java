@@ -197,8 +197,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // Initialize icons
             Context context = getApplicationContext();
             IconFactory iconFactory = IconFactory.getInstance(context);
-            Drawable defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker);
-            Drawable activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.yellow_marker);
+            // TODO: Proper tinting of blue marker like primary dark color
+            Drawable defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.blue_marker);
+            // Default marker uses our accent color
+            Drawable activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker);
             final Icon defaultIcon = iconFactory.fromDrawable(defaultIconDrawable);
             final Icon activeIcon = iconFactory.fromDrawable(activeIconDrawable);
 
