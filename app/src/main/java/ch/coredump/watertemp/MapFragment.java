@@ -233,6 +233,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         MapFragment.this.activeMarker.setIcon(defaultIcon);
                     }
                     marker.setIcon(activeIcon);
+                    MapFragment.this.activeMarker = marker;
 
                     // Update detail pane
                     final TextView title = (TextView) getActivity().findViewById(R.id.details_title);
@@ -240,8 +241,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     title.setText(marker.getTitle());
                     measurement.setText(marker.getSnippet());
 
-                    // Set active marker
-                    MapFragment.this.activeMarker = marker;
+                    // Show the details pane
+                    ((MapActivity)getActivity()).showDetailsFragment();
 
                     return true;
                 }
@@ -251,10 +252,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onMapClick(LatLng point) {
                     Log.d(TAG,  "Clicked on map");
 
-                    if (MapFragment.this.activeMarker != null) {
-                        MapFragment.this.activeMarker.setIcon(defaultIcon);
-                        MapFragment.this.activeMarker = null;
+                    if (MapFragment.this.activeMarker == null) {
+                        return;
                     }
+
+                    // No more active marker
+                    MapFragment.this.activeMarker.setIcon(defaultIcon);
+                    MapFragment.this.activeMarker = null;
+
+                    // Hide the details pane
+                    ((MapActivity)getActivity()).hideDetailsFragment();
                 }
             });
 
