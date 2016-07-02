@@ -187,11 +187,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             // Build caption
             final StringBuilder captionBuilder = new StringBuilder();
-            captionBuilder.append(sensor.getCaption());
             if (measurements.size() > 0) {
-                captionBuilder.append('\n');
-                captionBuilder.append(measurements.get(measurements.size() - 1).getTemperature());
+                final Measurement measurement = measurements.get(measurements.size() - 1);
+                captionBuilder.append(measurement.getTemperature());
                 captionBuilder.append("°C");
+            } else {
+                captionBuilder.append("No current measurement");
             }
 
             // Initialize icons

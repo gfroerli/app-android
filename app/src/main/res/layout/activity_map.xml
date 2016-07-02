@@ -43,12 +43,12 @@
                 android:background="@drawable/drop_shadow" />
 
             <!-- Bottom sheet (details) -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorBackground"
-                android:paddingTop="24dp"
-                android:paddingBottom="24dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:orientation="vertical">
@@ -58,16 +58,26 @@
                     android:id="@+id/details_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginBottom="8dp"
                     android:text="DETAILS"/>
+                <ImageView
+                    android:id="@+id/details_temperature_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_below="@id/details_title"
+                    android:src="@drawable/temperature" />
                 <TextView
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     style="@style/TextAppearance.AppCompat.Body1"
                     android:id="@+id/details_measurement"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_below="@id/details_title"
+                    android:layout_toEndOf="@id/details_temperature_icon"
                     android:text="Current temperature: 42.23°C"/>
-
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
