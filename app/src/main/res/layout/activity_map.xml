@@ -28,24 +28,47 @@
         android:id="@+id/details_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBackground"
         app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <!-- Layout containing both the bottom sheet and the drop shadow -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:id="@+id/details_title"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="DETAILS"
-                      style="@style/TextAppearance.AppCompat.Headline" />
-            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:id="@+id/details_measurement"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="Current temperature: 42.23°C"
-                      style="@style/TextAppearance.AppCompat.Body1" />
+
+            <!-- Drop shadow -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@drawable/drop_shadow" />
+
+            <!-- Bottom sheet (details) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorBackground"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:orientation="vertical">
+                <TextView
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:id="@+id/details_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DETAILS"/>
+                <TextView
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:id="@+id/details_measurement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Current temperature: 42.23°C"/>
+
+            </LinearLayout>
+
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
