@@ -3,4 +3,5 @@
     <string name="title_activity_map">Lake Zürich Temperatures</string>
     <string name="mapbox_access_token">***REMOVED***</string>
     <string name="mapbox_style">mapbox://styles/mapbox/outdoors-v9</string>
+    <string name="thermometer_icon_description">Thermometer icon</string>
 </resources>
