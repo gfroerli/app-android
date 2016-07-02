@@ -24,6 +24,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -189,8 +191,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             final StringBuilder captionBuilder = new StringBuilder();
             if (measurements.size() > 0) {
                 final Measurement measurement = measurements.get(measurements.size() - 1);
+                final PrettyTime pt = new PrettyTime();
                 captionBuilder.append(measurement.getTemperature());
-                captionBuilder.append("°C");
+                captionBuilder.append("°C (");
+                captionBuilder.append(pt.format(measurement.getCreatedAt()));
+                captionBuilder.append(")");
             } else {
                 captionBuilder.append("No current measurement");
             }

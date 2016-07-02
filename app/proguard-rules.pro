@@ -20,3 +20,4 @@
 -keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-keep class org.ocpsoft.prettytime.i18n.**
