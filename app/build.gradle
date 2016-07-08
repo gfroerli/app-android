@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'witness'
 
 android {
     compileSdkVersion 23
@@ -44,4 +45,25 @@ dependencies {
 
     // Testing
     testCompile 'junit:junit:4.12'
+}
+
+dependencyVerification {
+    verify = [
+        'com.android.support:appcompat-v7:d3d96637b0e8e61046567b8c87b667dcf3cd31c7447f651cb58d6e6e744adfba',
+        'com.android.support:design:5f1d5eab6940ece3ebb73691d8a60434d8d1e330176442be8f35a1585345b2ec',
+        'com.mapbox.mapboxsdk:mapbox-android-sdk:5f3df42246073160740a2caee276938b15742a673cfa120ddec31bc46730dce9',
+        'com.squareup.retrofit2:retrofit:6765754c159a5079ea948dc1f505afab9a2198399305a8a33466aad0bdbcb1dd',
+        'com.squareup.retrofit2:converter-gson:81760c3aebaf3b2457097969335a22ecbdaea82ff8056060b26eb319930ea623',
+        'org.ocpsoft.prettytime:prettytime:a6bc2641b3ab7873df604b77b6680c75b86d98e78afefb367940972f925591b5',
+        'com.android.support:animated-vector-drawable:bcb7ce66a9c629fa7c723a767b6430e1a383e8d4dd543d603dcb0ad1b855b8b2',
+        'com.android.support:support-v4:a0d002465c0f611eedaaef2b2530707d2e9fb3a5c7ed66f53c556a12f714f43a',
+        'com.android.support:support-vector-drawable:150021a89ae6f252415cbfff5c3111bf87433776b997b68e6e71f37e5b696799',
+        'com.android.support:recyclerview-v7:24465b2ba90dc5ed7e2c05f1c87fe4256c27df6d3cd69b6177f3cb447b05c021',
+        'com.mapzen.android:lost:db24f0c2152f420cc06ee7a38ad8e03eda564ba6fdb5732196b8d3b58a6c06d8',
+        'com.android.support:support-annotations:e91a88dd0c5e99069b7f09d4a46b5e06f1e9c4c72fc0a8e987e25d86af480f01',
+        'com.squareup.okhttp3:okhttp:31d2b24f05b0fcd89688c4e409c92d8aee75a092e76b87554a18330cacea6084',
+        'com.google.code.gson:gson:e80e32167a50a40def3e20b8286c977099922911724d593c9fef180665036a19',
+        'com.google.guava:guava:d664fbfc03d2e5ce9cab2a44fb01f1d0bf9dfebeccc1a473b1f9ea31f79f6f99',
+        'com.squareup.okio:okio:5cfea5afe6c6e441a4dbf6053a07a733b1249d1009382eb44ac2255ccedd0c15',
+    ]
 }
