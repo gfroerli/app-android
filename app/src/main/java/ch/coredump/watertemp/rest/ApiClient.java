@@ -8,7 +8,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private static final String API_URL = "http://x2000:3000/api/";
+    private static final String API_URL = "https://watertemp-api.coredump.ch/api/";
     private ApiService apiService;
 
     public ApiClient() {
