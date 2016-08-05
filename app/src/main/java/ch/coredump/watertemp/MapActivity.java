@@ -136,7 +136,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(Call<List<Sensor>> call, Throwable t) {
-                Log.e(TAG, "Fetching sensors failed:" + t.toString());
+                final String errmsg = "Fetching sensors failed: " + t.toString();
+                Log.e(TAG, errmsg);
+                Utils.showError(MapActivity.this, errmsg);
             }
         };
     }
@@ -157,7 +159,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(Call<List<Measurement>> call, Throwable t) {
-                Log.e(TAG, "Fetching measurements failed:" + t.toString());
+                final String errmsg = "Fetching measurements failed:" + t.toString();
+                Log.e(TAG, errmsg);
+                Utils.showError(MapActivity.this, errmsg);
             }
         };
     }
