@@ -167,10 +167,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void updateMarkers() {
-        // Create bounding box builder
-        LatLngBounds.Builder boundingBoxBuilder = new LatLngBounds.Builder();
-
         // Process sensors
+        final List<LatLng> locations = new ArrayList<>();
         for (SensorMeasurements sensorMeasurement : sensors.values()) {
             final Sensor sensor = sensorMeasurement.getSensor();
             final List<Measurement> measurements = sensorMeasurement.getMeasurements();
@@ -271,11 +269,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
 
-            // Add the location to the bounding box
-            boundingBoxBuilder.include(location);
+            // Store location
+            locations.add(location);
         }
 
         // Change zoom to include all markers
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100));
+        if (locations.size() == 1) {
+            final LatLng location = locations.get(0);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
+        } else if (sensors.size() > 1) {
+            LatLngBounds.Builder boundingBoxBuilder = new LatLngBounds.Builder();
+            for (final LatLng location : locations) {
+                boundingBoxBuilder.include(location);
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100));
+        }
     }
+
 }
