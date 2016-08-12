@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Zürichsee Temperatur</string>
+    <string name="thermometer_icon_description">Thermometer-Symbol</string>
+</resources>

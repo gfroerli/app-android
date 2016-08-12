@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">Water Temperatures</string>
-    <string name="title_activity_map">Lake Zürich Temperatures</string>
-    <string name="mapbox_access_token">***REMOVED***</string>
-    <string name="mapbox_style">mapbox://styles/mapbox/outdoors-v9</string>
+    <string name="app_name">Lake Zürich Temperature</string>
+    <string name="mapbox_access_token" translatable="false">***REMOVED***</string>
+    <string name="mapbox_style" translatable="false">mapbox://styles/mapbox/outdoors-v9</string>
     <string name="thermometer_icon_description">Thermometer icon</string>
 </resources>
