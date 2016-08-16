@@ -28,6 +28,7 @@
         android:id="@+id/details_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:behavior_hideable="true"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <!-- Layout containing both the bottom sheet and the drop shadow -->
@@ -42,45 +43,14 @@
                 android:layout_height="6dp"
                 android:background="@drawable/drop_shadow" />
 
-            <!-- Bottom sheet (details) -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorBackground"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:orientation="vertical">
+            <!-- Peek area -->
+            <include layout="@layout/bottom_sheet_peek" />
 
-                <!-- Device name -->
-                <TextView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:id="@+id/details_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="48dp"
-                    android:layout_marginBottom="8dp"/>
+            <!-- Divider -->
+            <include layout="@layout/divider" />
 
-                <!-- Temperature -->
-                <ImageView
-                    android:id="@+id/details_temperature_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_below="@id/details_title"
-                    android:src="@drawable/temperature"
-                    android:contentDescription="@string/thermometer_icon_description"/>
-                <TextView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    style="@style/TextAppearance.AppCompat.Body1"
-                    android:id="@+id/details_measurement"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_below="@id/details_title"
-                    android:layout_toEndOf="@id/details_temperature_icon"/>
-            </RelativeLayout>
+            <!-- Details -->
+            <include layout="@layout/bottom_sheet_details" />
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

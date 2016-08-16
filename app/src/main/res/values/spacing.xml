@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- https://material.google.com/style/typography.html#typography-line-height -->
+    <dimen name="display2Leading">48dp</dimen>
+    <dimen name="display1Leading">40dp</dimen>
+    <dimen name="headlineLeading">32dp</dimen>
+    <dimen name="subheading2Leading">28dp</dimen>
+    <dimen name="subheading1Leading">24dp</dimen>
+    <dimen name="body2Leading">24dp</dimen>
+    <dimen name="body1Leading">20dp</dimen>
+</resources>

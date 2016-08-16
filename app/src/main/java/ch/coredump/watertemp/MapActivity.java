@@ -9,8 +9,10 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
@@ -79,14 +81,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         apiService = apiClient.getApiService();
 
         // Initialize bottom sheet behavior
-        NestedScrollView bottomSheetView = (NestedScrollView) findViewById(R.id.details_bottom_sheet);
+        final NestedScrollView bottomSheetView = (NestedScrollView) findViewById(R.id.details_bottom_sheet);
         assert bottomSheetView != null;
         this.bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView);
+
+        // Set peek height as necessary
+        RelativeLayout bottomSheetPeek = (RelativeLayout) findViewById(R.id.bottom_sheet_peek);
+        assert bottomSheetPeek != null;
+        this.bottomSheetBehavior.setPeekHeight(bottomSheetPeek.getHeight());
+
+        // Add bottom sheet listener
         this.bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 // Bottom sheet state changed
                 Log.d(TAG, "State changed to " + newState);
+                // TODO: If it's gone, make sure to deselect all markers.
             }
 
             @Override
