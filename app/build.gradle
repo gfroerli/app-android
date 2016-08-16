@@ -49,6 +49,9 @@ dependencies {
     // Relative time calculation
     compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
 
+    // Baseline alignment of typography
+    compile 'com.actinarium.aligned:aligned:0.1'
+
     // Testing
     testCompile 'junit:junit:4.12'
 }
