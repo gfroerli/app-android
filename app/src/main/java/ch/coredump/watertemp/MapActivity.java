@@ -216,7 +216,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(lat, lng))
-                            .title(sensor.getCaption())
+                            .title(sensor.getDeviceName())
                             .snippet(captionBuilder.toString())
                             .icon(defaultIcon)
             );
