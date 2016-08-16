@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -103,6 +104,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Save map as attribute
         map = mapboxMap;
+
+        // Disable interactions that might confuse the user
+        UiSettings settings = map.getUiSettings();
+        settings.setRotateGesturesEnabled(false);
+        settings.setTiltGesturesEnabled(false);
+        settings.setCompassEnabled(false);
 
         // Fetch sensors
         Call<List<Sensor>> sensorCall = apiService.listSensors();
