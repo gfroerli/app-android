@@ -39,7 +39,7 @@
             <!-- Drop shadow -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
+                android:layout_height="6dp"
                 android:background="@drawable/drop_shadow" />
 
             <!-- Bottom sheet (details) -->
@@ -52,6 +52,8 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:orientation="vertical">
+
+                <!-- Device name -->
                 <TextView
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     style="@style/TextAppearance.AppCompat.Headline"
@@ -60,6 +62,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="48dp"
                     android:layout_marginBottom="8dp"/>
+
+                <!-- Temperature -->
                 <ImageView
                     android:id="@+id/details_temperature_icon"
                     android:layout_width="24dp"
