@@ -4,6 +4,11 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+
+import ch.coredump.watertemp.rest.models.ApiError;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -29,5 +34,17 @@ public class ApiClient {
 
     public ApiService getApiService() {
         return apiService;
+    }
+
+    public static ApiError parseError(Response<?> response) {
+        final int statusCode = response.code();
+        String body;
+        try {
+            body = response.errorBody().string().trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+            body = "Unknown error";
+        }
+        return new ApiError(statusCode, body);
     }
 }
