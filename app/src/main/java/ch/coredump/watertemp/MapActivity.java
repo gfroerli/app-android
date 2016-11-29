@@ -214,8 +214,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
 
             // Create location object
-            final float lat = sensor.getLocation().getLatitude();
-            final float lng = sensor.getLocation().getLongitude();
+            final double lat = sensor.getLatitude();
+            final double lng = sensor.getLongitude();
             final LatLng location = new LatLng(lat, lng);
 
             // Build caption

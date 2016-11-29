@@ -7,13 +7,15 @@ public class Sensor {
     private final int id;
     private final String deviceName;
     private final String caption;
-    private final Location location;
+    private final double latitude;
+    private final double longitude;
 
-    public Sensor(int id, String deviceName, String caption, Location location) {
+    public Sensor(int id, String deviceName, String caption, double latitude, float longitude) {
         this.id = id;
         this.deviceName = deviceName;
         this.caption = caption;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public int getId() {
@@ -28,7 +30,11 @@ public class Sensor {
         return caption;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 }
