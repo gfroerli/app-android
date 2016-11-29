@@ -17,14 +17,14 @@
         android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat.Headline"
         app:leading="@dimen/headlineLeading"
-        android:text="Details"/>
+        android:text="@string/section_header_details"/>
 
     <com.actinarium.aligned.TextView
+        android:id="@+id/details_sensor_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat.Body1"
         app:leading="@dimen/body1Leading"
-        app:firstLineLeading="@dimen/headlineLeading"
-        android:text="Details not yet implemented."/>
+        app:firstLineLeading="@dimen/headlineLeading"/>
 
 </LinearLayout>

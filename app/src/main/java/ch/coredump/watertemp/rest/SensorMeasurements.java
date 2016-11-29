@@ -11,8 +11,8 @@ import ch.coredump.watertemp.rest.models.Sensor;
  */
 public class SensorMeasurements {
 
-    private Sensor sensor;
-    private List<Measurement> measurements;
+    private final Sensor sensor;
+    private final List<Measurement> measurements;
 
     public SensorMeasurements(Sensor sensor) {
         this.sensor = sensor;

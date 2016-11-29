@@ -9,7 +9,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -196,6 +195,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void updateMarkers() {
+        // Initialize icons
+        Context context = getApplicationContext();
+        IconFactory iconFactory = IconFactory.getInstance(context);
+        // TODO: Proper tinting of blue marker like primary dark color
+        Drawable defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.blue_marker);
+        // Default marker uses our accent color
+        Drawable activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker);
+        final Icon defaultIcon = iconFactory.fromDrawable(defaultIconDrawable);
+        final Icon activeIcon = iconFactory.fromDrawable(activeIconDrawable);
+
         // Process sensors
         final List<LatLng> locations = new ArrayList<>();
         for (SensorMeasurements sensorMeasurement : sensors.values()) {
@@ -231,16 +240,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 captionBuilder.append("No current measurement");
             }
 
-            // Initialize icons
-            Context context = getApplicationContext();
-            IconFactory iconFactory = IconFactory.getInstance(context);
-            // TODO: Proper tinting of blue marker like primary dark color
-            Drawable defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.blue_marker);
-            // Default marker uses our accent color
-            Drawable activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker);
-            final Icon defaultIcon = iconFactory.fromDrawable(defaultIconDrawable);
-            final Icon activeIcon = iconFactory.fromDrawable(activeIconDrawable);
-
             // Add the marker to the map
             map.addMarker(
                     new MarkerOptions()
@@ -250,57 +249,62 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             .icon(defaultIcon)
             );
 
-            map.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(@NonNull Marker marker) {
-                    Log.d(TAG, "Marker ID: " + marker.getId());
-
-                    // Update active marker icon
-                    if (MapActivity.this.activeMarker != null) {
-                        MapActivity.this.activeMarker.setIcon(defaultIcon);
-                    }
-                    marker.setIcon(activeIcon);
-                    MapActivity.this.activeMarker = marker;
-
-                    // Update detail pane
-                    final TextView title = (TextView) findViewById(R.id.details_title);
-                    assert title != null;
-                    final TextView measurement = (TextView) findViewById(R.id.details_measurement);
-                    assert measurement != null;
-                    title.setText(marker.getTitle());
-                    measurement.setText(marker.getSnippet());
-
-                    // Show the details pane
-                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    }
-
-                    return true;
-                }
-            });
-            map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(@NonNull LatLng point) {
-                    Log.d(TAG,  "Clicked on map");
-
-                    if (MapActivity.this.activeMarker == null) {
-                        return;
-                    }
-
-                    // No more active marker
-                    MapActivity.this.activeMarker.setIcon(defaultIcon);
-                    MapActivity.this.activeMarker = null;
-
-                    // Hide the details pane
-                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                    }
-                }
-            });
-
             // Store location
             locations.add(location);
         }
+
+        // Add marker click listener
+        map.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Log.d(TAG, "Marker ID: " + marker.getId());
+
+                // Update active marker icon
+                if (MapActivity.this.activeMarker != null) {
+                    MapActivity.this.activeMarker.setIcon(defaultIcon);
+                }
+                marker.setIcon(activeIcon);
+                MapActivity.this.activeMarker = marker;
+
+                // Update peek pane
+                final TextView title = (TextView) findViewById(R.id.details_title);
+                final TextView measurement = (TextView) findViewById(R.id.details_measurement);
+                title.setText(marker.getTitle());
+                measurement.setText(marker.getSnippet());
+
+                // Update detail pane
+                final TextView sensorCaption = (TextView) findViewById(R.id.details_sensor_caption);
+                sensorCaption.setText("TODO: Sensor details");
+
+                // Show the details pane
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+
+                return true;
+            }
+        });
+
+        // Add map click listener
+        map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng point) {
+                Log.d(TAG,  "Clicked on map");
+
+                if (MapActivity.this.activeMarker == null) {
+                    return;
+                }
+
+                // No more active marker
+                MapActivity.this.activeMarker.setIcon(defaultIcon);
+                MapActivity.this.activeMarker = null;
+
+                // Hide the details pane
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
 
         // Change zoom to include all markers
         if (locations.size() == 1) {

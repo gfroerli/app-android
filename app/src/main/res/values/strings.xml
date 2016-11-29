@@ -4,4 +4,5 @@
     <string name="mapbox_access_token" translatable="false">***REMOVED***</string>
     <string name="mapbox_style" translatable="false">mapbox://styles/mapbox/outdoors-v9</string>
     <string name="thermometer_icon_description">Thermometer icon</string>
+    <string name="section_header_details">Details</string>
 </resources>
