@@ -7,7 +7,9 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 
 import ch.coredump.watertemp.rest.models.ApiError;
-import okhttp3.ResponseBody;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -16,16 +18,39 @@ public class ApiClient {
     private static final String API_URL = "https://watertemp-api.coredump.ch/api/";
     private ApiService apiService;
 
-    public ApiClient() {
-        Gson gson = new GsonBuilder()
+    public ApiClient(final String authToken) {
+        // Gson instance (for JSON (de)serialization)
+        final Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
+        // Request interceptor (add authentication)
+        final Interceptor interceptor = new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                final Request original = chain.request();
+
+                // Add request headers
+                Request request = original.newBuilder()
+                        .header("Authorization", "Bearer " + authToken)
+                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        };
+
+        // HTTP client
+        final OkHttpClient httpClient = new OkHttpClient.Builder()
+                .addInterceptor(interceptor)
+                .build();
+
         // Create retrofit REST adapter
-        Retrofit retrofit = new Retrofit.Builder()
+        final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(httpClient)
                 .build();
 
         // Create service

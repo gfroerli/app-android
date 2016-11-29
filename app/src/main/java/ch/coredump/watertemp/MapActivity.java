@@ -78,7 +78,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
-        final ApiClient apiClient = new ApiClient();
+        final ApiClient apiClient = new ApiClient(getString(R.string.public_api_token));
         apiService = apiClient.getApiService();
 
         // Initialize bottom sheet behavior
