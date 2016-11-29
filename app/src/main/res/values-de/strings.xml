@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Zürichsee Temperatur</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
+    <string name="section_header_details">Details</string>
 </resources>
