@@ -40,6 +40,7 @@ import java.util.Map;
 import ch.coredump.watertemp.rest.ApiClient;
 import ch.coredump.watertemp.rest.ApiService;
 import ch.coredump.watertemp.rest.SensorMeasurements;
+import ch.coredump.watertemp.rest.models.ApiError;
 import ch.coredump.watertemp.rest.models.Measurement;
 import ch.coredump.watertemp.rest.models.Sensor;
 import retrofit2.Call;
@@ -132,8 +133,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return new Callback<List<Sensor>>() {
             @Override
             public void onResponse(Call<List<Sensor>> call, Response<List<Sensor>> response) {
+                if (response == null) {
+                    Log.e(TAG, "Received null response from sensors endpoint");
+                    return;
+                }
                 Log.i(TAG, "Sensor response done!");
-                if (response != null) {
+                if (response.isSuccessful()) {
                     // Clear old sensor list
                     sensors.clear();
 
@@ -150,6 +155,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     final String ids = Utils.join(",", idList);
                     Call<List<Measurement>> measurementCall = apiService.listMeasurements(ids, idList.size() * 5);
                     measurementCall.enqueue(onMeasurementsFetched());
+                } else {
+                    ApiError error = ApiClient.parseError(response);
+                    Log.e(TAG, error.toString());
+                    Utils.showError(MapActivity.this, "Could not fetch sensors.\n" +
+                            error.getStatusCode() + ": " + error.getMessage());
                 }
             }
 
