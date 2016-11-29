@@ -38,16 +38,16 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
 
     // Mapbox SDK
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.1.0@aar'){
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.0-beta.5@aar'){
         transitive=true
     }
 
     // REST client
-    compile 'com.squareup.retrofit2:retrofit:2.0.2'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
     // Relative time calculation
-    compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
+    compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
 
     // Baseline alignment of typography
     compile 'com.actinarium.aligned:aligned:0.1'
@@ -73,15 +73,21 @@ dependencyVerification {
         'com.android.support:support-fragment:da47261a1d7c3d33e6e911335a7f4ce01135923bb221d3ab84625d005fa1969f',
         'com.android.support:support-annotations:bd94ab42c841db16fb480f4c65d33d297e544655ecc498b37c5cf33a0c5f1968',
 
-        // Other
-        'com.mapbox.mapboxsdk:mapbox-android-sdk:5f3df42246073160740a2caee276938b15742a673cfa120ddec31bc46730dce9',
-        'com.squareup.retrofit2:retrofit:6765754c159a5079ea948dc1f505afab9a2198399305a8a33466aad0bdbcb1dd',
-        'com.squareup.retrofit2:converter-gson:81760c3aebaf3b2457097969335a22ecbdaea82ff8056060b26eb319930ea623',
-        'com.squareup.okhttp3:okhttp:31d2b24f05b0fcd89688c4e409c92d8aee75a092e76b87554a18330cacea6084',
-        'com.squareup.okio:okio:5cfea5afe6c6e441a4dbf6053a07a733b1249d1009382eb44ac2255ccedd0c15',
-        'org.ocpsoft.prettytime:prettytime:a6bc2641b3ab7873df604b77b6680c75b86d98e78afefb367940972f925591b5',
-        'com.mapzen.android:lost:db24f0c2152f420cc06ee7a38ad8e03eda564ba6fdb5732196b8d3b58a6c06d8',
-        'com.google.code.gson:gson:e80e32167a50a40def3e20b8286c977099922911724d593c9fef180665036a19',
+        // Mapbox
+        'com.mapbox.mapboxsdk:mapbox-android-sdk:73613054368fe83339b81e8b9b6cbf79f48248aba6c17b60f716742b09fa17d0',
+        'com.mapbox.mapboxsdk:mapbox-java-services:48488716151c51f6606da48d30812ba6eb3d1b82d721d1c089ff648d22d95429',
+        'com.mapzen.android:lost:6e2a7bfb1627587cf17e7788fc16eb2a293f1fb03c1cd9715da4cf5c9d33fefe',
+
+        // API stuff
+        'com.squareup.retrofit2:retrofit:b7ae1a8c9f8de27c85ea43238c6c1507e91d33c6411cc52a06b5451842dc28bb',
+        'com.squareup.retrofit2:converter-gson:7a24c46a7185f89ffdde23670a5db2fb794a87d34fc3ab8e0e4039c5ef48e652',
+        'com.squareup.okhttp3:okhttp:270bd243041967363230ab565e24a7cfeae6d0438433541122b6411bb7f2dbfd',
+        'com.squareup.okhttp3:logging-interceptor:f1c50344a874d5c532b41d09a025acee1e6743b55e007f832d619bc2f552fc3d',
+        'com.squareup.okio:okio:3c0b8eb9f266fd9f0b9554fdf264f70ed0b40c1e9d6356839bf234277e39d7b5',
+        'com.google.code.gson:gson:2d43eb5ea9e133d2ee2405cc14f5ee08951b8361302fdd93494a3a997b508d32',
         'com.google.guava:guava:d664fbfc03d2e5ce9cab2a44fb01f1d0bf9dfebeccc1a473b1f9ea31f79f6f99',
+
+        // Other
+        'org.ocpsoft.prettytime:prettytime:ef7098d973ae78b57d1a22dc37d3b8a771bf030301300e24055d676b6cdc5e75',
     ]
 }
