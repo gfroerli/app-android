@@ -1,5 +1,6 @@
 package ch.coredump.watertemp
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -7,7 +8,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.util.SparseArray
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -37,6 +37,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var map: MapboxMap? = null
     private var mapView: MapView? = null
     private var apiService: ApiService? = null
+    @SuppressLint("UseSparseArrays")
     private val sensors = HashMap<Int, SensorMeasurements>()
     private var activeMarker: Marker? = null
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
