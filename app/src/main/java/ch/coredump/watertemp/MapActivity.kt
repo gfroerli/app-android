@@ -216,7 +216,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 captionBuilder.append(pt.format(measurement.createdAt))
                 captionBuilder.append(")")
             } else {
-                captionBuilder.append("No current measurement")
+                captionBuilder.append(getString(R.string.no_measurement))
             }
 
             // Add the marker to the map
