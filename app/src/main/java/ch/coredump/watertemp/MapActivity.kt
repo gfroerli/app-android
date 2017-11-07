@@ -205,7 +205,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         for (sensorMeasurement in sensors.values) {
             val sensor = sensorMeasurement.sensor
             val measurements = sensorMeasurement.measurements
-            Log.i(TAG, "Add sensor" + sensor.caption)
+            Log.i(TAG, "Add sensor " + sensor.deviceName)
 
             // Sort measurements by ID
             Collections.sort(measurements) { lhs, rhs ->
@@ -272,6 +272,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             // Update peek pane
             details_title.text = sensor.deviceName
             details_measurement.text = captionBuilder.toString()
+            if (sensor.caption.isNullOrBlank()) {
+                details_caption.visibility = View.GONE
+            } else {
+                details_caption.text = sensor.caption
+                details_caption.visibility = View.VISIBLE
+            }
 
             // Update detail pane
             details_sensor_caption.text = "TODO: Sensor details"
