@@ -211,7 +211,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (measurements.size > 0) {
                 val measurement = measurements[measurements.size - 1]
                 val pt = PrettyTime()
-                captionBuilder.append(measurement.temperature)
+                captionBuilder.append(String.format("%.2f", measurement.temperature))
                 captionBuilder.append("°C (")
                 captionBuilder.append(pt.format(measurement.createdAt))
                 captionBuilder.append(")")
