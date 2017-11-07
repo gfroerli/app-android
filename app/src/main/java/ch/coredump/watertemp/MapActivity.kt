@@ -1,16 +1,12 @@
 package ch.coredump.watertemp
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.ContextCompat
-import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import android.widget.RelativeLayout
-import android.widget.TextView
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -23,19 +19,22 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import kotlinx.android.synthetic.main.activity_map.*
+import kotlinx.android.synthetic.main.bottom_sheet_details.*
+import kotlinx.android.synthetic.main.bottom_sheet_peek.*
 import org.ocpsoft.prettytime.PrettyTime
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
+const val TAG = "MapActivity"
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var map: MapboxMap? = null
-    private var mapView: MapView? = null
     private var apiService: ApiService? = null
     @SuppressLint("UseSparseArrays")
     private val sensors = HashMap<Int, SensorMeasurements>()
@@ -52,11 +51,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map)
 
         // Create map view
-        mapView = findViewById<View>(R.id.map_view) as MapView
-        mapView!!.onCreate(savedInstanceState)
+        map_view.onCreate(savedInstanceState)
 
         // Initialize map
-        mapView!!.getMapAsync(this)
+        map_view.getMapAsync(this)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -64,12 +62,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         apiService = apiClient.apiService
 
         // Initialize bottom sheet behavior
-        val bottomSheetView = findViewById<View>(R.id.details_bottom_sheet) as NestedScrollView
-        this.bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
+        this.bottomSheetBehavior = BottomSheetBehavior.from(details_bottom_sheet)
 
         // Set peek height as necessary
-        val bottomSheetPeek = findViewById<View>(R.id.bottom_sheet_peek) as RelativeLayout
-        this.bottomSheetBehavior!!.peekHeight = bottomSheetPeek.height
+        this.bottomSheetBehavior!!.peekHeight = bottom_sheet_peek.height
 
         // Add bottom sheet listener
         this.bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -240,14 +236,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             this@MapActivity.activeMarker = marker
 
             // Update peek pane
-            val title = findViewById<View>(R.id.details_title) as TextView
-            val measurement = findViewById<View>(R.id.details_measurement) as TextView
-            title.text = marker.title
-            measurement.text = marker.snippet
+            details_title.text = marker.title
+            details_measurement.text = marker.snippet
 
             // Update detail pane
-            val sensorCaption = findViewById<View>(R.id.details_sensor_caption) as TextView
-            sensorCaption.text = "TODO: Sensor details"
+            details_sensor_caption.text = "TODO: Sensor details"
 
             // Show the details pane
             if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -292,38 +285,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     public override fun onResume() {
         super.onResume()
-        mapView!!.onResume()
+        map_view!!.onResume()
     }
 
     public override fun onPause() {
         super.onPause()
-        mapView!!.onPause()
+        map_view!!.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView!!.onLowMemory()
+        map_view!!.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView!!.onDestroy()
+        map_view!!.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState!!)
+        map_view!!.onSaveInstanceState(outState!!)
     }
 
-    /**
-     * Rotation or screen size changed.
-     */
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-    }
-
-    companion object {
-
-        private val TAG = "MapActivity"
-    }
 }
