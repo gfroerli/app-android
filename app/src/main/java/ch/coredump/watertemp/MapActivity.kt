@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.util.LongSparseArray
 import android.view.View
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
@@ -33,11 +34,23 @@ const val TAG = "MapActivity"
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    // The map instance
     private var map: MapboxMap? = null
+
+    // Access the water-sensor service
     private var apiService: ApiService? = null
+
+    // Mapping from sensor IDs to `SensorMeasurements` instances
     @SuppressLint("UseSparseArrays")
     private val sensors = HashMap<Int, SensorMeasurements>()
+
+    // Mapping from map marker IDs to sensor IDs
+    private val sensorMarkers = LongSparseArray<Int>()
+
+    // The currently active marker
     private var activeMarker: Marker? = null
+
+    // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -206,27 +219,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val lng = sensor.longitude
             val location = LatLng(lat, lng)
 
-            // Build caption
-            val captionBuilder = StringBuilder()
-            if (measurements.size > 0) {
-                val measurement = measurements[measurements.size - 1]
-                val pt = PrettyTime()
-                captionBuilder.append(String.format("%.2f", measurement.temperature))
-                captionBuilder.append("°C (")
-                captionBuilder.append(pt.format(measurement.createdAt))
-                captionBuilder.append(")")
-            } else {
-                captionBuilder.append(getString(R.string.no_measurement))
-            }
-
             // Add the marker to the map
-            map!!.addMarker(
+            val marker = map!!.addMarker(
                     MarkerOptions()
                             .position(LatLng(lat, lng))
                             .title(sensor.deviceName)
-                            .snippet(captionBuilder.toString())
                             .icon(defaultIcon)
             )
+
+            // Create a mapping from the marker id to the sensor id
+            sensorMarkers.put(marker.id, sensor.id)
 
             // Store location
             locations.add(location)
@@ -243,9 +245,33 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             marker.icon = activeIcon
             this@MapActivity.activeMarker = marker
 
+            // Fetch sensor for that marker
+            val sensorId: Int? = sensorMarkers[marker.id]
+            val sensorMeasurements = sensors[sensorId!!]
+            if (sensorMeasurements == null) {
+                Log.e(TAG, "Sensor with id $sensorId not found")
+                Utils.showError(this@MapActivity, "Sensor not found")
+                return@setOnMarkerClickListener true
+            }
+            val sensor = sensorMeasurements.sensor
+            val measurements = sensorMeasurements.measurements
+
+            // Get last temperature measurement
+            val captionBuilder = StringBuilder()
+            if (measurements.size > 0) {
+                val measurement = measurements[measurements.size - 1]
+                val pt = PrettyTime()
+                captionBuilder.append(String.format("%.2f", measurement.temperature))
+                captionBuilder.append("°C (")
+                captionBuilder.append(pt.format(measurement.createdAt))
+                captionBuilder.append(")")
+            } else {
+                captionBuilder.append(getString(R.string.no_measurement))
+            }
+
             // Update peek pane
-            details_title.text = marker.title
-            details_measurement.text = marker.snippet
+            details_title.text = sensor.deviceName
+            details_measurement.text = captionBuilder.toString()
 
             // Update detail pane
             details_sensor_caption.text = "TODO: Sensor details"
