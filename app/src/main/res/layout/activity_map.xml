@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_bottom_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -14,15 +13,15 @@
         android:id="@+id/map_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        mapbox:attribution_margin_bottom="3dp"
-        mapbox:attribution_margin_left="3dp"
-        mapbox:center_latitude="47.209587"
-        mapbox:center_longitude="8.823612"
-        mapbox:logo_enabled="false"
-        mapbox:my_location_enabled="false"
-        mapbox:style_url="@string/mapbox_style"
-        mapbox:tilt="0"
-        mapbox:zoom="12" />
+        mapbox:mapbox_styleUrl="@string/mapbox_style_outdoors"
+        mapbox:mapbox_cameraTargetLat="47.209587"
+        mapbox:mapbox_cameraTargetLng="8.823612"
+        mapbox:mapbox_cameraZoom="12"
+        mapbox:mapbox_cameraTilt="0"
+        mapbox:mapbox_myLocation="false"
+        mapbox:mapbox_uiAttributionMarginBottom="3dp"
+        mapbox:mapbox_uiAttributionMarginLeft="3dp"
+        mapbox:mapbox_uiLogo="false"/>
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/details_bottom_sheet"

@@ -44,7 +44,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
 
     // Mapbox SDK
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.0-beta.5@aar'){
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-beta.3@aar'){
         transitive=true
     }
 
@@ -81,18 +81,18 @@ dependencyVerification {
         'com.android.support:support-annotations:99d6199ad5a09a0e5e8a49a4cc08f818483ddcfd7eedea2f9923412daf982309',
 
         // Mapbox
-        'com.mapbox.mapboxsdk:mapbox-android-sdk:73613054368fe83339b81e8b9b6cbf79f48248aba6c17b60f716742b09fa17d0',
-        'com.mapbox.mapboxsdk:mapbox-java-services:48488716151c51f6606da48d30812ba6eb3d1b82d721d1c089ff648d22d95429',
+        'com.mapbox.mapboxsdk:mapbox-android-sdk:d18f874d135402266cffcd6697f16b78e122bb2b373fb04db534c3bc1bf1c374',
+        'com.mapbox.mapboxsdk:mapbox-android-telemetry:bb912ad3d55af402b0cac5e7874c07296bea860675843998a3902400f20435d8',
+        'com.mapbox.mapboxsdk:mapbox-java-geojson:fe643e894295dcf62bd952ad6e58aa5d28c2db40091544922125d7336e9d5f35',
+        'com.mapbox.mapboxsdk:mapbox-java-core:99cc79e1f681658cdf907541e034884b62dbad042b45d619a8b5360ca956b573',
         'com.mapzen.android:lost:6e2a7bfb1627587cf17e7788fc16eb2a293f1fb03c1cd9715da4cf5c9d33fefe',
 
         // API stuff
         'com.squareup.retrofit2:retrofit:c0295f38b3c1a48bb71a8ed2ea69ddeb2e49a830b11862385a403355c6a94643',
         'com.squareup.retrofit2:converter-gson:848f8036837d8650c05d2c100b87a008c53987dcfcf1217467b83f4e8504a708',
-        'com.squareup.okhttp3:okhttp:19e1db51787716ff0046fa19e408fb34ed32a6274baa0c07475bf724b4eb6800',
-        'com.squareup.okhttp3:logging-interceptor:f1c50344a874d5c532b41d09a025acee1e6743b55e007f832d619bc2f552fc3d',
+        'com.squareup.okhttp3:okhttp:7265adbd6f028aade307f58569d814835cd02bc9beffb70c25f72c9de50d61c4',
         'com.squareup.okio:okio:734269c3ebc5090e3b23566db558f421f0b4027277c79ad5d176b8ec168bb850',
-        'com.google.code.gson:gson:2d43eb5ea9e133d2ee2405cc14f5ee08951b8361302fdd93494a3a997b508d32',
-        'com.google.guava:guava:d664fbfc03d2e5ce9cab2a44fb01f1d0bf9dfebeccc1a473b1f9ea31f79f6f99',
+        'com.google.code.gson:gson:c6221763bd79c4f1c3dc7f750b5f29a0bb38b367b81314c4f71896e340c40825',
 
         // Other
         'org.ocpsoft.prettytime:prettytime:ef7098d973ae78b57d1a22dc37d3b8a771bf030301300e24055d676b6cdc5e75',

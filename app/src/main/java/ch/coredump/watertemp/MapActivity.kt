@@ -12,7 +12,7 @@ import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
-import com.mapbox.mapboxsdk.MapboxAccountManager
+import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -44,8 +44,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Start mapbox account manager
-        MapboxAccountManager.start(this.applicationContext, getString(R.string.mapbox_access_token))
+        // Initialize mapbox
+        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
 
         // Initialize the layout
         setContentView(R.layout.activity_map)
@@ -79,6 +79,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Called repeatedly while bottom sheet slides up
             }
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        map_view.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        map_view.onStop()
     }
 
     /**
@@ -172,12 +182,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize icons
         val context = applicationContext
         val iconFactory = IconFactory.getInstance(context)
-        // TODO: Proper tinting of blue marker like primary dark color
-        val defaultIconDrawable = ContextCompat.getDrawable(context, R.drawable.blue_marker)
-        // Default marker uses our accent color
-        val activeIconDrawable = ContextCompat.getDrawable(context, R.drawable.default_marker)
-        val defaultIcon = iconFactory.fromDrawable(defaultIconDrawable)
-        val activeIcon = iconFactory.fromDrawable(activeIconDrawable)
+        val defaultIcon = iconFactory.fromResource(R.drawable.blue_marker)
+        val activeIcon = iconFactory.fromResource(R.drawable.mapbox_marker_icon_default)
 
         // Process sensors
         val locations = ArrayList<LatLng>()
@@ -271,7 +277,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Change zoom to include all markers
         if (locations.size == 1) {
             val location = locations[0]
-            map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13f))
+            map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13.0))
         } else if (sensors.size > 1) {
             val boundingBoxBuilder = LatLngBounds.Builder()
             for (location in locations) {
