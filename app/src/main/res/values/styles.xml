@@ -20,7 +20,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:windowNoTitle">true</item> <!-- Hides the Action Bar -->
+        <item name="android:windowNoTitle">true</item> <!-- Hide the default action bar (we have our own) -->
         <item name="android:windowFullscreen">false</item> <!-- Don't hide the status bar -->
     </style>
 
