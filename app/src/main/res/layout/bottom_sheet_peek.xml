@@ -18,14 +18,13 @@
         style="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="48dp"/>
+        android:layout_marginBottom="8dp"/>
 
     <!-- Temperature -->
     <ImageView
         android:id="@+id/details_temperature_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_below="@id/details_title"
         android:contentDescription="@string/thermometer_icon_description"
         android:src="@drawable/temperature"/>
@@ -37,6 +36,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/details_title"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         android:layout_toEndOf="@id/details_temperature_icon"/>
 </RelativeLayout>
