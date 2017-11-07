@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
 import ch.coredump.watertemp.rest.ApiClient
@@ -163,7 +162,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (response != null) {
                     for (measurement in response.body()!!) {
                         Log.i(TAG, "Measurement: " + measurement.temperature)
-                        if (sensors.containsKey(measurement.sensorId)) {
+                        if (!sensors.containsKey(measurement.sensorId)) {
                             Log.e(TAG, "Sensor with id " + measurement.sensorId + " not found")
                             continue
                         }
