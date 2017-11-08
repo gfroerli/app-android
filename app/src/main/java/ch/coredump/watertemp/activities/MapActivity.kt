@@ -132,13 +132,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         settings.isTiltGesturesEnabled = false
         settings.isCompassEnabled = false
 
+        this.fetchData()
+    }
+
+    /**
+     * Request sensors and sponsors.
+     */
+    private fun fetchData() {
+        Log.d(TAG, "Fetching data from API")
+
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
-        sensorCall.enqueue(onSensorsFetched())
+        sensorCall.enqueue(this.onSensorsFetched())
 
         // Fetch sponsors
         val sponsorCall = apiService!!.listSponsors()
-        sponsorCall.enqueue(onSponsorsFetched())
+        sponsorCall.enqueue(this.onSponsorsFetched())
     }
 
     private fun onSensorsFetched(): Callback<List<Sensor>> {
@@ -434,9 +443,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_about -> {
-                Log.d(TAG, "About")
+                Log.d(TAG, "Menu: About")
                 val intent = Intent(this, AboutActivity::class.java)
                 startActivity(intent)
+            }
+            R.id.action_refresh -> {
+                Log.d(TAG, "Menu: Refresh")
+                fetchData()
             }
             else -> Log.w(TAG, "Selected unknown menu entry: " + item)
         }
