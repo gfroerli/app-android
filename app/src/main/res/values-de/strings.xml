@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">Zürichsee Temperatur</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
-    <string name="section_header_details">Details</string>
     <string name="no_measurement">Keine aktuelle Messung</string>
+    <string name="section_header_details">Details</string>
+    <string name="section_header_sponsor">Sponsor: %1$s</string>
+    <string name="sponsor_description">Dieser Sensor wurde von "%1$s" gesponsert.</string>
 </resources>

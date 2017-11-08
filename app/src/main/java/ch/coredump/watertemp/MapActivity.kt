@@ -279,8 +279,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 details_caption.visibility = View.VISIBLE
             }
 
-            // Update detail pane
+            // Update details section
             details_sensor_caption.text = "TODO: Sensor details"
+
+            // Update sponsor section
+            details_sponsor_section_header.text = getString(R.string.section_header_sponsor, "TODO")
+            val sponsorDescriptionBuilder = StringBuilder()
+            sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, "TODO"))
+            sponsorDescriptionBuilder.append("\n")
+            sponsorDescriptionBuilder.append("Sponsor description")
+            details_sponsor_description.text = sponsorDescriptionBuilder.toString()
 
             // Show the details pane
             if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
