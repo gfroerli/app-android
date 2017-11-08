@@ -1,13 +1,18 @@
-package ch.coredump.watertemp
+package ch.coredump.watertemp.activities
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.util.LongSparseArray
 import android.util.SparseArray
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import ch.coredump.watertemp.R
+import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -32,9 +37,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
-const val TAG = "MapActivity"
-
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    val TAG = "MapActivity"
 
     // The map instance
     private var map: MapboxMap? = null
@@ -417,6 +422,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         map_view!!.onSaveInstanceState(outState!!)
+    }
+
+    // Menu
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_about -> {
+                Log.d(TAG, "About")
+                val intent = Intent(this, AboutActivity::class.java)
+                startActivity(intent)
+            }
+            else -> Log.w(TAG, "Selected unknown menu entry: " + item)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }

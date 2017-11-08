@@ -7,4 +7,9 @@
     <string name="section_header_details">Details</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
+    <string name="about_project_heading">The Project</string>
+    <string name="about_project_text1">This app, the server infrastructure as well as the water temperature sensor hardware are developed by the Coredump hackerspace in Rapperswil.</string>
+    <string name="action_about">About</string>
+    <string name="action_refresh">Reload data</string>
+    <string name="activity_about">About</string>
 </resources>
