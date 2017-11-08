@@ -28,20 +28,27 @@
         app:firstLineLeading="@dimen/headlineLeading"
         app:lastLineDescent="@dimen/headlineLeading"/>
 
-    <com.actinarium.aligned.TextView
-        android:id="@+id/details_sponsor_section_header"
+    <LinearLayout
+        android:id="@+id/details_section_sponsor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppCompat.Headline"
-        android:text="@string/section_header_sponsor"/>
+        android:orientation="vertical">
 
-    <com.actinarium.aligned.TextView
-        android:id="@+id/details_sponsor_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/TextAppearance.AppCompat.Body1"
-        app:leading="@dimen/body1Leading"
-        app:firstLineLeading="@dimen/headlineLeading"
-        app:lastLineDescent="@dimen/headlineLeading"/>
+        <com.actinarium.aligned.TextView
+            android:id="@+id/details_sponsor_section_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:text="@string/section_header_sponsor"/>
+
+        <com.actinarium.aligned.TextView
+            android:id="@+id/details_sponsor_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Body1"
+            app:leading="@dimen/body1Leading"
+            app:firstLineLeading="@dimen/headlineLeading"
+            app:lastLineDescent="@dimen/headlineLeading"/>
+    </LinearLayout>
 
 </LinearLayout>

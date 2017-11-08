@@ -6,7 +6,8 @@ package ch.coredump.watertemp.rest.models
 data class Sensor(
     val id: Int,
     val deviceName: String,
-    val caption: String,
-    val latitude: Double,
-    val longitude: Double
+    val caption: String?,
+    val sponsorId: Int?,
+    val latitude: Double?,
+    val longitude: Double?
 )

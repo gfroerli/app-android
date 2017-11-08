@@ -6,12 +6,14 @@ import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.util.LongSparseArray
+import android.util.SparseArray
 import android.view.View
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
+import ch.coredump.watertemp.rest.models.Sponsor
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
@@ -43,6 +45,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Mapping from sensor IDs to `SensorMeasurements` instances
     @SuppressLint("UseSparseArrays")
     private val sensors = HashMap<Int, SensorMeasurements>()
+
+    // Mapping from sponsor IDs to `Sponsor` instances
+    private val sponsors = SparseArray<Sponsor>()
 
     // Mapping from map marker IDs to sensor IDs
     private val sensorMarkers = LongSparseArray<Int>()
@@ -125,43 +130,89 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
         sensorCall.enqueue(onSensorsFetched())
+
+        // Fetch sponsors
+        val sponsorCall = apiService!!.listSponsors()
+        sponsorCall.enqueue(onSponsorsFetched())
     }
 
     private fun onSensorsFetched(): Callback<List<Sensor>> {
         return object : Callback<List<Sensor>> {
             override fun onResponse(call: Call<List<Sensor>>, response: Response<List<Sensor>>?) {
+                // Handle null response
                 if (response == null) {
                     Log.e(TAG, "Received null response from sensors endpoint")
                     return
                 }
-                Log.i(TAG, "Sensor response done!")
-                if (response.isSuccessful) {
-                    // Clear old sensor list
-                    sensors.clear()
 
-                    // Prepare list for sensor IDs
-                    val idList = ArrayList<String>()
-
-                    // Extract sensor information
-                    for (sensor in response.body()!!) {
-                        sensors.put(sensor.id, SensorMeasurements(sensor))
-                        idList.add(sensor.id.toString())
-                    }
-
-                    // Fetch measurements
-                    val ids = Utils.join(",", idList)
-                    val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
-                    measurementCall.enqueue(onMeasurementsFetched())
-                } else {
+                // Handle unsuccessful response
+                if (!response.isSuccessful) {
                     val error = ApiClient.parseError(response)
                     Log.e(TAG, error.toString())
                     Utils.showError(this@MapActivity, "Could not fetch sensors.\n" +
                             error.statusCode + ": " + error.message)
                 }
+
+                // Success!
+                Log.d(TAG, "Sensors response successful")
+
+                // Clear old sensor list
+                sensors.clear()
+
+                // Prepare list for sensor IDs
+                val idList = ArrayList<String>()
+
+                // Extract sensor information
+                for (sensor in response.body()!!) {
+                    sensors.put(sensor.id, SensorMeasurements(sensor))
+                    idList.add(sensor.id.toString())
+                }
+
+                // Fetch measurements
+                val ids = Utils.join(",", idList)
+                val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
+                measurementCall.enqueue(onMeasurementsFetched())
             }
 
             override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
                 val errmsg = "Fetching sensors failed: " + t.toString()
+                Log.e(TAG, errmsg)
+                Utils.showError(this@MapActivity, errmsg)
+            }
+        }
+    }
+
+    private fun onSponsorsFetched(): Callback<List<Sponsor>> {
+        return object : Callback<List<Sponsor>> {
+            override fun onResponse(call: Call<List<Sponsor>>, response: Response<List<Sponsor>>?) {
+                // Handle null response
+                if (response == null) {
+                    Log.e(TAG, "Received null response from sponsors endpoint")
+                    return
+                }
+
+                // Handle unsuccessful response
+                if (!response.isSuccessful) {
+                    Log.e(TAG, "Sponsors response not successful")
+                    val error = ApiClient.parseError(response)
+                    Log.e(TAG, error.toString())
+                    Utils.showError(this@MapActivity, "Could not fetch sensors.\n" +
+                            error.statusCode + ": " + error.message)
+                    return
+                }
+
+                // Success!
+                Log.d(TAG, "Sponsors response successful")
+
+                // Store sponsors
+                sponsors.clear()
+                for (sponsor in response.body()!!) {
+                    sponsors.put(sponsor.id, sponsor)
+                }
+            }
+
+            override fun onFailure(call: Call<List<Sponsor>>, t: Throwable) {
+                val errmsg = "Fetching sponsors failed: " + t.toString()
                 Log.e(TAG, errmsg)
                 Utils.showError(this@MapActivity, errmsg)
             }
@@ -217,6 +268,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             // Create location object
             val lat = sensor.latitude
             val lng = sensor.longitude
+            if (lat == null || lng == null) {
+                Log.w(TAG, "Skipping sensor without location: " + sensor.deviceName)
+                continue
+            }
             val location = LatLng(lat, lng)
 
             // Add the marker to the map
@@ -256,6 +311,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val sensor = sensorMeasurements.sensor
             val measurements = sensorMeasurements.measurements
 
+            // Lookup sponsor for that sensor
+            val sponsor: Sponsor? = sensor.sponsorId?.let { sponsors.get(it) }
+
             // Get last temperature measurement
             val captionBuilder = StringBuilder()
             if (measurements.size > 0) {
@@ -283,12 +341,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             details_sensor_caption.text = "TODO: Sensor details"
 
             // Update sponsor section
-            details_sponsor_section_header.text = getString(R.string.section_header_sponsor, "TODO")
-            val sponsorDescriptionBuilder = StringBuilder()
-            sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, "TODO"))
-            sponsorDescriptionBuilder.append("\n")
-            sponsorDescriptionBuilder.append("Sponsor description")
-            details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+            if (sponsor == null) {
+                details_section_sponsor.visibility = View.GONE
+            } else {
+                details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
+                val sponsorDescriptionBuilder = StringBuilder()
+                sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
+                sponsorDescriptionBuilder.append("\n")
+                sponsorDescriptionBuilder.append(sponsor.description)
+                details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+                details_section_sponsor.visibility = View.VISIBLE
+            }
 
             // Show the details pane
             if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {

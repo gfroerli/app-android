@@ -6,5 +6,5 @@
     <string name="no_measurement">No current measurement</string>
     <string name="section_header_details">Details</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">This sensor was sponsored by "%1$s".</string>
+    <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
 </resources>
