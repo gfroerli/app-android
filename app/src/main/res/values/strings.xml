@@ -7,8 +7,17 @@
     <string name="section_header_details">Details</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
-    <string name="about_project_heading">The Project</string>
-    <string name="about_project_text1">This app, the server infrastructure as well as the water temperature sensor hardware are developed by the Coredump hackerspace in Rapperswil.</string>
+
+    <!-- About activity -->
+    <string name="about_project_heading">Why this app?</string>
+    <string name="about_project_text1">The water temperature is a value relevant to a lot of people: Swimmers, divers, fishermen, and many others. But until now, there were no reliable ways to get real time information about the water temperature in the area you\'re interested in.</string>
+    <string name="about_project_text2">Today there are already some water temperature sensor networks, but usually there is only one sensor per lake (ignoring temperature differences for example near the mouth of a cold river) and it is often published only once per day.</string>
+    <string name="about_project_text3">We are building a network of low-cost low-energy water temperature sensors. This allows us to measure the water temperature locally and to show it to you in real time, for free.</string>
+    <string name="about_us_heading">Who made this app?</string>
+    <string name="about_us_text1">This app, the server infrastructure as well as the water temperature sensor hardware is developed by the Coredump hackerspace in Rapperswil.</string>
+    <string name="about_us_text2">Find more information about us on our website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+
+    <!-- Action bar menu -->
     <string name="action_about">About</string>
     <string name="action_refresh">Reload data</string>
     <string name="activity_about">About</string>

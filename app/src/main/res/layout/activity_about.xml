@@ -28,8 +28,8 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+
             <com.actinarium.aligned.TextView
-                android:id="@+id/details_sponsor_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/TextAppearance.AppCompat.Headline"
@@ -42,6 +42,47 @@
                 app:leading="@dimen/body1Leading"
                 app:firstLineLeading="@dimen/body1Leading"
                 android:text="@string/about_project_text1"/>
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:leading="@dimen/body1Leading"
+                app:firstLineLeading="@dimen/body1Leading"
+                android:text="@string/about_project_text2"/>
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:leading="@dimen/body1Leading"
+                app:firstLineLeading="@dimen/body1Leading"
+                android:text="@string/about_project_text3"/>
+
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Headline"
+                app:firstLineLeading="@dimen/headlineLeading"
+                android:text="@string/about_us_heading"/>
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:leading="@dimen/body1Leading"
+                app:firstLineLeading="@dimen/body1Leading"
+                android:text="@string/about_us_text1"/>
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:leading="@dimen/body1Leading"
+                app:firstLineLeading="@dimen/body1Leading"
+                android:autoLink="web"
+                android:text="@string/about_us_text2"/>
 
         </LinearLayout>
 
