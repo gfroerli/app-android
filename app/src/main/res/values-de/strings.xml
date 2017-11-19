@@ -6,4 +6,14 @@
     <string name="section_header_details">Details</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">Dieser Sensor wurde von \"%1$s\" gesponsert.</string>
+    <string name="about_project_heading">Warum diese App?</string>
+    <string name="about_project_text1">Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es keine verlässliche Methode, um Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten.</string>
+    <string name="about_project_text2">Es gibt heute bereits ein paar Wassertemperatur-Sensor-Netzwerke, aber meistens gibt es nur einen Sensor pro See, wodurch lokale Temperaturunterschiede (z.B. an einer Flussmündung) ignoriert werden. Viele Sensoren werden zudem nur ein mal pro Tag publiziert.</string>
+    <string name="about_project_text3">"Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf. Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen.</string>
+    <string name="about_us_heading">Wer hat diese App entwickelt?</string>
+    <string name="about_us_text1">Diese App, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt.</string>
+    <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+    <string name="action_about">Über</string>
+    <string name="action_refresh">Daten aktualisieren</string>
+    <string name="activity_about">Über</string>
 </resources>
