@@ -258,6 +258,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Show the bottom sheet if it isn't already visible.
+     */
+    private fun showBottomSheet() {
+        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
+    /**
+     * Hide the bottom sheet if it's visible.
+     */
+    private fun hideBottomSheet() {
+        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
     private fun updateMarkers() {
         // Initialize icons
         val context = applicationContext
@@ -368,9 +386,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             // Show the details pane
-            if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-            }
+            this.showBottomSheet()
 
             true
         }
@@ -388,9 +404,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             this@MapActivity.activeMarker = null
 
             // Hide the details pane
-            if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
+            this.hideBottomSheet()
         })
 
         // Change zoom to include all markers
@@ -456,4 +470,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         return super.onOptionsItemSelected(item)
     }
 
+    // Key events
+
+    override fun onBackPressed() {
+        // If the bottom sheet is visible, close it on back button press.
+        // Otherwise, fall back to default behavior.
+        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
