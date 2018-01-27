@@ -20,6 +20,7 @@ import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
 import ch.coredump.watertemp.rest.models.Sponsor
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -323,72 +324,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add marker click listener
         map!!.setOnMarkerClickListener { marker ->
-            Log.d(TAG, "Marker ID: " + marker.id)
-
-            // Update active marker icon
-            if (this@MapActivity.activeMarker != null) {
-                this@MapActivity.activeMarker!!.icon = defaultIcon
-            }
-            marker.icon = activeIcon
-            this@MapActivity.activeMarker = marker
-
-            // Fetch sensor for that marker
-            val sensorId: Int? = sensorMarkers[marker.id]
-            val sensorMeasurements = sensors[sensorId!!]
-            if (sensorMeasurements == null) {
-                Log.e(TAG, "Sensor with id $sensorId not found")
-                Utils.showError(this@MapActivity, "Sensor not found")
-                return@setOnMarkerClickListener true
-            }
-            val sensor = sensorMeasurements.sensor
-            val measurements = sensorMeasurements.measurements
-
-            // Lookup sponsor for that sensor
-            val sponsor: Sponsor? = sensor.sponsorId?.let { sponsors.get(it) }
-
-            // Get last temperature measurement
-            val captionBuilder = StringBuilder()
-            if (measurements.size > 0) {
-                val measurement = measurements[measurements.size - 1]
-                val pt = PrettyTime()
-                captionBuilder.append(String.format("%.2f", measurement.temperature))
-                captionBuilder.append("°C (")
-                captionBuilder.append(pt.format(measurement.createdAt))
-                captionBuilder.append(")")
-            } else {
-                captionBuilder.append(getString(R.string.no_measurement))
-            }
-
-            // Update peek pane
-            details_title.text = sensor.deviceName
-            details_measurement.text = captionBuilder.toString()
-            if (sensor.caption.isNullOrBlank()) {
-                details_caption.visibility = View.GONE
-            } else {
-                details_caption.text = sensor.caption
-                details_caption.visibility = View.VISIBLE
-            }
-
-            // Update details section
-            details_sensor_caption.text = "TODO: Sensor details"
-
-            // Update sponsor section
-            if (sponsor == null) {
-                details_section_sponsor.visibility = View.GONE
-            } else {
-                details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
-                val sponsorDescriptionBuilder = StringBuilder()
-                sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
-                sponsorDescriptionBuilder.append("\n")
-                sponsorDescriptionBuilder.append(sponsor.description)
-                details_sponsor_description.text = sponsorDescriptionBuilder.toString()
-                details_section_sponsor.visibility = View.VISIBLE
-            }
-
-            // Show the details pane
-            this.showBottomSheet()
-
-            true
+            this@MapActivity.onMarkerSelected(marker, defaultIcon, activeIcon)
         }
 
         // Add map click listener
@@ -418,6 +354,75 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100))
         }
+    }
+
+    private fun onMarkerSelected(marker: Marker, defaultIcon: Icon, activeIcon: Icon): Boolean {
+        Log.d(TAG, "Marker ID: " + marker.id)
+
+        // Update active marker icon
+        if (this@MapActivity.activeMarker != null) {
+            this@MapActivity.activeMarker!!.icon = defaultIcon
+        }
+        marker.icon = activeIcon
+        this@MapActivity.activeMarker = marker
+
+        // Fetch sensor for that marker
+        val sensorId: Int? = sensorMarkers[marker.id]
+        val sensorMeasurements = sensors[sensorId!!]
+        if (sensorMeasurements == null) {
+            Log.e(TAG, "Sensor with id $sensorId not found")
+            Utils.showError(this@MapActivity, "Sensor not found")
+            return true
+        }
+        val sensor = sensorMeasurements.sensor
+        val measurements = sensorMeasurements.measurements
+
+        // Lookup sponsor for that sensor
+        val sponsor: Sponsor? = sensor.sponsorId?.let { sponsors.get(it) }
+
+        // Get last temperature measurement
+        val captionBuilder = StringBuilder()
+        if (measurements.size > 0) {
+            val measurement = measurements[measurements.size - 1]
+            val pt = PrettyTime()
+            captionBuilder.append(String.format("%.2f", measurement.temperature))
+            captionBuilder.append("°C (")
+            captionBuilder.append(pt.format(measurement.createdAt))
+            captionBuilder.append(")")
+        } else {
+            captionBuilder.append(getString(R.string.no_measurement))
+        }
+
+        // Update peek pane
+        details_title.text = sensor.deviceName
+        details_measurement.text = captionBuilder.toString()
+        if (sensor.caption.isNullOrBlank()) {
+            details_caption.visibility = View.GONE
+        } else {
+            details_caption.text = sensor.caption
+            details_caption.visibility = View.VISIBLE
+        }
+
+        // Update details section
+        details_sensor_caption.text = "TODO: Sensor details"
+
+        // Update sponsor section
+        if (sponsor == null) {
+            details_section_sponsor.visibility = View.GONE
+        } else {
+            details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
+            val sponsorDescriptionBuilder = StringBuilder()
+            sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
+            sponsorDescriptionBuilder.append("\n")
+            sponsorDescriptionBuilder.append(sponsor.description)
+            details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+            details_section_sponsor.visibility = View.VISIBLE
+        }
+
+        // Show the details pane
+        this.showBottomSheet()
+
+        return true
     }
 
     // Lifecycle methods
