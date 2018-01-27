@@ -33,6 +33,8 @@ import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.bottom_sheet_details.*
 import kotlinx.android.synthetic.main.bottom_sheet_peek.*
 import org.ocpsoft.prettytime.PrettyTime
+import org.threeten.bp.Instant
+import org.threeten.bp.temporal.ChronoUnit
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -183,11 +185,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     idList.add(sensor.id.toString())
                 }
 
+                updateMarkers()
+
                 // Fetch measurements
                 // TODO: Fetch aggregations instead
-                val ids = Utils.join(",", idList)
-                val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
-                measurementCall.enqueue(onMeasurementsFetched())
+//                val ids = Utils.join(",", idList)
+//                val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
+//                measurementCall.enqueue(onMeasurementsFetched())
             }
 
             override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
@@ -380,6 +384,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         val sensor = sensorMeasurements.sensor
         val measurements = sensorMeasurements.measurements
+
+        // Fetch sensor measurements from last three days
+        val since = Instant.now().minus(3, ChronoUnit.DAYS)
+        val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
+        measurementCall.enqueue(onMeasurementsFetched())
 
         // Lookup sponsor for that sensor
         val sponsor: Sponsor? = sensor.sponsorId?.let { sponsors.get(it) }
