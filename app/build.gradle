@@ -53,6 +53,9 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
+    // Java 8 date/time API backport
+    compile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+
     // Relative time calculation
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
 
@@ -98,5 +101,6 @@ dependencyVerification {
 
         // Other
         'org.ocpsoft.prettytime:prettytime:ef7098d973ae78b57d1a22dc37d3b8a771bf030301300e24055d676b6cdc5e75',
+        'com.jakewharton.timber:timber:d553d3d3e883ce7d061f1b21b95d6ee0840f3bfbf6d3bd51c5671f0b0f0b0091',
     ]
 }
