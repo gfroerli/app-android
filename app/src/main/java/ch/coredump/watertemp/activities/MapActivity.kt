@@ -184,6 +184,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 // Fetch measurements
+                // TODO: Fetch aggregations instead
                 val ids = Utils.join(",", idList)
                 val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
                 measurementCall.enqueue(onMeasurementsFetched())
@@ -356,22 +357,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Called when a marker is selected.
+     */
     private fun onMarkerSelected(marker: Marker, defaultIcon: Icon, activeIcon: Icon): Boolean {
-        Log.d(TAG, "Marker ID: " + marker.id)
+        Log.d(TAG, "Selected marker ID: " + marker.id)
 
         // Update active marker icon
-        if (this@MapActivity.activeMarker != null) {
-            this@MapActivity.activeMarker!!.icon = defaultIcon
+        if (this.activeMarker != null) {
+            this.activeMarker!!.icon = defaultIcon
         }
         marker.icon = activeIcon
-        this@MapActivity.activeMarker = marker
+        this.activeMarker = marker
 
         // Fetch sensor for that marker
         val sensorId: Int? = sensorMarkers[marker.id]
         val sensorMeasurements = sensors[sensorId!!]
         if (sensorMeasurements == null) {
             Log.e(TAG, "Sensor with id $sensorId not found")
-            Utils.showError(this@MapActivity, "Sensor not found")
+            Utils.showError(this, "Sensor not found")
             return true
         }
         val sensor = sensorMeasurements.sensor
@@ -382,12 +386,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Get last temperature measurement
         val captionBuilder = StringBuilder()
-        if (measurements.size > 0) {
-            val measurement = measurements[measurements.size - 1]
+        if (sensor.lastMeasurement != null) {
             val pt = PrettyTime()
-            captionBuilder.append(String.format("%.2f", measurement.temperature))
+            captionBuilder.append(String.format("%.2f", sensor.lastMeasurement.temperature))
             captionBuilder.append("°C (")
-            captionBuilder.append(pt.format(measurement.createdAt))
+            captionBuilder.append(pt.format(sensor.lastMeasurement.createdAt))
             captionBuilder.append(")")
         } else {
             captionBuilder.append(getString(R.string.no_measurement))

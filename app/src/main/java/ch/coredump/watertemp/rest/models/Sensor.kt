@@ -9,5 +9,6 @@ data class Sensor(
     val caption: String?,
     val sponsorId: Int?,
     val latitude: Double?,
-    val longitude: Double?
+    val longitude: Double?,
+    val lastMeasurement: Measurement?
 )
