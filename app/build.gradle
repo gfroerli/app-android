@@ -51,6 +51,7 @@ dependencies {
     // REST client
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
     // Relative time calculation
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
@@ -91,6 +92,7 @@ dependencyVerification {
         'com.squareup.retrofit2:retrofit:c0295f38b3c1a48bb71a8ed2ea69ddeb2e49a830b11862385a403355c6a94643',
         'com.squareup.retrofit2:converter-gson:848f8036837d8650c05d2c100b87a008c53987dcfcf1217467b83f4e8504a708',
         'com.squareup.okhttp3:okhttp:7265adbd6f028aade307f58569d814835cd02bc9beffb70c25f72c9de50d61c4',
+        'com.squareup.okhttp3:logging-interceptor:88d04693ab3109b549149b38abf96530bf6ee97f38c0dc72aa73560ef30d953d',
         'com.squareup.okio:okio:734269c3ebc5090e3b23566db558f421f0b4027277c79ad5d176b8ec168bb850',
         'com.google.code.gson:gson:c6221763bd79c4f1c3dc7f750b5f29a0bb38b367b81314c4f71896e340c40825',
 

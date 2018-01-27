@@ -6,10 +6,12 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
+import ch.coredump.watertemp.BuildConfig;
 import ch.coredump.watertemp.rest.models.ApiError;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -26,7 +28,7 @@ public class ApiClient {
                 .create();
 
         // Request interceptor (add authentication)
-        final Interceptor interceptor = new Interceptor() {
+        final Interceptor authInterceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
                 final Request original = chain.request();
@@ -41,9 +43,18 @@ public class ApiClient {
             }
         };
 
+        // Request log interceptor
+        final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        } else {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
+
         // HTTP client
         final OkHttpClient httpClient = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
+                .addInterceptor(authInterceptor)
+                .addInterceptor(loggingInterceptor)
                 .build();
 
         // Create retrofit REST adapter
