@@ -1,15 +1,15 @@
 package ch.coredump.watertemp.rest.models;
 
-import java.util.Date;
+import org.threeten.bp.ZonedDateTime;
 
 public class Measurement {
     private final int id;
     private final int sensorId;
     private final float temperature;
-    private final Date createdAt;
-    private final Date updatedAt;
+    private final ZonedDateTime createdAt;
+    private final ZonedDateTime updatedAt;
 
-    public Measurement(int id, int sensorId, float temperature, Date createdAt, Date updatedAt) {
+    public Measurement(int id, int sensorId, float temperature, ZonedDateTime createdAt, ZonedDateTime updatedAt) {
         this.id = id;
         this.sensorId = sensorId;
         this.temperature = temperature;
@@ -29,11 +29,11 @@ public class Measurement {
         return temperature;
     }
 
-    public Date getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public ZonedDateTime getUpdatedAt() {
         return updatedAt;
     }
 }

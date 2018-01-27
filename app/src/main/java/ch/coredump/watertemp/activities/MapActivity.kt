@@ -399,7 +399,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val pt = PrettyTime()
             captionBuilder.append(String.format("%.2f", sensor.lastMeasurement.temperature))
             captionBuilder.append("°C (")
-            captionBuilder.append(pt.format(sensor.lastMeasurement.createdAt))
+            val createdAtDate = Date(sensor.lastMeasurement.createdAt.toInstant().toEpochMilli())
+            captionBuilder.append(pt.format(createdAtDate))
             captionBuilder.append(")")
         } else {
             captionBuilder.append(getString(R.string.no_measurement))

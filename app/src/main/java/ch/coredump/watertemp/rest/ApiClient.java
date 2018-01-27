@@ -4,6 +4,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.threeten.bp.ZonedDateTime;
+
 import java.io.IOException;
 
 import ch.coredump.watertemp.BuildConfig;
@@ -25,6 +27,7 @@ public class ApiClient {
         final Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(ZonedDateTime.class, GsonHelper.INSTANCE.getZDT_DESERIALIZER())
                 .create();
 
         // Request interceptor (add authentication)
