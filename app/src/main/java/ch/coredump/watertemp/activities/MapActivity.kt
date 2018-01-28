@@ -288,6 +288,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val defaultIcon = iconFactory.fromResource(R.drawable.blue_marker)
         val activeIcon = iconFactory.fromResource(R.drawable.mapbox_marker_icon_default)
 
+        // Clear old markers
+        map!!.clear()
+
         // Process sensors
         val locations = ArrayList<LatLng>()
         for (sensorMeasurement in sensors.values) {
