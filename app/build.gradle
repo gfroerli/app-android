@@ -12,8 +12,8 @@ android {
         applicationId "ch.coredump.watertemp"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 5
-        versionName "0.3.1"
+        versionCode 6
+        versionName "0.4.0"
         vectorDrawables.useSupportLibrary = true
     }
 
