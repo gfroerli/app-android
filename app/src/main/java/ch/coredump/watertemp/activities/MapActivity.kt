@@ -441,40 +441,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
                 Log.i(TAG, "Measurement response done!")
                 if (response != null && response.body()!!.isNotEmpty()) {
-                    // This is the start of the X axis
-                    val duration = Duration.of(3, ChronoUnit.DAYS)
-                    val startEpoch = Instant.now().minus(duration).toEpochMilli()
-
-                    // Create an entry for every measurement
-                    val entries: MutableList<Entry> = ArrayList()
-                    for (measurement in response.body()!!) {
-                        val x = measurement.createdAt.toInstant().toEpochMilli() - startEpoch
-                        val y = measurement.temperature
-                        entries.add(Entry(x.toFloat(), y))
-                    }
-                    entries.sortBy { it.x }
-
-                    // Create a data set
-                    val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
-
-                    // X axis value range
-                    this@MapActivity.chart3days!!.xAxis.axisMinimum = 0f
-                    this@MapActivity.chart3days!!.xAxis.axisMaximum = duration.toMillis().toFloat()
-
-                    // Styling
-                    dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-                    dataSet.lineWidth = 4f
-                    dataSet.circleRadius = 2f
-                    dataSet.color = resources.getColor(R.color.colorAccentAlpha)
-                    dataSet.setCircleColor(dataSet.color)
-                    dataSet.setDrawCircleHole(false)
-                    dataSet.setDrawHighlightIndicators(false)
-
-                    // Draw data
-                    val data = LineData(dataSet)
-                    data.setDrawValues(false)
-                    this@MapActivity.chart3days!!.data = data
-                    this@MapActivity.chart3days!!.invalidate()
+                    drawChart3Days(response.body()!!)
                 }
             }
 
@@ -484,6 +451,46 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Utils.showError(this@MapActivity, errmsg)
             }
         }
+    }
+
+    /**
+     * Draw the temperature line chart for the measurements during the last 3 days.
+     */
+    private fun drawChart3Days(measurements: List<Measurement>) {
+        // This is the start of the X axis
+        val duration = Duration.of(3, ChronoUnit.DAYS)
+        val startEpoch = Instant.now().minus(duration).toEpochMilli()
+
+        // Create an entry for every measurement
+        val entries: MutableList<Entry> = ArrayList()
+        for (measurement in measurements) {
+            val x = measurement.createdAt.toInstant().toEpochMilli() - startEpoch
+            val y = measurement.temperature
+            entries.add(Entry(x.toFloat(), y))
+        }
+        entries.sortBy { it.x }
+
+        // Create a data set
+        val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
+
+        // X axis value range
+        this@MapActivity.chart3days!!.xAxis.axisMinimum = 0f
+        this@MapActivity.chart3days!!.xAxis.axisMaximum = duration.toMillis().toFloat()
+
+        // Styling
+        dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+        dataSet.lineWidth = 4f
+        dataSet.circleRadius = 2f
+        dataSet.color = resources.getColor(R.color.colorAccentAlpha)
+        dataSet.setCircleColor(dataSet.color)
+        dataSet.setDrawCircleHole(false)
+        dataSet.setDrawHighlightIndicators(false)
+
+        // Draw data
+        val data = LineData(dataSet)
+        data.setDrawValues(false)
+        this@MapActivity.chart3days!!.data = data
+        this@MapActivity.chart3days!!.invalidate()
     }
 
     // Lifecycle methods
