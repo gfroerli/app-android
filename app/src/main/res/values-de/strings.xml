@@ -19,4 +19,5 @@
     <string name="activity_about">Über</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
+    <string name="section_subheader_summary">Zusammenfassung der letzte 3 Tage</string>
 </resources>

@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.bottom_sheet_details.*
 import kotlinx.android.synthetic.main.bottom_sheet_peek.*
 import org.ocpsoft.prettytime.PrettyTime
+import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import retrofit2.Call
@@ -441,7 +442,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.i(TAG, "Measurement response done!")
                 if (response != null && response.body()!!.isNotEmpty()) {
                     // This is the start of the X axis
-                    val startEpoch = Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli()
+                    val duration = Duration.of(3, ChronoUnit.DAYS)
+                    val startEpoch = Instant.now().minus(duration).toEpochMilli()
 
                     // Create an entry for every measurement
                     val entries: MutableList<Entry> = ArrayList()
@@ -455,11 +457,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     // Create a data set
                     val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
 
+                    // X axis value range
+                    this@MapActivity.chart3days!!.xAxis.axisMinimum = 0f
+                    this@MapActivity.chart3days!!.xAxis.axisMaximum = duration.toMillis().toFloat()
+
                     // Styling
                     dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
                     dataSet.lineWidth = 4f
                     dataSet.circleRadius = 2f
                     dataSet.color = resources.getColor(R.color.colorAccentAlpha)
+                    dataSet.setCircleColor(dataSet.color)
                     dataSet.setDrawCircleHole(false)
                     dataSet.setDrawHighlightIndicators(false)
 

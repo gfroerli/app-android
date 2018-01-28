@@ -42,6 +42,14 @@
     </FrameLayout>
 
     <com.actinarium.aligned.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        app:leading="@dimen/headlineLeading"
+        android:text="@string/section_subheader_summary"/>
+
+
+    <com.actinarium.aligned.TextView
         android:id="@+id/details_sensor_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
