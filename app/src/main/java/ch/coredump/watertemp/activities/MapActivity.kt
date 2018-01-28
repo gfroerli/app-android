@@ -11,6 +11,7 @@ import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import ch.coredump.watertemp.MapMarkers
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
@@ -25,7 +26,6 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -68,6 +68,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // The currently active marker
     private var activeMarker: Marker? = null
 
+    // Marker icons wrapper
+    private var mapMarkers: MapMarkers? = null
+
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
@@ -83,14 +86,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize the layout
         setContentView(R.layout.activity_map)
 
+        // Initialize the map marker class
+        this.mapMarkers = MapMarkers(applicationContext)
+
         // Initialize the action bar
         setSupportActionBar(main_action_bar)
 
         // Create map view
-        map_view.onCreate(savedInstanceState)
+        this.map_view.onCreate(savedInstanceState)
 
         // Initialize map
-        map_view.getMapAsync(this)
+        this.map_view.getMapAsync(this)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -112,7 +118,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     this@MapActivity.chart3days!!.clear()
 
                     // Deselect all markers
-                    // TODO
+                    this@MapActivity.deselectMarkers()
                 }
             }
 
@@ -282,12 +288,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updateMarkers() {
-        // Initialize icons
-        val context = applicationContext
-        val iconFactory = IconFactory.getInstance(context)
-        val defaultIcon = iconFactory.fromResource(R.drawable.blue_marker)
-        val activeIcon = iconFactory.fromResource(R.drawable.mapbox_marker_icon_default)
-
         // Clear old markers
         map!!.clear()
 
@@ -319,7 +319,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     MarkerOptions()
                             .position(LatLng(lat, lng))
                             .title(sensor.deviceName)
-                            .icon(defaultIcon)
+                            .icon(this.mapMarkers!!.defaultIcon)
             )
 
             // Create a mapping from the marker id to the sensor id
@@ -331,7 +331,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add marker click listener
         map!!.setOnMarkerClickListener { marker ->
-            this@MapActivity.onMarkerSelected(marker, defaultIcon, activeIcon)
+            this@MapActivity.onMarkerSelected(marker)
         }
 
         // Add map click listener
@@ -343,7 +343,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             // No more active marker
-            this@MapActivity.activeMarker!!.icon = defaultIcon
+            this@MapActivity.activeMarker!!.icon = this@MapActivity.mapMarkers!!.defaultIcon
             this@MapActivity.activeMarker = null
 
             // Hide the details pane
@@ -366,14 +366,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     /**
      * Called when a marker is selected.
      */
-    private fun onMarkerSelected(marker: Marker, defaultIcon: Icon, activeIcon: Icon): Boolean {
+    private fun onMarkerSelected(marker: Marker): Boolean {
         Log.d(TAG, "Selected marker ID: " + marker.id)
 
         // Update active marker icon
         if (this.activeMarker != null) {
-            this.activeMarker!!.icon = defaultIcon
+            this.activeMarker!!.icon = this.mapMarkers!!.defaultIcon
         }
-        marker.icon = activeIcon
+        marker.icon = this.mapMarkers!!.activeIcon
         this.activeMarker = marker
 
         // Fetch sensor for that marker
@@ -437,6 +437,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.showBottomSheet()
 
         return true
+    }
+
+    private fun deselectMarkers() {
+        this.activeMarker!!.icon = this.mapMarkers!!.defaultIcon
     }
 
     private fun onMeasurementsFetched(): Callback<List<Measurement>> {
