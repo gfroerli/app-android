@@ -454,12 +454,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     // Create a data set
                     val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
-                    dataSet.color = R.color.colorPrimary
-                    dataSet.lineWidth = 4f
-                    dataSet.circleRadius = 3f
-                    dataSet.setCircleColor(dataSet.color)
-                    dataSet.setDrawCircleHole(false)
+
+                    // Styling
                     dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+                    dataSet.lineWidth = 4f
+                    dataSet.circleRadius = 2f
+                    dataSet.color = resources.getColor(R.color.colorAccentAlpha)
+                    dataSet.setDrawCircleHole(false)
+                    dataSet.setDrawHighlightIndicators(false)
 
                     // Draw data
                     val data = LineData(dataSet)

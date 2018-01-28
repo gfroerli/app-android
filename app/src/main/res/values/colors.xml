@@ -3,6 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#F84D4D</color>
+    <color name="colorAccentAlpha">#BFF84D4D</color>
     <color name="colorBackground">#FAFAFA</color>
 
     <!-- Dark divider or icon: Black at 38% opacity -->
