@@ -62,6 +62,9 @@ dependencies {
     // Baseline alignment of typography
     compile 'com.actinarium.aligned:aligned:0.1'
 
+    // Charts
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+
     // Testing
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -102,5 +105,6 @@ dependencyVerification {
         // Other
         'org.ocpsoft.prettytime:prettytime:ef7098d973ae78b57d1a22dc37d3b8a771bf030301300e24055d676b6cdc5e75',
         'com.jakewharton.timber:timber:d553d3d3e883ce7d061f1b21b95d6ee0840f3bfbf6d3bd51c5671f0b0f0b0091',
+        'com.github.PhilJay:MPAndroidChart:c66ebf3370fe3da48ed6d1867d52f31adc6af4b285c7d2eb10acfdc6f90a1f73',
     ]
 }

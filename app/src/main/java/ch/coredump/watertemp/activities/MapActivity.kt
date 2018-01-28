@@ -19,6 +19,10 @@ import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
 import ch.coredump.watertemp.rest.models.Sponsor
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
@@ -66,6 +70,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
+    // Views
+    private var chart3days: LineChart? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,14 +106,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Bottom sheet state changed
-                Log.d(TAG, "State changed to " + newState)
-                // TODO: If it's gone, make sure to deselect all markers.
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    // Clear chart data
+                    this@MapActivity.chart3days!!.clear()
+
+                    // Deselect all markers
+                    // TODO
+                }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // Called repeatedly while bottom sheet slides up
             }
         })
+
+        // Initialize views
+        this.chart3days = findViewById(R.id.chart_3days)
+
+        // Style charts
+        this.chart3days!!.setNoDataText(getString(R.string.chart_no_data))
+        this.chart3days!!.setDrawGridBackground(false)
+        this.chart3days!!.setDrawBorders(false)
+        this.chart3days!!.description.isEnabled = false
+        this.chart3days!!.xAxis.isEnabled = false
+        this.chart3days!!.axisRight.isEnabled = false
     }
 
     override fun onStart() {
@@ -239,31 +262,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun onMeasurementsFetched(): Callback<List<Measurement>> {
-        return object : Callback<List<Measurement>> {
-            override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
-                Log.i(TAG, "Measurement response done!")
-                if (response != null) {
-                    for (measurement in response.body()!!) {
-                        Log.i(TAG, "Measurement: " + measurement.temperature)
-                        if (!sensors.containsKey(measurement.sensorId)) {
-                            Log.e(TAG, "Sensor with id " + measurement.sensorId + " not found")
-                            continue
-                        }
-                        sensors[measurement.sensorId]!!.addMeasurement(measurement)
-                    }
-                    updateMarkers()
-                }
-            }
-
-            override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
-                val errmsg = "Fetching measurements failed:" + t.toString()
-                Log.e(TAG, errmsg)
-                Utils.showError(this@MapActivity, errmsg)
-            }
-        }
-    }
-
     /**
      * Show the bottom sheet if it isn't already visible.
      */
@@ -383,7 +381,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             return true
         }
         val sensor = sensorMeasurements.sensor
-        val measurements = sensorMeasurements.measurements
 
         // Fetch sensor measurements from last three days
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
@@ -436,6 +433,48 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.showBottomSheet()
 
         return true
+    }
+
+    private fun onMeasurementsFetched(): Callback<List<Measurement>> {
+        return object : Callback<List<Measurement>> {
+            override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
+                Log.i(TAG, "Measurement response done!")
+                if (response != null && response.body()!!.isNotEmpty()) {
+                    // This is the start of the X axis
+                    val startEpoch = Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli()
+
+                    // Create an entry for every measurement
+                    val entries: MutableList<Entry> = ArrayList()
+                    for (measurement in response.body()!!) {
+                        val x = measurement.createdAt.toInstant().toEpochMilli() - startEpoch
+                        val y = measurement.temperature
+                        entries.add(Entry(x.toFloat(), y))
+                    }
+                    entries.sortBy { it.x }
+
+                    // Create a data set
+                    val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
+                    dataSet.color = R.color.colorPrimary
+                    dataSet.lineWidth = 4f
+                    dataSet.circleRadius = 3f
+                    dataSet.setCircleColor(dataSet.color)
+                    dataSet.setDrawCircleHole(false)
+                    dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+
+                    // Draw data
+                    val data = LineData(dataSet)
+                    data.setDrawValues(false)
+                    this@MapActivity.chart3days!!.data = data
+                    this@MapActivity.chart3days!!.invalidate()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
+                val errmsg = "Fetching measurements failed:" + t.toString()
+                Log.e(TAG, errmsg)
+                Utils.showError(this@MapActivity, errmsg)
+            }
+        }
     }
 
     // Lifecycle methods

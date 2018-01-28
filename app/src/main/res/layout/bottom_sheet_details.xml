@@ -20,6 +20,28 @@
         android:text="@string/section_header_details"/>
 
     <com.actinarium.aligned.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        app:leading="@dimen/headlineLeading"
+        android:text="@string/section_subheader_3days"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <!--<ProgressBar
+            android:id="@+id/loading_3days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"/>-->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_3days"
+            android:layout_width="match_parent"
+            android:layout_height="144dp" />
+    </FrameLayout>
+
+    <com.actinarium.aligned.TextView
         android:id="@+id/details_sensor_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

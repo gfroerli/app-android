@@ -21,3 +21,4 @@
 -keepattributes Signature
 -keepattributes Exceptions
 -keep class org.ocpsoft.prettytime.i18n.**
+-keep class com.github.mikephil.charting.** { *; }
