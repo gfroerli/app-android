@@ -1,8 +1,15 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.novoda.build-properties'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'project-report'
 apply plugin: 'witness'
+
+buildProperties {
+    secrets {
+        using project.file('secrets.properties')
+    }
+}
 
 android {
     compileSdkVersion 27
@@ -15,6 +22,9 @@ android {
         versionCode 6
         versionName "0.4.0"
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigString 'GFROERLI_API_KEY_PUBLIC', buildProperties.secrets['gfroerli_api_key_public']
+        buildConfigString 'MAPBOX_ACCESS_TOKEN', buildProperties.secrets['mapbox_access_token']
     }
 
     buildTypes {

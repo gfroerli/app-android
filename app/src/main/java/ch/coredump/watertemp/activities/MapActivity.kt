@@ -11,6 +11,7 @@ import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.MapMarkers
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
@@ -81,7 +82,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         // Initialize mapbox
-        Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
+        Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN)
 
         // Initialize the layout
         setContentView(R.layout.activity_map)
@@ -100,7 +101,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
-        val apiClient = ApiClient(getString(R.string.public_api_token))
+        val apiClient = ApiClient(BuildConfig.GFROERLI_API_KEY_PUBLIC)
         apiService = apiClient.apiService
 
         // Initialize bottom sheet behavior
