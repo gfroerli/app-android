@@ -35,7 +35,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '26.1.0'
+    supportLibVersion = '27.1.1'
 }
 
 dependencies {
@@ -73,19 +73,19 @@ dependencies {
 dependencyVerification {
     verify = [
         // Support libraries
-        'com.android.support:appcompat-v7:9d44e7bf343dfd19a55e3e6f4c4e733b68d32509e0b0af5b32f2981f4f1dedd8',
-        'com.android.support:design:76f5fbb365bf2d622af5df8a4205904409250305685e38670bf654ac90c2494d',
-        'com.android.support:transition:c5d3d1204997f80af1f4a3a315a54b1a23543c554963cef831da726aac34b56f',
-        'com.android.support:support-v4:36d8385de1be7791231acb933b757198f97cb53bc7d046e8c4bc403d214caaca',
-        'com.android.support:support-fragment:a0ab3369ef40fe199160692f0463a5f63f1277ebfb64dd587c76fdb128d76b32',
-        'com.android.support:recyclerview-v7:389cb47a7dabca4fb8c23657ff7c85ebc651428580d3a5ea0349eeb43ddea94b',
-        'com.android.support:animated-vector-drawable:d5905aee3c8a4ac75e069a73b914c0a41b9b36b0e6b04126719fca22659d3cc8',
-        'com.android.support:support-core-ui:82f538051599335ea881ec264407547cab52be750f16ce099cfb27754fc755ff',
-        'com.android.support:support-core-utils:4fda6d4eb430971e3b1dad7456988333f374b0f4ba15f99839ca1a0ab5155c8a',
-        'com.android.support:support-media-compat:9d8cee7cd40eff22ebdeb90c8e70f5ee96c5bd25cb2c3e3b3940e27285a3e98a',
-        'com.android.support:support-vector-drawable:1151b7f0ea29c9a9a8fee042a1dbe82f196632d801c438d08b279e131c767118',
-        'com.android.support:support-compat:7d6da01cf9766b1705c6c80cfc12274a895b406c4c287900b07a56145ca6c030',
-        'com.android.support:support-annotations:99d6199ad5a09a0e5e8a49a4cc08f818483ddcfd7eedea2f9923412daf982309',
+        'com.android.support:animated-vector-drawable:59670473f6e98fda792f7bef25dd7292b0a3106031c7a5e30eb020bf26f077bd',
+        'com.android.support:appcompat-v7:0c7808fbbc5838d831e32e3c0a6f84e1f2c981deb8f11e010650f2b57923a335',
+        'com.android.support:design:7225973f7ee03765008a9c2f17a40b154c6885169fef022276e811c926a2202c',
+        'com.android.support:recyclerview-v7:d735e4727878e99ef3980c10d15dc3468462fd509d4fb60cb8bd20b0f735085c',
+        'com.android.support:support-annotations:3365960206c3d2b09e845f555e7f88f8effc8d2f00b369e66c4be384029299cf',
+        'com.android.support:support-compat:880ce01ff5be42b233ff8ec0c61cefb7dc3dc9500fea9e24423214813ac27ea2',
+        'com.android.support:support-core-ui:a3ae20e6d5dffba69ac97b99846d2738003af8563843d5f3c9dc4c35b4804241',
+        'com.android.support:support-core-utils:61036832c54e8701aae954fc3bf96d1d80bf8d9dd531bff77d72def456ba087a',
+        'com.android.support:support-fragment:ec72d6ac36a1a0e6523bbddba33d73ffad070b9b3dd246cc44d8727a41ddb5e6',
+        'com.android.support:support-media-compat:55e9837dda88b74a8c812c63a78c63fd83c6c039a8c22d318492663a493585eb',
+        'com.android.support:support-v4:4f41dfc3e89f2738e45c86264a85c0934d055ee8ebe2020e23c97f303b80a48b',
+        'com.android.support:support-vector-drawable:1c0f421114cf4627cf208776d6eb4f76340c78b7e96fe6e12b3e6eb950caf1b9',
+        'com.android.support:transition:c0765b2f3c78696567ec5b3f519d22da1e3df11ac994625adf4bb4dc571caacc',
 
         // Mapbox
         'com.mapbox.mapboxsdk:mapbox-android-sdk:d18f874d135402266cffcd6697f16b78e122bb2b373fb04db534c3bc1bf1c374',
