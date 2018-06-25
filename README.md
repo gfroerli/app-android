@@ -26,3 +26,9 @@ To ensure the integrity of our dependencies, we use the
 plugin by Open Whisper Systems. Therefore new dependencies
 need to be updated in the `depencencyVerification` list in
 `app/build.gradle`.
+
+## License
+
+Copyright © 2016–2018 Coredump Hackerspace.
+
+Licensed under the GPLv3 or later, see `LICENSE.txt`.
