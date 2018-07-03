@@ -1,5 +1,7 @@
 # Water Temperatures Android App
 
+[![CircleCI][circle-ci-badge]][circle-ci]
+
 Work in progress. Uses Mapbox API.
 
 ## Building
@@ -32,3 +34,8 @@ need to be updated in the `depencencyVerification` list in
 Copyright © 2016–2018 Coredump Hackerspace.
 
 Licensed under the GPLv3 or later, see `LICENSE.txt`.
+
+
+<!-- Badges -->
+[circle-ci]: https://circleci.com/gh/gfroerli/app-android/tree/master
+[circle-ci-badge]: https://circleci.com/gh/gfroerli/app-android/tree/master.svg?style=shield
