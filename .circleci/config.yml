@@ -8,6 +8,9 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - checkout
+      - run:
+          name: Create secrets.properties
+          command: echo -e "gfroerli_api_key_public=testing\nmapbox_access_token=testing\n" > app/secrets.properties
       - restore_cache:
           key: v1-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
