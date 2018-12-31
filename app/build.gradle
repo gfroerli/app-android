@@ -32,15 +32,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    flavorDimensions "region"
-
-    productFlavors {
-        zh {
-            dimension "region"
-            applicationIdSuffix ".zh"
-        }
-    }
 }
 
 ext {
