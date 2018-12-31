@@ -16,6 +16,7 @@ android {
 
     defaultConfig {
         applicationId "ch.coredump.watertemp"
+        applicationIdSuffix ".zh"
         minSdkVersion 17
         targetSdkVersion 28
         versionCode 6
