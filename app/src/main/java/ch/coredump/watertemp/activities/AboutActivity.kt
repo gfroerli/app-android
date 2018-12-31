@@ -1,7 +1,7 @@
 package ch.coredump.watertemp.activities
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import ch.coredump.watertemp.R

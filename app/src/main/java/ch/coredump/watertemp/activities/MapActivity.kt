@@ -3,14 +3,13 @@ package ch.coredump.watertemp.activities
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.util.LongSparseArray
 import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.MapMarkers
 import ch.coredump.watertemp.R
@@ -25,8 +24,8 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -524,9 +523,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         map_view!!.onDestroy()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        map_view!!.onSaveInstanceState(outState!!)
+        map_view!!.onSaveInstanceState(outState)
     }
 
     // Menu

@@ -20,7 +20,6 @@ android {
         targetSdkVersion 28
         versionCode 6
         versionName "0.4.0"
-        vectorDrawables.useSupportLibrary = true
 
         buildConfigString 'GFROERLI_API_KEY_PUBLIC', buildProperties.secrets['gfroerli_api_key_public']
         buildConfigString 'MAPBOX_ACCESS_TOKEN', buildProperties.secrets['mapbox_access_token']
@@ -34,14 +33,10 @@ android {
     }
 }
 
-ext {
-    supportLibVersion = '28.0.0'
-}
-
 dependencies {
     // Support libraries
-    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
-    implementation "com.android.support:design:${supportLibVersion}"
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    implementation 'com.google.android.material:material:1.1.0-alpha02'
 
     // Mapbox SDK
     implementation ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-beta.3@aar'){
