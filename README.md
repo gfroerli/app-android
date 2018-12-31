@@ -2,7 +2,7 @@
 
 [![CircleCI][circle-ci-badge]][circle-ci]
 
-Work in progress. Uses Mapbox API.
+Android app written in Kotlin. Work in progress. Uses Mapbox API.
 
 ## Building
 
@@ -20,14 +20,6 @@ To install the app to your device:
     ./gradlew installZhDebug
 
 (Alternatively, do all that stuff through Android Studio.)
-
-## Dependency verification
-
-To ensure the integrity of our dependencies, we use the
-[gradle-witness](https://github.com/WhisperSystems/gradle-witness)
-plugin by Open Whisper Systems. Therefore new dependencies
-need to be updated in the `depencencyVerification` list in
-`app/build.gradle`.
 
 ## License
 
