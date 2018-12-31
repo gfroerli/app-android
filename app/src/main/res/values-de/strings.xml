@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Zürichsee Temperatur</string>
+    <string name="activity_about">Über</string>
+    <string name="activity_map">Gfrör.li: Wassertemperaturen</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
     <string name="no_measurement">Keine aktuelle Messung</string>
     <string name="section_header_details">Details</string>
@@ -16,7 +17,6 @@
     <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
     <string name="action_about">Über</string>
     <string name="action_refresh">Daten aktualisieren</string>
-    <string name="activity_about">Über</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
     <string name="section_subheader_summary">Zusammenfassung der letzte 3 Tage</string>

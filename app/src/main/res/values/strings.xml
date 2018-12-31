@@ -1,10 +1,14 @@
 <resources>
-    <string name="app_name">Lake Zürich Temperature</string>
+    <string name="app_name" translatable="false">Gfrör.li</string>
     <string name="thermometer_icon_description">Thermometer icon</string>
     <string name="no_measurement">No current measurement</string>
 
     <!-- Common -->
     <string name="temperature">Temperature</string>
+
+    <!-- Activity titles -->
+    <string name="activity_about">About</string>
+    <string name="activity_map">Gfrör.li: Water Temperatures</string>
 
     <!-- Detail pane -->
     <string name="section_header_details">Details</string>
@@ -26,5 +30,4 @@
     <!-- Action bar menu -->
     <string name="action_about">About</string>
     <string name="action_refresh">Reload data</string>
-    <string name="activity_about">About</string>
 </resources>

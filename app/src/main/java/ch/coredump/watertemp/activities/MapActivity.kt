@@ -92,6 +92,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Initialize the action bar
         setSupportActionBar(main_action_bar)
+        supportActionBar!!.title = getString(R.string.activity_map)
 
         // Create map view
         this.map_view.onCreate(savedInstanceState)
