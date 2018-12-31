@@ -37,6 +37,18 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+        unitTests.all {
+            // Whether failing tests should fail the build
+            ignoreFailures false
+
+            // Logging output
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+            }
+        }
+    }
 }
 
 dependencies {
