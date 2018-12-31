@@ -336,7 +336,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Add map click listener
-        map!!.setOnMapClickListener(MapboxMap.OnMapClickListener {
+        map!!.addOnMapClickListener(MapboxMap.OnMapClickListener {
             Log.d(TAG, "Clicked on map")
 
             if (this@MapActivity.activeMarker == null) {

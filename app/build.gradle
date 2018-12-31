@@ -31,6 +31,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -39,9 +44,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha02'
 
     // Mapbox SDK
-    implementation ('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-beta.3@aar'){
-        transitive=true
-    }
+    implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.1')
 
     // REST client
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
