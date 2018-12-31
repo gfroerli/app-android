@@ -47,9 +47,9 @@ dependencies {
     implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.1')
 
     // REST client
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
 
     // Java 8 date/time API backport
     implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
