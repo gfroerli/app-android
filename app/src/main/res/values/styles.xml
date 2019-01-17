@@ -4,7 +4,7 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppBaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -22,6 +22,8 @@
 
         <item name="android:windowNoTitle">true</item> <!-- Hide the default action bar (we have our own) -->
         <item name="android:windowFullscreen">false</item> <!-- Don't hide the status bar -->
+
+        <item name="actionOverflowMenuStyle">@style/Base.Widget.MaterialComponents.PopupMenu.Overflow</item>
     </style>
 
 </resources>
