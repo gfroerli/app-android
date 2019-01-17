@@ -58,8 +58,9 @@
             android:id="@+id/details_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_behavior="@string/bottom_sheet_behavior"
             app:behavior_hideable="true"
-            app:layout_behavior="@string/bottom_sheet_behavior">
+            app:behavior_peekHeight="125dp">
 
             <!-- Layout containing both the bottom sheet and the drop shadow -->
             <LinearLayout
