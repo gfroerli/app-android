@@ -1,5 +1,6 @@
 package ch.coredump.watertemp.utils
 
+import android.util.Log
 import android.view.View
 
 /**
@@ -9,6 +10,8 @@ import android.view.View
  * hide it when the last event has stopped.
  */
 class ProgressCounter(val progressView: View) {
+    val TAG = "ProgressCounter"
+
     var count = 0
 
     /**
@@ -28,7 +31,8 @@ class ProgressCounter(val progressView: View) {
     @Synchronized
     fun stop() {
         if (count == 0) {
-            return;
+            Log.w(TAG, "Warning: Count already 0")
+            return
         }
         count -= 1
         if (count == 0) {

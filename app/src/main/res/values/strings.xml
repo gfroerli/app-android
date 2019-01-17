@@ -30,4 +30,10 @@
     <!-- Action bar menu -->
     <string name="action_about">About</string>
     <string name="action_refresh">Reload data</string>
+
+    <!-- Error messages -->
+    <string name="fetching_data_failed">Fetching %1$s failed. Please check your internet connection.</string>
+    <string name="data_sensors">sensors</string>
+    <string name="data_sponsors">sponsors</string>
+    <string name="data_measurements">measurements</string>
 </resources>
