@@ -20,6 +20,7 @@ import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
 import ch.coredump.watertemp.rest.models.Sponsor
+import ch.coredump.watertemp.utils.ProgressCounter
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -77,6 +78,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Views
     private var chart3days: LineChart? = null
 
+    // Activity indicator
+    private var progressCounter: ProgressCounter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -92,6 +96,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize the action bar
         setSupportActionBar(main_action_bar)
         supportActionBar!!.title = getString(R.string.activity_map)
+
+        // Progress counter
+        this.progressCounter = ProgressCounter(findViewById(R.id.loadingbar))
 
         // Create map view
         this.map_view.onCreate(savedInstanceState)
@@ -128,10 +135,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
-        // Initialize views
-        this.chart3days = findViewById(R.id.chart_3days)
-
         // Style charts
+        this.chart3days = findViewById(R.id.chart_3days)
         this.chart3days!!.setNoDataText(getString(R.string.chart_no_data))
         this.chart3days!!.setDrawGridBackground(false)
         this.chart3days!!.setDrawBorders(false)
@@ -175,6 +180,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun fetchData() {
         Log.d(TAG, "Fetching data from API")
 
+        // Start progress activity
+        this.progressCounter!!.start()
+
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
         sensorCall.enqueue(this.onSensorsFetched())
@@ -187,6 +195,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onSensorsFetched(): Callback<List<Sensor>> {
         return object : Callback<List<Sensor>> {
             override fun onResponse(call: Call<List<Sensor>>, response: Response<List<Sensor>>?) {
+                // Stop progress activity
+                this@MapActivity.progressCounter!!.stop()
+
                 // Handle null response
                 if (response == null) {
                     Log.e(TAG, "Received null response from sensors endpoint")

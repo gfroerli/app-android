@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MapActivity">
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_action_bar"
@@ -17,48 +15,77 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/map_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        mapbox:mapbox_styleUrl="@string/mapbox_style_outdoors"
-        mapbox:mapbox_cameraTargetLat="47.209587"
-        mapbox:mapbox_cameraTargetLng="8.823612"
-        mapbox:mapbox_cameraZoom="12"
-        mapbox:mapbox_cameraTilt="0"
-        mapbox:mapbox_uiAttributionMarginBottom="3dp"
-        mapbox:mapbox_uiAttributionMarginLeft="3dp"
-        mapbox:mapbox_uiLogo="false"/>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/details_bottom_sheet"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:behavior_hideable="true"
-        app:layout_behavior="@string/bottom_sheet_behavior">
+        android:background="?attr/colorPrimary">
+        <ProgressBar
+            android:id="@+id/loadingbar"
+            style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:minHeight="6dp"
+            android:maxHeight="6dp"
+            android:scaleY="2"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:indeterminate="true"
+            android:visibility="invisible"/>
+    </FrameLayout>
 
-        <!-- Layout containing both the bottom sheet and the drop shadow -->
-        <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.MapActivity">
+
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            mapbox:mapbox_cameraTargetLat="47.209587"
+            mapbox:mapbox_cameraTargetLng="8.823612"
+            mapbox:mapbox_cameraTilt="0"
+            mapbox:mapbox_cameraZoom="12"
+            mapbox:mapbox_styleUrl="@string/mapbox_style_outdoors"
+            mapbox:mapbox_uiAttributionMarginBottom="3dp"
+            mapbox:mapbox_uiAttributionMarginLeft="3dp"
+            mapbox:mapbox_uiLogo="false"/>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/details_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            app:behavior_hideable="true"
+            app:layout_behavior="@string/bottom_sheet_behavior">
 
-            <!-- Drop shadow -->
-            <View
+            <!-- Layout containing both the bottom sheet and the drop shadow -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:background="@drawable/drop_shadow" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <!-- Peek area -->
-            <include layout="@layout/bottom_sheet_peek" />
+                <!-- Drop shadow -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:background="@drawable/drop_shadow"/>
 
-            <!-- Divider -->
-            <include layout="@layout/divider" />
+                <!-- Peek area -->
+                <include layout="@layout/bottom_sheet_peek"/>
 
-            <!-- Details -->
-            <include layout="@layout/bottom_sheet_details" />
+                <!-- Divider -->
+                <include layout="@layout/divider"/>
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                <!-- Details -->
+                <include layout="@layout/bottom_sheet_details"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</LinearLayout>
