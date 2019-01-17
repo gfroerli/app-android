@@ -180,22 +180,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun fetchData() {
         Log.d(TAG, "Fetching data from API")
 
-        // Start progress activity
-        this.progressCounter!!.start()
-
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
+        this.progressCounter!!.start()
         sensorCall.enqueue(this.onSensorsFetched())
 
         // Fetch sponsors
         val sponsorCall = apiService!!.listSponsors()
+        this.progressCounter!!.start()
         sponsorCall.enqueue(this.onSponsorsFetched())
     }
 
     private fun onSensorsFetched(): Callback<List<Sensor>> {
         return object : Callback<List<Sensor>> {
             override fun onResponse(call: Call<List<Sensor>>, response: Response<List<Sensor>>?) {
-                // Stop progress activity
                 this@MapActivity.progressCounter!!.stop()
 
                 // Handle null response
@@ -237,9 +235,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
-                val errmsg = "Fetching sensors failed: " + t.toString()
-                Log.e(TAG, errmsg)
-                Utils.showError(this@MapActivity, errmsg)
+                this@MapActivity.progressCounter!!.stop()
+                Log.e(TAG, "Fetching sensors failed: " + t.toString())
+                Utils.showError(
+                        this@MapActivity,
+                        getString(R.string.fetching_data_failed, getString(R.string.data_sensors))
+                )
             }
         }
     }
@@ -247,6 +248,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onSponsorsFetched(): Callback<List<Sponsor>> {
         return object : Callback<List<Sponsor>> {
             override fun onResponse(call: Call<List<Sponsor>>, response: Response<List<Sponsor>>?) {
+                this@MapActivity.progressCounter!!.stop()
+
                 // Handle null response
                 if (response == null) {
                     Log.e(TAG, "Received null response from sponsors endpoint")
@@ -274,9 +277,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<Sponsor>>, t: Throwable) {
-                val errmsg = "Fetching sponsors failed: " + t.toString()
-                Log.e(TAG, errmsg)
-                Utils.showError(this@MapActivity, errmsg)
+                this@MapActivity.progressCounter!!.stop()
+                Log.e(TAG, "Fetching sponsors failed: " + t.toString())
+                Utils.showError(
+                        this@MapActivity,
+                        getString(R.string.fetching_data_failed, getString(R.string.data_sponsors))
+                )
             }
         }
     }
@@ -401,6 +407,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Fetch sensor measurements from last three days
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
+        this.progressCounter!!.start()
         measurementCall.enqueue(onMeasurementsFetched())
 
         // Lookup sponsor for that sensor
@@ -458,6 +465,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onMeasurementsFetched(): Callback<List<Measurement>> {
         return object : Callback<List<Measurement>> {
             override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
+                this@MapActivity.progressCounter!!.stop()
+
                 Log.i(TAG, "Measurement response done!")
                 if (response != null && response.body()!!.isNotEmpty()) {
                     drawChart3Days(response.body()!!)
@@ -465,9 +474,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
-                val errmsg = "Fetching measurements failed:" + t.toString()
-                Log.e(TAG, errmsg)
-                Utils.showError(this@MapActivity, errmsg)
+                this@MapActivity.progressCounter!!.stop()
+
+                Log.e(TAG, "Fetching measurements failed: " + t.toString())
+                Utils.showError(
+                        this@MapActivity,
+                        getString(R.string.fetching_data_failed, getString(R.string.data_measurements))
+                )
             }
         }
     }
