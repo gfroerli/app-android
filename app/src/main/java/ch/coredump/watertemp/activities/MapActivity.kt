@@ -114,14 +114,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize bottom sheet behavior
         this.bottomSheetBehavior = BottomSheetBehavior.from(details_bottom_sheet)
 
-        // Set peek height as necessary
-        this.bottomSheetBehavior!!.peekHeight = bottom_sheet_peek.height
+        // Initially hidden
+        this.bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
+
+        // We want two sizes: Peek height and full height
+        this.bottomSheetBehavior!!.isFitToContents = false
 
         // Add bottom sheet listener
         this.bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Bottom sheet state changed
-                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     // Clear chart data
                     this@MapActivity.chart3days!!.clear()
 
@@ -291,8 +294,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * Show the bottom sheet if it isn't already visible.
      */
     private fun showBottomSheet() {
-        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
-            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior?.let {
+            if (it.state == BottomSheetBehavior.STATE_HIDDEN) {
+                it.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
         }
     }
 
@@ -300,8 +305,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * Hide the bottom sheet if it's visible.
      */
     private fun hideBottomSheet() {
-        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior?.let {
+            if (it.state != BottomSheetBehavior.STATE_HIDDEN) {
+                it.state = BottomSheetBehavior.STATE_HIDDEN
+            }
         }
     }
 
@@ -459,7 +466,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun deselectMarkers() {
-        this.activeMarker!!.icon = this.mapMarkers!!.defaultIcon
+        this.activeMarker?.let {
+            it.icon = this.mapMarkers!!.defaultIcon
+        }
     }
 
     private fun onMeasurementsFetched(): Callback<List<Measurement>> {
@@ -580,8 +589,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onBackPressed() {
         // If the bottom sheet is visible, close it on back button press.
         // Otherwise, fall back to default behavior.
-        if (bottomSheetBehavior!!.state == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+        if (bottomSheetBehavior!!.state != BottomSheetBehavior.STATE_HIDDEN) {
+            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
         } else {
             super.onBackPressed()
         }
