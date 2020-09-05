@@ -49,7 +49,6 @@
             mapbox:mapbox_cameraTargetLng="8.823612"
             mapbox:mapbox_cameraTilt="0"
             mapbox:mapbox_cameraZoom="12"
-            mapbox:mapbox_styleUrl="@string/mapbox_style_outdoors"
             mapbox:mapbox_uiAttributionMarginBottom="3dp"
             mapbox:mapbox_uiAttributionMarginLeft="3dp"
             mapbox:mapbox_uiLogo="false"/>

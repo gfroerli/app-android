@@ -34,6 +34,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.bottom_sheet_details.*
 import kotlinx.android.synthetic.main.bottom_sheet_peek.*
@@ -165,16 +166,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         Log.d(TAG, "Map is ready")
 
-        // Save map as attribute
-        map = mapboxMap
+        mapboxMap.setStyle(Style.OUTDOORS) {
+            Log.d(TAG, "Style loaded")
 
-        // Disable interactions that might confuse the user
-        val settings = map!!.uiSettings
-        settings.isRotateGesturesEnabled = false
-        settings.isTiltGesturesEnabled = false
-        settings.isCompassEnabled = false
+            // Save map as attribute
+            map = mapboxMap
 
-        this.fetchData()
+            // Disable interactions that might confuse the user
+            val settings = map!!.uiSettings
+            settings.isRotateGesturesEnabled = false
+            settings.isTiltGesturesEnabled = false
+            settings.isCompassEnabled = false
+
+            this.fetchData()
+        }
     }
 
     /**
@@ -364,7 +369,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.d(TAG, "Clicked on map")
 
             if (this@MapActivity.activeMarker == null) {
-                return@OnMapClickListener
+                return@OnMapClickListener true
             }
 
             // No more active marker
@@ -373,6 +378,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Hide the details pane
             this.hideBottomSheet()
+
+            return@OnMapClickListener true
         })
 
         // Change zoom to include all markers
