@@ -333,6 +333,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
 
             // Sort measurements by ID
+            // See https://github.com/gfroerli/gfroerli-api/issues/40
             measurements.sortWith { lhs, rhs ->
                 val leftId = lhs.id
                 val rightId = rhs.id
@@ -459,9 +460,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             details_caption.visibility = View.VISIBLE
         }
 
-        // Update details section
-        details_sensor_caption.text = "TODO: Sensor details"
-
         // Update sponsor section
         if (sponsor == null) {
             details_section_sponsor.visibility = View.GONE
@@ -498,18 +496,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 this@MapActivity.progressCounter!!.stop()
 
                 Log.i(TAG, "Measurement response done!")
-                if (response != null && response.body()!!.isNotEmpty()) {
-                    drawChart3Days(response.body()!!)
+                response?.body()?.let {
+                    drawChart3Days(it)
+                    updateDataSummary(it)
                 }
             }
 
             override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
                 this@MapActivity.progressCounter!!.stop()
 
-                Log.e(TAG, "Fetching measurements failed: " + t.toString())
+                Log.e(TAG, "Fetching measurements failed: $t")
                 Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_measurements))
+                    this@MapActivity,
+                    getString(R.string.fetching_data_failed, getString(R.string.data_measurements))
                 )
             }
         }
@@ -530,6 +529,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val y = measurement.temperature
             entries.add(Entry(x.toFloat(), y))
         }
+        // See https://github.com/gfroerli/gfroerli-api/issues/40
         entries.sortBy { it.x }
 
         // Create a data set
@@ -553,6 +553,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         data.setDrawValues(false)
         this@MapActivity.chart3days!!.data = data
         this@MapActivity.chart3days!!.invalidate()
+    }
+
+    private fun updateDataSummary(measurements: List<Measurement>) {
+        var minTemp: Float? = null
+        var maxTemp: Float? = null
+        var avgTemp: Float = 0.0f
+        for (temperature in measurements.map { it.temperature }) {
+            if (minTemp == null || minTemp > temperature) {
+                minTemp = temperature
+            } else if (maxTemp == null || maxTemp < temperature) {
+                maxTemp = temperature
+            }
+            avgTemp += temperature
+        }
+        avgTemp /= measurements.size
+        this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+            minTemp, maxTemp, avgTemp
+        )
     }
 
     // Lifecycle methods
