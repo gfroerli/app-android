@@ -7,10 +7,9 @@ import android.view.MenuItem
 import ch.coredump.watertemp.R
 import kotlinx.android.synthetic.main.activity_about.*
 
+private const val TAG = "AboutActivity"
+
 class AboutActivity : AppCompatActivity() {
-
-    val TAG = "AboutActivity"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -22,13 +21,13 @@ class AboutActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.home -> {
                 this.finish()
                 return true
             }
-            else -> Log.w(TAG, "Selected unknown menu entry: " + item)
+            else -> Log.w(TAG, "Selected unknown menu entry: $item")
         }
         return super.onOptionsItemSelected(item)
     }
