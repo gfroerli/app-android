@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.LongSparseArray
 import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import ch.coredump.watertemp.BuildConfig
-import ch.coredump.watertemp.MapMarkers
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
@@ -26,15 +25,18 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.bottom_sheet_details.*
 import kotlinx.android.synthetic.main.bottom_sheet_peek.*
@@ -47,12 +49,16 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
+// Marker image names
+private const val MARKER_DEFAULT = "marker_default"
+private const val MARKER_ACTIVE = "marker_active"
+
+private const val TAG = "MapActivity"
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
-
-    val TAG = "MapActivity"
-
     // The map instance
     private var map: MapboxMap? = null
+    private var symbolManager: SymbolManager? = null
 
     // Access the water-sensor service
     private var apiService: ApiService? = null
@@ -64,14 +70,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Mapping from sponsor IDs to `Sponsor` instances
     private val sponsors = SparseArray<Sponsor>()
 
-    // Mapping from map marker IDs to sensor IDs
-    private val sensorMarkers = LongSparseArray<Int>()
-
     // The currently active marker
-    private var activeMarker: Marker? = null
-
-    // Marker icons wrapper
-    private var mapMarkers: MapMarkers? = null
+    private var activeMarker: Symbol? = null
 
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
@@ -90,9 +90,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Initialize the layout
         setContentView(R.layout.activity_map)
-
-        // Initialize the map marker class
-        this.mapMarkers = MapMarkers(applicationContext)
 
         // Initialize the action bar
         setSupportActionBar(main_action_bar)
@@ -166,11 +163,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         Log.d(TAG, "Map is ready")
 
-        mapboxMap.setStyle(Style.OUTDOORS) {
+        mapboxMap.setStyle(Style.OUTDOORS) { style ->
             Log.d(TAG, "Style loaded")
 
+            // Load marker icon
+            style.addImage(MARKER_DEFAULT, ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
+            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, R.drawable.mapbox_marker_icon_default)!!)
+
+            // Initialize symbol manager
+            this.symbolManager = SymbolManager(this.map_view, mapboxMap, style)
+
             // Save map as attribute
-            map = mapboxMap
+            this.map = mapboxMap
 
             // Disable interactions that might confuse the user
             val settings = map!!.uiSettings
@@ -319,17 +323,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun updateMarkers() {
         // Clear old markers
-        map!!.clear()
+        this.symbolManager!!.deleteAll()
 
         // Process sensors
         val locations = ArrayList<LatLng>()
         for (sensorMeasurement in sensors.values) {
             val sensor = sensorMeasurement.sensor
             val measurements = sensorMeasurement.measurements
-            Log.i(TAG, "Add sensor " + sensor.deviceName)
+            Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
 
             // Sort measurements by ID
-            Collections.sort(measurements) { lhs, rhs ->
+            measurements.sortWith { lhs, rhs ->
                 val leftId = lhs.id
                 val rightId = rhs.id
                 leftId.compareTo(rightId)
@@ -344,24 +348,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             val location = LatLng(lat, lng)
 
-            // Add the marker to the map
-            val marker = map!!.addMarker(
-                    MarkerOptions()
-                            .position(LatLng(lat, lng))
-                            .title(sensor.deviceName)
-                            .icon(this.mapMarkers!!.defaultIcon)
+            // Create marker on map
+            val marker = this.symbolManager!!.create(
+                SymbolOptions()
+                    .withLatLng(LatLng(lat, lng))
+                    .withIconImage(MARKER_DEFAULT)
             )
 
-            // Create a mapping from the marker id to the sensor id
-            sensorMarkers.put(marker.id, sensor.id)
+            // Attach data to marker
+            val markerData = JsonObject()
+            markerData.add("sensorId", JsonPrimitive(sensor.id))
+            marker.data = markerData
+
+            // Add click listener
+            symbolManager!!.addClickListener {
+                onMarkerSelected(it)
+            }
 
             // Store location
             locations.add(location)
-        }
-
-        // Add marker click listener
-        map!!.setOnMarkerClickListener { marker ->
-            this@MapActivity.onMarkerSelected(marker)
         }
 
         // Add map click listener
@@ -373,8 +378,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             // No more active marker
-            this@MapActivity.activeMarker!!.icon = this@MapActivity.mapMarkers!!.defaultIcon
-            this@MapActivity.activeMarker = null
+            this.deselectMarkers()
 
             // Hide the details pane
             this.hideBottomSheet()
@@ -398,19 +402,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     /**
      * Called when a marker is selected.
      */
-    private fun onMarkerSelected(marker: Marker): Boolean {
-        Log.d(TAG, "Selected marker ID: " + marker.id)
+    private fun onMarkerSelected(marker: Symbol): Boolean {
+        val sensorId: Int? = marker.data?.asJsonObject?.get("sensorId")?.asInt
+        Log.d(TAG, "Selected marker ID: ${marker.id} (sensor ID: $sensorId)")
+        if (sensorId == null) {
+            return true
+        }
 
         // Update active marker icon
-        if (this.activeMarker != null) {
-            this.activeMarker!!.icon = this.mapMarkers!!.defaultIcon
+        this.activeMarker?.let {
+            it.iconImage = MARKER_DEFAULT
+            symbolManager?.update(it)
         }
-        marker.icon = this.mapMarkers!!.activeIcon
+        marker.iconImage = MARKER_ACTIVE
+        symbolManager?.update(marker)
         this.activeMarker = marker
 
-        // Fetch sensor for that marker
-        val sensorId: Int? = sensorMarkers[marker.id]
-        val sensorMeasurements = sensors[sensorId!!]
+        // Lookup sensor for that marker
+        val sensorMeasurements = sensors[sensorId]
         if (sensorMeasurements == null) {
             Log.e(TAG, "Sensor with id $sensorId not found")
             Utils.showError(this, "Sensor not found")
@@ -472,9 +481,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
+    /**
+     * Deselect all markers and set the `activeMarker` attribute to `null`.
+     */
     private fun deselectMarkers() {
         this.activeMarker?.let {
-            it.icon = this.mapMarkers!!.defaultIcon
+            it.iconImage = MARKER_DEFAULT
+            this.symbolManager?.update(it)
+            this.activeMarker = null
         }
     }
 
@@ -584,9 +598,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             R.id.action_refresh -> {
                 Log.d(TAG, "Menu: Refresh")
-                fetchData()
+                if (this.map != null) {
+                    fetchData()
+                }
             }
-            else -> Log.w(TAG, "Selected unknown menu entry: " + item)
+            else -> Log.w(TAG, "Selected unknown menu entry: $item")
         }
         return super.onOptionsItemSelected(item)
     }
