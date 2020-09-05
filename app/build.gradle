@@ -63,7 +63,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha02'
 
     // Mapbox SDK
-    implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.1')
+    implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:9.2.1')
 
     // REST client
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
