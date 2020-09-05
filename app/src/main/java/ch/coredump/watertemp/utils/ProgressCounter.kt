@@ -3,15 +3,15 @@ package ch.coredump.watertemp.utils
 import android.util.Log
 import android.view.View
 
+private const val TAG = "ProgressCounter"
+
 /**
  * Track multiple progress events.
  *
  * Show the progress view when the first event is started,
  * hide it when the last event has stopped.
  */
-class ProgressCounter(val progressView: View) {
-    val TAG = "ProgressCounter"
-
+class ProgressCounter(private val progressView: View) {
     var count = 0
 
     /**
