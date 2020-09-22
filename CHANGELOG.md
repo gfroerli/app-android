@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.1 (2020-09-22)
+
+- Update many dependencies
+- Show summary of aggregated data (#28)
+
 ## v0.5.0 (2019-01-18)
 
 - Update icon

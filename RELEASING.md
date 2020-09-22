@@ -11,7 +11,7 @@ Update version numbers:
 
 Update changelog:
 
-    $ vim CHANGELOG.txt
+    $ vim CHANGELOG.md
 
 Commit & tag:
 
