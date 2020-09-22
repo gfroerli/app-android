@@ -218,8 +218,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (!response.isSuccessful) {
                     val error = ApiClient.parseError(response)
                     Log.e(TAG, error.toString())
-                    Utils.showError(this@MapActivity, "Could not fetch sensors.\n" +
-                            error.statusCode + ": " + error.message)
+                    Utils.showError(
+                        this@MapActivity,
+                        "Could not fetch sensors.\n ${error.statusCode}: ${error.message}"
+                    )
                 }
 
                 // Success!
@@ -233,7 +235,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 // Extract sensor information
                 for (sensor in response.body()!!) {
-                    sensors.put(sensor.id, SensorMeasurements(sensor))
+                    sensors[sensor.id] = SensorMeasurements(sensor)
                     idList.add(sensor.id.toString())
                 }
 
@@ -248,10 +250,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
                 this@MapActivity.progressCounter!!.stop()
-                Log.e(TAG, "Fetching sensors failed: " + t.toString())
+                Log.e(TAG, "Fetching sensors failed: $t")
                 Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sensors))
+                    this@MapActivity,
+                    getString(R.string.fetching_data_failed, getString(R.string.data_sensors)
+                )
                 )
             }
         }
@@ -273,8 +276,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.e(TAG, "Sponsors response not successful")
                     val error = ApiClient.parseError(response)
                     Log.e(TAG, error.toString())
-                    Utils.showError(this@MapActivity, "Could not fetch sensors.\n" +
-                            error.statusCode + ": " + error.message)
+                    Utils.showError(
+                        this@MapActivity,
+                        "Could not fetch sensors.\n${error.statusCode}: ${error.message}"
+                    )
                     return
                 }
 
@@ -290,10 +295,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             override fun onFailure(call: Call<List<Sponsor>>, t: Throwable) {
                 this@MapActivity.progressCounter!!.stop()
-                Log.e(TAG, "Fetching sponsors failed: " + t.toString())
+                Log.e(TAG, "Fetching sponsors failed: $t")
                 Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sponsors))
+                    this@MapActivity,
+                    getString(R.string.fetching_data_failed, getString(R.string.data_sponsors))
                 )
             }
         }
@@ -344,7 +349,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val lat = sensor.latitude
             val lng = sensor.longitude
             if (lat == null || lng == null) {
-                Log.w(TAG, "Skipping sensor without location: " + sensor.deviceName)
+                Log.w(TAG, "Skipping sensor without location: ${sensor.deviceName}")
                 continue
             }
             val location = LatLng(lat, lng)
@@ -561,7 +566,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val maxTemp: Float? = measurements.asSequence().map { it.temperature }.maxOrNull()
             val avgTemp: Double = measurements.asSequence().map { it.temperature }.average()
             this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
-                    minTemp, maxTemp, avgTemp
+                minTemp, maxTemp, avgTemp
             )
         }
     }
