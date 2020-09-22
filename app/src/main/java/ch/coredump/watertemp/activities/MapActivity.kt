@@ -556,21 +556,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updateDataSummary(measurements: List<Measurement>) {
-        var minTemp: Float? = null
-        var maxTemp: Float? = null
-        var avgTemp: Float = 0.0f
-        for (temperature in measurements.map { it.temperature }) {
-            if (minTemp == null || minTemp > temperature) {
-                minTemp = temperature
-            } else if (maxTemp == null || maxTemp < temperature) {
-                maxTemp = temperature
-            }
-            avgTemp += temperature
+        if (measurements.isNotEmpty()) {
+            val minTemp: Float? = measurements.asSequence().map { it.temperature }.minOrNull()
+            val maxTemp: Float? = measurements.asSequence().map { it.temperature }.maxOrNull()
+            val avgTemp: Double = measurements.asSequence().map { it.temperature }.average()
+            this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+                    minTemp, maxTemp, avgTemp
+            )
         }
-        avgTemp /= measurements.size
-        this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
-            minTemp, maxTemp, avgTemp
-        )
     }
 
     // Lifecycle methods
