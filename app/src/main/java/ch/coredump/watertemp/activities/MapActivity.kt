@@ -631,8 +631,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.action_about -> {
                 Log.d(TAG, "Menu: About")
                 val intent = Intent(this, AboutActivity::class.java)
