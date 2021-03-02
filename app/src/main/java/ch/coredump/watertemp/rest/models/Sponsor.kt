@@ -7,5 +7,5 @@ data class Sponsor(
     val id: Int,
     val name: String,
     val description: String?,
-    val logoSource: String?,
+    val logoUrl: String?,
 )

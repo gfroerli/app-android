@@ -8,6 +8,7 @@ import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import ch.coredump.watertemp.BuildConfig
@@ -21,6 +22,7 @@ import ch.coredump.watertemp.rest.models.Sensor
 import ch.coredump.watertemp.rest.models.SensorDetails
 import ch.coredump.watertemp.rest.models.Sponsor
 import ch.coredump.watertemp.utils.ProgressCounter
+import com.bumptech.glide.Glide
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -49,6 +51,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+
 
 // Marker image names
 private const val MARKER_DEFAULT = "marker_default"
@@ -588,12 +591,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun updateDetailsSponsor(sponsor: Sponsor) {
         Log.d(TAG, "Update sensor details: Sponsor ${sponsor.id}")
+
+        // Header
         details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
+
+        // Description
         val sponsorDescriptionBuilder = StringBuilder()
         sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
         sponsorDescriptionBuilder.append("\n")
         sponsorDescriptionBuilder.append(sponsor.description)
         details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+
+        // Logo
+        if (sponsor.logoUrl != null) {
+            val imageView: ImageView = findViewById(R.id.details_sponsor_logo)
+            Glide.with(this).load(sponsor.logoUrl).into(imageView)
+        }
+
+        // Show section
         details_section_sponsor.visibility = View.VISIBLE
     }
 
