@@ -19,9 +19,11 @@
     <string name="action_refresh">Daten aktualisieren</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
-    <string name="section_subheader_summary">Zusammenfassung der letzte 3 Tage</string>
+    <string name="section_subheader_summary">Zusammenfassung (insgesamt)</string>
     <string name="fetching_data_failed">%1$s konnten nicht geladen werden. Bitte prüfe deine Internetverbindung.</string>
     <string name="data_sensors">Sensoren</string>
+    <string name="data_sensor_details">Sensor-Details</string>
+    <string name="data_sponsor">Sponsor</string>
     <string name="data_sponsors">Sponsoren</string>
     <string name="data_measurements">Messungen</string>
 </resources>

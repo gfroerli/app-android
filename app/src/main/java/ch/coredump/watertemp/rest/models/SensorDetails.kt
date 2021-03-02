@@ -1,9 +1,9 @@
 package ch.coredump.watertemp.rest.models
 
 /**
- * Gson Sensor model.
+ * Gson Sensor model with details.
  */
-data class Sensor(
+data class SensorDetails(
     val id: Int,
     val deviceName: String,
     val caption: String?,
@@ -11,4 +11,7 @@ data class Sensor(
     val longitude: Double?,
     val latestTemperature: Double?,
     val sponsorId: Int?,
+    val minimumTemperature: Double?,
+    val maximumTemperature: Double?,
+    val averageTemperature: Double?,
 )

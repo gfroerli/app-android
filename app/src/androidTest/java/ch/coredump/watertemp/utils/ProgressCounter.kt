@@ -26,9 +26,9 @@ class ProgressCounterTest {
     @Test
     fun testStartStop() {
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.start()
+        this.progressCounter.increment()
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.stop()
+        this.progressCounter.decrement()
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
     }
 
@@ -36,19 +36,19 @@ class ProgressCounterTest {
     fun testMixed() {
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.stop()
+        this.progressCounter.decrement()
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.start()
+        this.progressCounter.increment()
         // count = 1
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.start()
+        this.progressCounter.increment()
         // count = 2
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.stop()
+        this.progressCounter.decrement()
         // count = 1
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.stop()
+        this.progressCounter.decrement()
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
     }

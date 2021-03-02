@@ -18,6 +18,7 @@ import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
+import ch.coredump.watertemp.rest.models.SensorDetails
 import ch.coredump.watertemp.rest.models.Sponsor
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.github.mikephil.charting.charts.LineChart
@@ -182,31 +183,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             settings.isTiltGesturesEnabled = false
             settings.isCompassEnabled = false
 
-            this.fetchData()
+            this.fetchInitialData()
         }
     }
 
     /**
-     * Request sensors and sponsors.
+     * Request initial data.
      */
-    private fun fetchData() {
-        Log.d(TAG, "Fetching data from API")
+    private fun fetchInitialData() {
+        Log.d(TAG, "Fetching initial data from API")
 
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
-        this.progressCounter!!.start()
+        this.progressCounter!!.increment()
         sensorCall.enqueue(this.onSensorsFetched())
 
-        // Fetch sponsors
-        val sponsorCall = apiService!!.listSponsors()
-        this.progressCounter!!.start()
-        sponsorCall.enqueue(this.onSponsorsFetched())
+        // TODO: Do we need to re-fetch sensor-details of currently showing sensor?
     }
 
     private fun onSensorsFetched(): Callback<List<Sensor>> {
         return object : Callback<List<Sensor>> {
             override fun onResponse(call: Call<List<Sensor>>, response: Response<List<Sensor>>?) {
-                this@MapActivity.progressCounter!!.stop()
+                this@MapActivity.progressCounter!!.decrement()
 
                 // Handle null response
                 if (response == null) {
@@ -249,56 +247,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
-                this@MapActivity.progressCounter!!.stop()
+                this@MapActivity.progressCounter!!.decrement()
                 Log.e(TAG, "Fetching sensors failed: $t")
                 Utils.showError(
                     this@MapActivity,
                     getString(R.string.fetching_data_failed, getString(R.string.data_sensors)
                 )
-                )
-            }
-        }
-    }
-
-    private fun onSponsorsFetched(): Callback<List<Sponsor>> {
-        return object : Callback<List<Sponsor>> {
-            override fun onResponse(call: Call<List<Sponsor>>, response: Response<List<Sponsor>>?) {
-                this@MapActivity.progressCounter!!.stop()
-
-                // Handle null response
-                if (response == null) {
-                    Log.e(TAG, "Received null response from sponsors endpoint")
-                    return
-                }
-
-                // Handle unsuccessful response
-                if (!response.isSuccessful) {
-                    Log.e(TAG, "Sponsors response not successful")
-                    val error = ApiClient.parseError(response)
-                    Log.e(TAG, error.toString())
-                    Utils.showError(
-                        this@MapActivity,
-                        "Could not fetch sensors.\n${error.statusCode}: ${error.message}"
-                    )
-                    return
-                }
-
-                // Success!
-                Log.d(TAG, "Sponsors response successful")
-
-                // Store sponsors
-                sponsors.clear()
-                for (sponsor in response.body()!!) {
-                    sponsors.put(sponsor.id, sponsor)
-                }
-            }
-
-            override fun onFailure(call: Call<List<Sponsor>>, t: Throwable) {
-                this@MapActivity.progressCounter!!.stop()
-                Log.e(TAG, "Fetching sponsors failed: $t")
-                Utils.showError(
-                    this@MapActivity,
-                    getString(R.string.fetching_data_failed, getString(R.string.data_sponsors))
                 )
             }
         }
@@ -424,6 +378,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         symbolManager?.update(marker)
         this.activeMarker = marker
 
+        // Clear old data
+        details_section_sponsor.visibility = View.GONE
+
         // Lookup sensor for that marker
         val sensorMeasurements = sensors[sensorId]
         if (sensorMeasurements == null) {
@@ -433,23 +390,43 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         val sensor = sensorMeasurements.sensor
 
+        // Fetch sensor details asynchronously
+        Log.i(TAG, "Fetching sensor " + sensor.id)
+        this.progressCounter!!.increment()
+        apiService!!.getSensorDetails(sensor.id).enqueue(onSensorDetailsFetched())
+
+        // Look up sponsor in cache. If not found, fetch it asynchronously.
+        if (sensor.sponsorId != null) {
+            val sponsor = sponsors.get(sensor.sponsorId)
+            if (sponsor == null) {
+                // Not found in cache, fetch it from the API
+                Log.i(TAG, "Fetching sponsor " + sensor.id)
+                this.progressCounter!!.increment()
+                apiService!!.getSponsor(sensor.id).enqueue(onSponsorFetched())
+            } else {
+                // Cache hit!
+                Log.d(TAG, "Sponsor " + sensor.sponsorId + " cache hit")
+                updateDetailsSponsor(sponsor)
+            }
+        }
+
         // Fetch sensor measurements from last three days
+        // TODO: Use new API
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
-        this.progressCounter!!.start()
+        this.progressCounter!!.increment()
         measurementCall.enqueue(onMeasurementsFetched())
-
-        // Lookup sponsor for that sensor
-        val sponsor: Sponsor? = sensor.sponsorId?.let { sponsors.get(it) }
 
         // Get last temperature measurement
         val captionBuilder = StringBuilder()
-        if (sensor.lastMeasurement != null) {
+        if (sensor.latestTemperature != null) {
             val pt = PrettyTime()
-            captionBuilder.append(String.format("%.2f", sensor.lastMeasurement.temperature))
+            captionBuilder.append(String.format("%.2f", sensor.latestTemperature))
             captionBuilder.append("°C (")
-            val createdAtDate = Date(sensor.lastMeasurement.createdAt.toInstant().toEpochMilli())
-            captionBuilder.append(pt.format(createdAtDate))
+            // TODO: Once https://github.com/gfroerli/api/pull/80 is merged
+            //val createdAtDate = Date(sensor.latestTemperature.createdAt.toInstant().toEpochMilli())
+            //captionBuilder.append(pt.format(createdAtDate))
+            captionBuilder.append("TODO time ago")
             captionBuilder.append(")")
         } else {
             captionBuilder.append(getString(R.string.no_measurement))
@@ -463,19 +440,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             details_caption.text = sensor.caption
             details_caption.visibility = View.VISIBLE
-        }
-
-        // Update sponsor section
-        if (sponsor == null) {
-            details_section_sponsor.visibility = View.GONE
-        } else {
-            details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
-            val sponsorDescriptionBuilder = StringBuilder()
-            sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
-            sponsorDescriptionBuilder.append("\n")
-            sponsorDescriptionBuilder.append(sponsor.description)
-            details_sponsor_description.text = sponsorDescriptionBuilder.toString()
-            details_section_sponsor.visibility = View.VISIBLE
         }
 
         // Show the details pane
@@ -495,20 +459,69 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun onSensorDetailsFetched(): Callback<SensorDetails> {
+        return object : Callback<SensorDetails> {
+            override fun onResponse(call: Call<SensorDetails>, response: Response<SensorDetails>?) {
+                this@MapActivity.progressCounter!!.decrement()
+
+                Log.i(TAG, "Processing sensor details response")
+                response?.body()?.let {
+                    updateDetailsDataSummary(it)
+                }
+            }
+
+            override fun onFailure(call: Call<SensorDetails>, t: Throwable) {
+                this@MapActivity.progressCounter!!.decrement()
+
+                Log.e(TAG, "Fetching sensor details failed: $t")
+                Utils.showError(
+                        this@MapActivity,
+                        getString(R.string.fetching_data_failed, getString(R.string.data_sensor_details))
+                )
+            }
+        }
+    }
+
+    private fun onSponsorFetched(): Callback<Sponsor> {
+        return object : Callback<Sponsor> {
+            override fun onResponse(call: Call<Sponsor>, response: Response<Sponsor>?) {
+                this@MapActivity.progressCounter!!.decrement()
+
+                Log.i(TAG, "Processing sponsor response")
+                response?.body()?.let {
+                    // Update details
+                    updateDetailsSponsor(it)
+
+                    // Store in cache
+                    this@MapActivity.sponsors.put(it.id, it)
+                }
+            }
+
+            override fun onFailure(call: Call<Sponsor>, t: Throwable) {
+                this@MapActivity.progressCounter!!.decrement()
+
+                Log.e(TAG, "Fetching sponsor failed: $t")
+                Utils.showError(
+                        this@MapActivity,
+                        getString(R.string.fetching_data_failed, getString(R.string.data_sponsor))
+                )
+            }
+        }
+    }
+
     private fun onMeasurementsFetched(): Callback<List<Measurement>> {
         return object : Callback<List<Measurement>> {
             override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
-                this@MapActivity.progressCounter!!.stop()
+                this@MapActivity.progressCounter!!.decrement()
 
-                Log.i(TAG, "Measurement response done!")
+                Log.i(TAG, "Processing measurements response")
                 response?.body()?.let {
                     drawChart3Days(it)
-                    updateDataSummary(it)
                 }
             }
 
             override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
-                this@MapActivity.progressCounter!!.stop()
+                this@MapActivity.progressCounter!!.decrement()
 
                 Log.e(TAG, "Fetching measurements failed: $t")
                 Utils.showError(
@@ -560,15 +573,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this@MapActivity.chart3days!!.invalidate()
     }
 
-    private fun updateDataSummary(measurements: List<Measurement>) {
-        if (measurements.isNotEmpty()) {
-            val minTemp: Float? = measurements.asSequence().map { it.temperature }.minOrNull()
-            val maxTemp: Float? = measurements.asSequence().map { it.temperature }.maxOrNull()
-            val avgTemp: Double = measurements.asSequence().map { it.temperature }.average()
-            this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
-                minTemp, maxTemp, avgTemp
-            )
-        }
+    /**
+     * Update the summary of the sensor with aggregated data (min/max/avg temperature).
+     */
+    private fun updateDetailsDataSummary(sensorDetails: SensorDetails) {
+        Log.d(TAG, "Update sensor ${sensorDetails.id} details: Summary")
+        this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+            sensorDetails.minimumTemperature, sensorDetails.maximumTemperature, sensorDetails.averageTemperature
+        )
+    }
+
+    /**
+     * Update the sponsor details of the sensor.
+     */
+    private fun updateDetailsSponsor(sponsor: Sponsor) {
+        Log.d(TAG, "Update sensor details: Sponsor ${sponsor.id}")
+        details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
+        val sponsorDescriptionBuilder = StringBuilder()
+        sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
+        sponsorDescriptionBuilder.append("\n")
+        sponsorDescriptionBuilder.append(sponsor.description)
+        details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+        details_section_sponsor.visibility = View.VISIBLE
     }
 
     // Lifecycle methods
@@ -615,7 +641,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             R.id.action_refresh -> {
                 Log.d(TAG, "Menu: Refresh")
                 if (this.map != null) {
-                    fetchData()
+                    fetchInitialData()
                 }
             }
             else -> Log.w(TAG, "Selected unknown menu entry: $item")

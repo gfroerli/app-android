@@ -18,7 +18,7 @@ class ProgressCounter(private val progressView: View) {
      * Start a progress activitiy.
      */
     @Synchronized
-    fun start() {
+    fun increment() {
         count += 1
         if (count == 1) {
             this.progressView.visibility = View.VISIBLE
@@ -29,7 +29,7 @@ class ProgressCounter(private val progressView: View) {
      * Stop a progress activitiy.
      */
     @Synchronized
-    fun stop() {
+    fun decrement() {
         if (count == 0) {
             Log.w(TAG, "Warning: Count already 0")
             return

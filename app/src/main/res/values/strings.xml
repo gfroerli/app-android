@@ -13,7 +13,7 @@
     <!-- Detail pane -->
     <string name="section_header_details">Details</string>
     <string name="section_subheader_3days">History (last 3 days)</string>
-    <string name="section_subheader_summary">Summary (last 3 days)</string>
+    <string name="section_subheader_summary">Summary (all time)</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
     <string name="chart_no_data">No data found</string>
@@ -33,7 +33,14 @@
 
     <!-- Error messages -->
     <string name="fetching_data_failed">Fetching %1$s failed. Please check your internet connection.</string>
+    <!-- Shown in "fetching data failed" error message -->
+    <string name="data_sensor_details">sensor details</string>
+    <!-- Shown in "fetching data failed" error message -->
     <string name="data_sensors">sensors</string>
+    <!-- Shown in "fetching data failed" error message -->
+    <string name="data_sponsor">sponsor</string>
+    <!-- Shown in "fetching data failed" error message -->
     <string name="data_sponsors">sponsors</string>
+    <!-- Shown in "fetching data failed" error message -->
     <string name="data_measurements">measurements</string>
 </resources>
