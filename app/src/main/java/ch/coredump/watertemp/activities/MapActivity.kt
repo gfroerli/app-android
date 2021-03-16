@@ -426,10 +426,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val pt = PrettyTime()
             captionBuilder.append(String.format("%.2f", sensor.latestTemperature))
             captionBuilder.append("°C (")
-            // TODO: Once https://github.com/gfroerli/api/pull/80 is merged
-            //val createdAtDate = Date(sensor.latestTemperature.createdAt.toInstant().toEpochMilli())
-            //captionBuilder.append(pt.format(createdAtDate))
-            captionBuilder.append("TODO time ago")
+            val createdAtDate = Date(sensor.latestMeasurementAt!! * 1000)
+            captionBuilder.append(pt.format(createdAtDate))
             captionBuilder.append(")")
         } else {
             captionBuilder.append(getString(R.string.no_measurement))

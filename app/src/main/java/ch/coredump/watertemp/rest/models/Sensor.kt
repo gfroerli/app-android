@@ -10,5 +10,6 @@ data class Sensor(
     val latitude: Double?,
     val longitude: Double?,
     val latestTemperature: Double?,
+    val latestMeasurementAt: Long?,
     val sponsorId: Int?,
 )

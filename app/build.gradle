@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
 
     // Relative time calculation
-    implementation 'org.ocpsoft.prettytime:prettytime:4.0.5.Final'
+    implementation 'org.ocpsoft.prettytime:prettytime:5.0.0.Final'
 
     // Baseline alignment of typography
     implementation 'com.actinarium.aligned:aligned:0.1'

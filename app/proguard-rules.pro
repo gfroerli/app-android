@@ -20,7 +20,11 @@
 -keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+# prettytime
 -keep class org.ocpsoft.prettytime.i18n.**
+
+# charts
 -keep class com.github.mikephil.charting.** { *; }
 
 # Glide
