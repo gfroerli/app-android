@@ -6,32 +6,39 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/main_action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
-
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:outlineProvider="paddedBounds">
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/loadingbar"
+        android:orientation="vertical"
+        android:elevation="@dimen/elevation"
+        android:outlineProvider="bounds">
+
+        <!-- Main toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_action_bar"
             android:layout_width="match_parent"
-            android:layout_height="6dp"
-            app:trackColor="@color/colorPrimaryDark"
-            app:indicatorColor="@color/colorLightBlue"
-            app:minHideDelay="1100"
-            android:indeterminate="true" />
-    </FrameLayout>
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+
+        <!-- Progress bar -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary">
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/loadingbar"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                app:trackColor="@color/colorPrimaryDark"
+                app:indicatorColor="@color/colorLightBlue"
+                app:minHideDelay="1100"
+                android:indeterminate="true"/>
+        </FrameLayout>
+
+    </LinearLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:mapbox="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -56,19 +63,15 @@
             android:layout_height="wrap_content"
             app:layout_behavior="@string/bottom_sheet_behavior"
             app:behavior_hideable="true"
-            app:behavior_peekHeight="125dp">
+            app:behavior_peekHeight="125dp"
+            android:elevation="@dimen/elevation"
+            android:outlineProvider="bounds">
 
             <!-- Layout containing both the bottom sheet and the drop shadow -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-                <!-- Drop shadow -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="6dp"
-                    android:background="@drawable/drop_shadow"/>
 
                 <!-- Peek area -->
                 <include layout="@layout/bottom_sheet_peek"/>

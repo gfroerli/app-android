@@ -16,10 +16,16 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
 
+        <!-- Colors -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <!-- Shadows -->
+        <item name="android:ambientShadowAlpha">0.1</item>
+        <item name="android:spotShadowAlpha">0.1</item>
+
+        <!-- Action and status bars -->
         <item name="android:windowNoTitle">true</item> <!-- Hide the default action bar (we have our own) -->
         <item name="android:windowFullscreen">false</item> <!-- Don't hide the status bar -->
 
