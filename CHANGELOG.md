@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.6.0 (2021-03-16)
+
+- Adaptive app icon (#31)
+- Show sponsor logos (#30)
+- Increase minSdkVersion to 21 (Android 5)
+- Use new API endpoints
+- About screen: Link to GitHub
+- UI fixes
+- Disable MapBox telemetry (#22)
+- Update many dependencies
+
 ## v0.5.1 (2020-09-22)
 
 - Update many dependencies
