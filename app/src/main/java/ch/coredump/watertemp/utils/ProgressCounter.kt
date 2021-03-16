@@ -2,6 +2,7 @@ package ch.coredump.watertemp.utils
 
 import android.util.Log
 import android.view.View
+import com.google.android.material.progressindicator.LinearProgressIndicator
 
 private const val TAG = "ProgressCounter"
 
@@ -11,7 +12,7 @@ private const val TAG = "ProgressCounter"
  * Show the progress view when the first event is started,
  * hide it when the last event has stopped.
  */
-class ProgressCounter(private val progressView: View) {
+class ProgressCounter(private val progressView: LinearProgressIndicator) {
     var count = 0
 
     /**
@@ -21,7 +22,7 @@ class ProgressCounter(private val progressView: View) {
     fun increment() {
         count += 1
         if (count == 1) {
-            this.progressView.visibility = View.VISIBLE
+            this.progressView.show()
         }
     }
 
@@ -36,7 +37,7 @@ class ProgressCounter(private val progressView: View) {
         }
         count -= 1
         if (count == 0) {
-            this.progressView.visibility = View.INVISIBLE
+            this.progressView.hide()
         }
     }
 }

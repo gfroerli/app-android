@@ -5,6 +5,7 @@
     <color name="colorAccent">#F84D4D</color>
     <color name="colorAccentAlpha">#BFF84D4D</color>
     <color name="colorBackground">#FAFAFA</color>
+    <color name="colorLightBlue">#65B0E3</color>
 
     <!-- Dark divider or icon: Black at 38% opacity -->
     <!-- https://material.google.com/style/color.html#color-text-background-colors -->
