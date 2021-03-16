@@ -15,6 +15,8 @@
     <string name="about_us_heading">Wer hat diese App entwickelt?</string>
     <string name="about_us_text1">Diese App, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt.</string>
     <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+    <string name="open_source_heading">Open Source</string>
+    <string name="open_source_text1">Diese app ist open source! Du findest den Quellcode auf GitHub: <a href="https://github.com/gfroerli/app-android">github.com/gfroerli/app-android</a></string>
     <string name="action_about">Über</string>
     <string name="action_refresh">Daten aktualisieren</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>

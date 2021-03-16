@@ -84,6 +84,22 @@
                 android:autoLink="web"
                 android:text="@string/about_us_text2"/>
 
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Headline"
+                app:firstLineLeading="@dimen/headlineLeading"
+                android:text="@string/open_source_heading"/>
+
+            <com.actinarium.aligned.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                app:leading="@dimen/body1Leading"
+                app:firstLineLeading="@dimen/body1Leading"
+                android:autoLink="web"
+                android:text="@string/open_source_text1"/>
+
         </LinearLayout>
 
     </ScrollView>

@@ -26,6 +26,8 @@
     <string name="about_us_heading">Who made this app?</string>
     <string name="about_us_text1">This app, the server infrastructure as well as the water temperature sensor hardware is developed by the Coredump hackerspace in Rapperswil-Jona.</string>
     <string name="about_us_text2">Find more information about us on our website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+    <string name="open_source_heading">Open Source</string>
+    <string name="open_source_text1">This app is open source! You can find the code on GitHub: <a href="https://github.com/gfroerli/app-android">github.com/gfroerli/app-android</a></string>
 
     <!-- Action bar menu -->
     <string name="action_about">About</string>
