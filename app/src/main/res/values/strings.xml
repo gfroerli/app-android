@@ -34,6 +34,7 @@
     <string name="action_refresh">Reload data</string>
 
     <!-- Error messages -->
+    <string name="fetching_sensor_data_failed">Could not fetch sensors (HTTP %1$d).\nIf the problem persists, please contact %2$s.</string>
     <string name="fetching_data_failed">Fetching %1$s failed. Please check your internet connection.</string>
     <!-- Shown in "fetching data failed" error message -->
     <string name="data_sensor_details">sensor details</string>

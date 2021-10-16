@@ -12,6 +12,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import ch.coredump.watertemp.BuildConfig
+import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
@@ -227,11 +228,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Handle unsuccessful response
                 if (!response.isSuccessful) {
                     val error = ApiClient.parseError(response)
-                    Log.e(TAG, error.toString())
+                    Log.e(TAG, "Could not fetch sensors (HTTP " + error.statusCode + "): " + error.message)
                     Utils.showError(
                         this@MapActivity,
-                        "Could not fetch sensors.\n ${error.statusCode}: ${error.message}"
+                        getString(R.string.fetching_sensor_data_failed, error.statusCode, Config.SUPPORT_EMAIL)
                     )
+                    return
                 }
 
                 // Success!
