@@ -1,14 +1,17 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.novoda.build-properties'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'project-report'
 
-buildProperties {
-    secrets {
-        using project.file('secrets.properties')
+def getLocalProperties() {
+    final Properties props = new Properties()
+    if (file('secrets.properties').exists()) {
+        props.load(new FileInputStream(file('secrets.properties')))
     }
+    return props
 }
+
+final Properties properties = getLocalProperties()
 
 android {
     compileSdkVersion 29
@@ -22,8 +25,8 @@ android {
         versionCode 10
         versionName "0.6.0"
 
-        buildConfigString 'GFROERLI_API_KEY_PUBLIC', buildProperties.secrets['gfroerli_api_key_public']
-        buildConfigString 'MAPBOX_ACCESS_TOKEN', buildProperties.secrets['mapbox_access_token']
+        buildConfigField 'String', 'GFROERLI_API_KEY_PUBLIC', '"' + properties['gfroerli_api_key_public'] + '"'
+        buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + properties['mapbox_access_token'] + '"'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         testInstrumentationRunnerArgument 'disableAnalytics', 'true'
