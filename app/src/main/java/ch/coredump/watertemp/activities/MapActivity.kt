@@ -31,7 +31,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import com.mapbox.android.telemetry.TelemetryEnabler
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -39,7 +38,6 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.maps.TelemetryDefinition
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
@@ -94,13 +92,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Initialize mapbox
         Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN)
-
-        val telemetry: TelemetryDefinition? = Mapbox.getTelemetry()
-        if (telemetry != null) {
-            Log.i(TAG, "Disable MapBox telemetry")
-            telemetry.setUserTelemetryRequestState(false)
-            TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED)
-        }
 
         // Initialize the layout
         setContentView(R.layout.activity_map)
