@@ -1,9 +1,14 @@
-version: 2
+version: 2.
+
+orbs:
+  # https://circleci.com/developer/orbs/orb/circleci/android
+  android: circleci/android@2.0.0
+
 jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/android:api-29
+      - image: cimg/android:2022.01.1
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
