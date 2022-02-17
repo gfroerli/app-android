@@ -32,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.WellKnownTileServer
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -91,7 +92,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
 
         // Initialize mapbox
-        Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN)
+        Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN, WellKnownTileServer.Mapbox)
 
         // Initialize the layout
         setContentView(R.layout.activity_map)
@@ -168,7 +169,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(mapboxMap: MapboxMap) {
         Log.d(TAG, "Map is ready")
 
-        mapboxMap.setStyle(Style.OUTDOORS) { style ->
+        mapboxMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
 
             // Load marker icon
