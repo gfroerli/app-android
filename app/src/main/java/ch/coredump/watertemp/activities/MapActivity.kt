@@ -15,6 +15,7 @@ import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
+import ch.coredump.watertemp.databinding.ActivityMapBinding
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -24,7 +25,6 @@ import ch.coredump.watertemp.rest.models.SensorDetails
 import ch.coredump.watertemp.rest.models.Sponsor
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.bumptech.glide.Glide
-import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -42,9 +42,6 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
-import kotlinx.android.synthetic.main.activity_map.*
-import kotlinx.android.synthetic.main.bottom_sheet_details.*
-import kotlinx.android.synthetic.main.bottom_sheet_peek.*
 import org.ocpsoft.prettytime.PrettyTime
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
@@ -62,6 +59,9 @@ private const val MARKER_ACTIVE = "marker_active"
 private const val TAG = "MapActivity"
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
+    // View bindings
+    private lateinit var binding: ActivityMapBinding
+
     // The map instance
     private var map: MapboxMap? = null
     private var symbolManager: SymbolManager? = null
@@ -82,9 +82,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
-    // Views
-    private var chart3days: LineChart? = null
-
     // Activity indicator
     private var progressCounter: ProgressCounter? = null
 
@@ -95,20 +92,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN, WellKnownTileServer.Mapbox)
 
         // Initialize the layout
-        setContentView(R.layout.activity_map)
+        this.binding = ActivityMapBinding.inflate(layoutInflater)
+        setContentView(this.binding.root)
 
         // Initialize the action bar
-        setSupportActionBar(main_action_bar)
+        setSupportActionBar(this.binding.mainActionBar)
         supportActionBar!!.title = getString(R.string.activity_map)
 
         // Progress counter
-        this.progressCounter = ProgressCounter(findViewById(R.id.loadingbar))
+        this.progressCounter = ProgressCounter(binding.loadingbar)
 
         // Create map view
-        this.map_view.onCreate(savedInstanceState)
+        this.binding.mapView.onCreate(savedInstanceState)
 
         // Initialize map
-        this.map_view.getMapAsync(this)
+        this.binding.mapView.getMapAsync(this)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -116,7 +114,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         apiService = apiClient.apiService
 
         // Initialize bottom sheet behavior
-        this.bottomSheetBehavior = BottomSheetBehavior.from(details_bottom_sheet)
+        this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.detailsBottomSheet)
 
         // Initially hidden
         this.bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
@@ -130,7 +128,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Bottom sheet state changed
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     // Clear chart data
-                    this@MapActivity.chart3days!!.clear()
+                    this@MapActivity.binding.bottomSheetDetails.chart3days.clear()
 
                     // Deselect all markers
                     this@MapActivity.deselectMarkers()
@@ -142,24 +140,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
+        this.binding.bottomSheetPeek.detailsTitle.text = "aww yeah"
+
         // Style charts
-        this.chart3days = findViewById(R.id.chart_3days)
-        this.chart3days!!.setNoDataText(getString(R.string.chart_no_data))
-        this.chart3days!!.setDrawGridBackground(false)
-        this.chart3days!!.setDrawBorders(false)
-        this.chart3days!!.description.isEnabled = false
-        this.chart3days!!.xAxis.isEnabled = false
-        this.chart3days!!.axisRight.isEnabled = false
+        val chart3days = this.binding.bottomSheetDetails.chart3days
+        chart3days.setNoDataText(getString(R.string.chart_no_data))
+        chart3days.setDrawGridBackground(false)
+        chart3days.setDrawBorders(false)
+        chart3days.description.isEnabled = false
+        chart3days.xAxis.isEnabled = false
+        chart3days.axisRight.isEnabled = false
     }
 
     override fun onStart() {
         super.onStart()
-        map_view.onStart()
+        this.binding.mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        map_view.onStop()
+        this.binding.mapView.onStop()
     }
 
     /**
@@ -177,7 +177,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, R.drawable.mapbox_marker_icon_default)!!)
 
             // Initialize symbol manager
-            this.symbolManager = SymbolManager(this.map_view, mapboxMap, style)
+            this.symbolManager = SymbolManager(this.binding.mapView, mapboxMap, style)
 
             // Save map as attribute
             this.map = mapboxMap
@@ -385,7 +385,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.activeMarker = marker
 
         // Clear old data
-        details_section_sponsor.visibility = View.GONE
+        this.binding.bottomSheetDetails.detailsSectionSponsor.visibility = View.GONE
 
         // Lookup sensor for that marker
         val sensorMeasurements = sensors[sensorId]
@@ -437,13 +437,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Update peek pane
-        details_title.text = sensor.deviceName
-        details_measurement.text = captionBuilder.toString()
+        Log.i(TAG, "Set detailsTitle text to " + sensor.deviceName)
+        this.binding.bottomSheetPeek.detailsTitle.text = sensor.deviceName
+        this.binding.bottomSheetPeek.detailsMeasurement.text = captionBuilder.toString()
         if (sensor.caption.isNullOrBlank()) {
-            details_caption.visibility = View.GONE
+            this.binding.bottomSheetPeek.detailsCaption.visibility = View.GONE
         } else {
-            details_caption.text = sensor.caption
-            details_caption.visibility = View.VISIBLE
+            this.binding.bottomSheetPeek.detailsCaption.text = sensor.caption
+            this.binding.bottomSheetPeek.detailsCaption.visibility = View.VISIBLE
         }
 
         // Show the details pane
@@ -558,8 +559,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
 
         // X axis value range
-        this@MapActivity.chart3days!!.xAxis.axisMinimum = 0f
-        this@MapActivity.chart3days!!.xAxis.axisMaximum = duration.toMillis().toFloat()
+        this@MapActivity.binding.bottomSheetDetails.chart3days.xAxis.axisMinimum = 0f
+        this@MapActivity.binding.bottomSheetDetails.chart3days.xAxis.axisMaximum = duration.toMillis().toFloat()
 
         // Styling
         dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
@@ -573,8 +574,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Draw data
         val data = LineData(dataSet)
         data.setDrawValues(false)
-        this@MapActivity.chart3days!!.data = data
-        this@MapActivity.chart3days!!.invalidate()
+        this@MapActivity.binding.bottomSheetDetails.chart3days.data = data
+        this@MapActivity.binding.bottomSheetDetails.chart3days.invalidate()
     }
 
     /**
@@ -582,7 +583,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun updateDetailsDataSummary(sensorDetails: SensorDetails) {
         Log.d(TAG, "Update sensor ${sensorDetails.id} details: Summary")
-        this.details_sensor_caption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+        this.binding.bottomSheetPeek.detailsCaption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
             sensorDetails.minimumTemperature, sensorDetails.maximumTemperature, sensorDetails.averageTemperature
         )
     }
@@ -594,50 +595,50 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         Log.d(TAG, "Update sensor details: Sponsor ${sponsor.id}")
 
         // Header
-        details_sponsor_section_header.text = getString(R.string.section_header_sponsor, sponsor.name)
+        this.binding.bottomSheetDetails.detailsSponsorSectionHeader.text = getString(R.string.section_header_sponsor, sponsor.name)
 
         // Description
         val sponsorDescriptionBuilder = StringBuilder()
         sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
         sponsorDescriptionBuilder.append("\n")
         sponsorDescriptionBuilder.append(sponsor.description)
-        details_sponsor_description.text = sponsorDescriptionBuilder.toString()
+        this.binding.bottomSheetDetails.detailsSponsorDescription.text = sponsorDescriptionBuilder.toString()
 
         // Logo
         if (sponsor.logoUrl != null) {
-            val imageView: ImageView = findViewById(R.id.details_sponsor_logo)
+            val imageView: ImageView = this.binding.bottomSheetDetails.detailsSponsorLogo
             Glide.with(this).load(sponsor.logoUrl).into(imageView)
         }
 
         // Show section
-        details_section_sponsor.visibility = View.VISIBLE
+        this.binding.bottomSheetDetails.detailsSectionSponsor.visibility = View.VISIBLE
     }
 
     // Lifecycle methods
 
     public override fun onResume() {
         super.onResume()
-        map_view!!.onResume()
+        this.binding.mapView.onResume()
     }
 
     public override fun onPause() {
         super.onPause()
-        map_view!!.onPause()
+        this.binding.mapView.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        map_view!!.onLowMemory()
+        this.binding.mapView.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        map_view!!.onDestroy()
+        this.binding.mapView.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        map_view!!.onSaveInstanceState(outState)
+        this.binding.mapView.onSaveInstanceState(outState)
     }
 
     // Menu
