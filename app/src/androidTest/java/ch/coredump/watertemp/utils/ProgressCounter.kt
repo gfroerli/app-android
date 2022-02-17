@@ -1,54 +1,70 @@
 package ch.coredump.watertemp.utils
 
+import android.content.Context
+import android.os.Handler
 import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
+import ch.coredump.watertemp.R
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
 
 class ProgressCounterTest {
-    private lateinit var view: View
-    private lateinit var progressCounter: ProgressCounter
+    private lateinit var context: Context
+    private lateinit var handler: Handler
+    private lateinit var view: LinearProgressIndicator
 
     @Before
     fun initialize() {
-        // Create view mock
+        // Get context
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        this.view = View(context)
+        context.setTheme(R.style.Theme_AppCompat)
+        this.context = context
 
-        // Initialize view as invisible
-        view.visibility = View.INVISIBLE
+        // Initialize handler
+        this.handler = Handler(context.mainLooper)
 
-        // Initialize progress counter
-        this.progressCounter = ProgressCounter(this.view)
+        // Initialize view
+        val viewInitialized = CountDownLatch(1)
+        handler.post {
+            val view = LinearProgressIndicator(context)
+            view.visibility = View.INVISIBLE
+            this.view = view
+            viewInitialized.countDown()
+        }
+        viewInitialized.await()
     }
 
     @Test
     fun testStartStop() {
+        val progressCounter = ProgressCounter(this.view)
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.increment()
+        progressCounter.increment()
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.decrement()
+        progressCounter.decrement()
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
     }
 
     @Test
     fun testMixed() {
+        val progressCounter = ProgressCounter(this.view)
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.decrement()
+        progressCounter.decrement()
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
-        this.progressCounter.increment()
+        progressCounter.increment()
         // count = 1
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.increment()
+        progressCounter.increment()
         // count = 2
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.decrement()
+        progressCounter.decrement()
         // count = 1
         Assert.assertEquals(this.view.visibility, View.VISIBLE)
-        this.progressCounter.decrement()
+        progressCounter.decrement()
         // count = 0
         Assert.assertEquals(this.view.visibility, View.INVISIBLE)
     }

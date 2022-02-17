@@ -1,11 +1,11 @@
-version: 2.
+version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/android
   android: circleci/android@2.0.0
 
 jobs:
-  build:
+  unittests:
     working_directory: ~/code
     docker:
       - image: cimg/android:2022.01.1
@@ -33,3 +33,30 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+
+  androidtests:
+    parameters:
+      system-image:
+        type: string
+    machine:
+      image: android:2022.01.1
+    resource_class: large
+    steps:
+      - checkout
+      - android/start-emulator-and-run-tests:
+          test-command: ./gradlew connectedDebugAndroidTest
+          system-image: << parameters.system-image >>
+
+
+workflows:
+  test:
+    jobs:
+      - unittests
+      - androidtests:
+          matrix:
+            alias: androidtests-all
+            parameters:
+              system-image:
+                - system-images;android-21;default;x86
+                - system-images;android-30;google_apis;x86
+          name: "androidtests:<<matrix.system-image>>"
