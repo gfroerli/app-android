@@ -68,7 +68,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     // Maplibre SDK
-    implementation 'org.maplibre.gl:android-sdk:9.2.1'
+    implementation 'org.maplibre.gl:android-sdk:9.5.2'
     implementation 'org.maplibre.gl:android-plugin-annotation-v9:1.0.0'
 
     // REST client
