@@ -9,12 +9,12 @@ import ch.coredump.watertemp.activities.MapActivity
 import org.junit.Rule
 import org.junit.Test
 
-class ApplicationTest {
+class MapActivityTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MapActivity::class.java)
 
     @Test
-    fun testMapActivity() {
+    fun testTitle() {
         onView(withSubstring("Gfrör.li"))
             .check(matches(isDisplayed()))
     }
