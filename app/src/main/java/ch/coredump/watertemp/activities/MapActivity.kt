@@ -581,9 +581,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     /**
      * Update the summary of the sensor with aggregated data (min/max/avg temperature).
      */
+    @SuppressLint("SetTextI18n")
     private fun updateDetailsDataSummary(sensorDetails: SensorDetails) {
         Log.d(TAG, "Update sensor ${sensorDetails.id} details: Summary")
-        this.binding.bottomSheetPeek.detailsCaption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+        this.binding.bottomSheetDetails.detailsSensorCaption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
             sensorDetails.minimumTemperature, sensorDetails.maximumTemperature, sensorDetails.averageTemperature
         )
     }
