@@ -9,7 +9,16 @@
     android:paddingBottom="16dp"
     android:paddingEnd="16dp"
     android:paddingStart="16dp"
-    android:paddingTop="16dp">
+    android:paddingTop="0dp">
+
+    <!-- Grab handle -->
+    <ImageView
+        android:id="@+id/grabHandle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_bottom_sheet_grab_handle" />
 
     <!-- Device name -->
     <TextView
@@ -17,6 +26,7 @@
         style="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp" />
 
     <!-- Caption -->

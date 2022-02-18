@@ -56,6 +56,7 @@ import java.util.*
 private const val MARKER_DEFAULT = "marker_default"
 private const val MARKER_ACTIVE = "marker_active"
 
+// Log tag
 private const val TAG = "MapActivity"
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -85,6 +86,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // Activity indicator
     private var progressCounter: ProgressCounter? = null
 
+    // Animation values
+    private var shortAnimationDuration: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -98,6 +102,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize the action bar
         setSupportActionBar(this.binding.mainActionBar)
         supportActionBar!!.title = getString(R.string.activity_map)
+
+        // Get resource values
+        shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
 
         // Progress counter
         this.progressCounter = ProgressCounter(binding.loadingbar)
@@ -126,12 +133,28 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Bottom sheet state changed
+
+                // Deselect markers when hidden
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     // Clear chart data
                     this@MapActivity.binding.bottomSheetDetails.chart3days.clear()
 
                     // Deselect all markers
                     this@MapActivity.deselectMarkers()
+                }
+
+                // Show/hide grab handle
+                val grabHandle = this@MapActivity.binding.bottomSheetPeek.grabHandle
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    grabHandle.animate()
+                        .alpha(0f)
+                        .setDuration(shortAnimationDuration.toLong())
+                        .setListener(null)
+                } else {
+                    grabHandle.animate()
+                        .alpha(1f)
+                        .setDuration(shortAnimationDuration.toLong())
+                        .setListener(null)
                 }
             }
 
