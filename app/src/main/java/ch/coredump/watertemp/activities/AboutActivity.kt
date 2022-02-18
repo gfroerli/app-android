@@ -5,19 +5,23 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import ch.coredump.watertemp.R
-import kotlinx.android.synthetic.main.activity_about.*
+import ch.coredump.watertemp.databinding.ActivityAboutBinding
 
 private const val TAG = "AboutActivity"
 
 class AboutActivity : AppCompatActivity() {
+    // View bindings
+    private lateinit var binding: ActivityAboutBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Initialize the layout
-        setContentView(R.layout.activity_about)
+        this.binding = ActivityAboutBinding.inflate(layoutInflater)
+        setContentView(this.binding.root)
 
         // Initialize the action bar
-        setSupportActionBar(about_action_bar)
+        setSupportActionBar(this.binding.aboutActionBar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
