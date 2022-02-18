@@ -361,7 +361,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             for (location in locations) {
                 boundingBoxBuilder.include(location)
             }
-            map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100))
+            map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 350))
         }
     }
 
