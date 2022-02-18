@@ -10,6 +10,19 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
@@ -23,6 +36,7 @@ import ch.coredump.watertemp.rest.models.Measurement
 import ch.coredump.watertemp.rest.models.Sensor
 import ch.coredump.watertemp.rest.models.SensorDetails
 import ch.coredump.watertemp.rest.models.Sponsor
+import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.data.Entry
@@ -163,8 +177,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
-        this.binding.bottomSheetPeek.detailsTitle.text = "aww yeah"
-
         // Style charts
         val chart3days = this.binding.bottomSheetDetails.chart3days
         chart3days.setNoDataText(getString(R.string.chart_no_data))
@@ -183,6 +195,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStop() {
         super.onStop()
         this.binding.mapView.onStop()
+    }
+
+    /**
+     * Update the sensor details UI with data from the specified sensor.
+     *
+     * // TODO: Maybe use a dedicated viewmodel?
+     */
+    fun updateSensorUi(sensor: SensorViewModel) {
+        this.binding.bottomSheetPeek.sensorCompose.setContent {
+            MaterialTheme(typography = GfroerliTypography) {
+                SensorPreview(sensor)
+            }
+        }
     }
 
     /**
@@ -419,6 +444,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         val sensor = sensorMeasurements.sensor
 
+        // Initialize viewmodel
+        val viewmodel = SensorViewModel.fromSensor(sensor)
+
+        // Initialize UI
+        this.updateSensorUi(viewmodel)
+
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
         this.progressCounter!!.increment()
@@ -445,30 +476,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
         this.progressCounter!!.increment()
         measurementCall.enqueue(onMeasurementsFetched())
-
-        // Get last temperature measurement
-        val captionBuilder = StringBuilder()
-        if (sensor.latestTemperature != null) {
-            val pt = PrettyTime()
-            captionBuilder.append(String.format("%.2f", sensor.latestTemperature))
-            captionBuilder.append("°C (")
-            val createdAtDate = Date(sensor.latestMeasurementAt!! * 1000)
-            captionBuilder.append(pt.format(createdAtDate))
-            captionBuilder.append(")")
-        } else {
-            captionBuilder.append(getString(R.string.no_measurement))
-        }
-
-        // Update peek pane
-        Log.i(TAG, "Set detailsTitle text to " + sensor.deviceName)
-        this.binding.bottomSheetPeek.detailsTitle.text = sensor.deviceName
-        this.binding.bottomSheetPeek.detailsMeasurement.text = captionBuilder.toString()
-        if (sensor.caption.isNullOrBlank()) {
-            this.binding.bottomSheetPeek.detailsCaption.visibility = View.GONE
-        } else {
-            this.binding.bottomSheetPeek.detailsCaption.text = sensor.caption
-            this.binding.bottomSheetPeek.detailsCaption.visibility = View.VISIBLE
-        }
 
         // Show the details pane
         this.showBottomSheet()
@@ -701,4 +708,95 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             super.onBackPressed()
         }
     }
+
+    // View models
+
+    data class MeasurementViewModel(
+        val temperature: Double,
+        val timestamp: Date,
+    )
+
+    data class SensorViewModel(
+        val name: String,
+        val caption: String?,
+        val latestMeasurement: MeasurementViewModel?,
+    ) {
+        companion object {
+            fun fromSensor(sensor: Sensor): SensorViewModel {
+                var latestMeasurement: MeasurementViewModel? = null
+                if (sensor.latestTemperature != null && sensor.latestMeasurementAt != null) {
+                    latestMeasurement = MeasurementViewModel(
+                        sensor.latestTemperature,
+                        Date(sensor.latestMeasurementAt * 1000),
+                    )
+                }
+                return SensorViewModel(sensor.deviceName, sensor.caption, latestMeasurement)
+            }
+        }
+    }
+
+    // Composables
+
+    /**
+     * The sensor preview shown in the bottom sheet peek pane.
+     */
+    @Composable
+    private fun SensorPreview(sensor: SensorViewModel) {
+        Column() {
+            Text(
+                text = sensor.name,
+                style = MaterialTheme.typography.h2,
+                modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 4.dp),
+            )
+            Text(
+                text = sensor.caption ?: "",
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier
+                    .padding(0.dp, 0.dp, 0.dp, 8.dp)
+                    .horizontalScroll(ScrollState(0)),
+            )
+            sensor.latestMeasurement?.let {
+                SensorMeasurement(it)
+            }
+        }
+    }
+
+    @Composable
+    private fun SensorMeasurement(measurement: MeasurementViewModel) {
+        val pt = PrettyTime()
+        val summary = "%.2f °C (%s)".format(
+            measurement.temperature,
+            pt.format(measurement.timestamp)
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.temperature),
+                modifier = Modifier
+                    .width(16.dp)
+                    .height(16.dp)
+                    .offset((-2).dp, 0.dp),
+                contentDescription = "Temperature icon",
+            )
+            Text(
+                text = summary,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.padding(4.dp, 0.dp, 0.dp, 0.dp),
+            )
+        }
+    }
+
+    @Preview
+    @Composable
+    fun PreviewSensorPreview() {
+        MaterialTheme(typography = GfroerliTypography) {
+            SensorPreview(
+                SensorViewModel(
+                    "Testsensor",
+                    "The bestest sensor of all!",
+                    MeasurementViewModel(13.37373737, Date()),
+                )
+            )
+        }
+    }
+
 }
