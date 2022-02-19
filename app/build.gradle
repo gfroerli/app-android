@@ -52,7 +52,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.0.5'
+        kotlinCompilerExtensionVersion compose_version
     }
 
     testOptions {
@@ -77,17 +77,17 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.0-alpha02'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
-    // Jetpack: Integration with activities
+    // Compose: Integration with activities
     implementation 'androidx.activity:activity-compose:1.4.0'
-    // Jetpack: Compose Material Design
-    implementation 'androidx.compose.material:material:1.1.0'
-    // Jetpack: Animations
-    implementation 'androidx.compose.animation:animation:1.1.0'
-    // Jetpack: Tooling support (Previews, etc.)
-    implementation 'androidx.compose.ui:ui-tooling:1.1.0'
-    // Jetpack: Integration with ViewModels
+    // Compose: Compose Material Design
+    implementation "androidx.compose.material:material:$compose_version"
+    // Compose: Animations
+    implementation "androidx.compose.animation:animation:$compose_version"
+    // Compose: Tooling support (Previews, etc.)
+    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    // Compose: Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha02'
-    // Jetpack: Image loading
+    // Compose: Image loading
     implementation "com.github.skydoves:landscapist-glide:1.4.8"
 
     // Maplibre SDK
