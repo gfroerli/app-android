@@ -12,7 +12,7 @@ val GfroerliTypography = Typography(
         letterSpacing = (-0.5).sp
     ),
     h2 = TextStyle(
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         letterSpacing = 0.sp
     ),
