@@ -11,9 +11,8 @@
     <string name="activity_map">Gfrör.li: Water Temperatures</string>
 
     <!-- Detail pane -->
-    <string name="section_header_details">Details</string>
-    <string name="section_subheader_3days">History (last 3 days)</string>
-    <string name="section_subheader_summary">Summary (all time)</string>
+    <string name="section_header_3days">History (last 3 days)</string>
+    <string name="section_header_summary">Summary (all time)</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
     <string name="chart_no_data">No data found</string>

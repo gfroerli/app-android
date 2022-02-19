@@ -4,8 +4,7 @@
     <string name="activity_map">Gfrör.li: Wassertemperaturen</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
     <string name="no_measurement">Keine aktuelle Messung</string>
-    <string name="section_header_details">Details</string>
-    <string name="section_subheader_3days">Messungen der letzten 3 Tage</string>
+    <string name="section_header_3days">Messungen der letzten 3 Tage</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">Dieser Sensor wurde von \"%1$s\" gesponsert.</string>
     <string name="about_project_heading">Warum diese App?</string>
@@ -21,7 +20,7 @@
     <string name="action_refresh">Daten aktualisieren</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
-    <string name="section_subheader_summary">Zusammenfassung (insgesamt)</string>
+    <string name="section_header_summary">Zusammenfassung (insgesamt)</string>
     <string name="fetching_sensor_data_failed">Sensor-Daten konnten nicht geladen werden (HTTP %1$d).\nWenn das Problem fortbesteht, kontaktieren Sie bitte %2$s.</string>
     <string name="fetching_data_failed">%1$s konnten nicht geladen werden. Bitte prüfe deine Internetverbindung.</string>
     <string name="data_sensors">Sensoren</string>

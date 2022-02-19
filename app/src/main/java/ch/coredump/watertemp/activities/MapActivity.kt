@@ -8,11 +8,9 @@ import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -20,9 +18,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
@@ -38,7 +39,7 @@ import ch.coredump.watertemp.rest.models.SensorDetails
 import ch.coredump.watertemp.rest.models.Sponsor
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.utils.ProgressCounter
-import com.bumptech.glide.Glide
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -56,6 +57,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.skydoves.landscapist.glide.GlideImage
 import org.ocpsoft.prettytime.PrettyTime
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
@@ -94,6 +96,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     // The currently active marker
     private var activeMarker: Symbol? = null
 
+    // The currently active sensor (and its data)
+    private var sensor: SensorViewModel? = null
+    private var sensorMeasurements: List<Measurement> = emptyList()
+
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
@@ -102,6 +108,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Animation values
     private var shortAnimationDuration: Int = 0
+    private var colorAccentAlpha: Int? = null
+    private lateinit var labelTemperature: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +127,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Get resource values
         shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
+        colorAccentAlpha = resources.getColor(R.color.colorAccentAlpha)
+        labelTemperature = getString(R.string.temperature)
 
         // Progress counter
         this.progressCounter = ProgressCounter(binding.loadingbar)
@@ -150,9 +160,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 // Deselect markers when hidden
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    // Clear chart data
-                    this@MapActivity.binding.bottomSheetDetails.chart3days.clear()
-
                     // Deselect all markers
                     this@MapActivity.deselectMarkers()
                 }
@@ -176,15 +183,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Called repeatedly while bottom sheet slides up
             }
         })
-
-        // Style charts
-        val chart3days = this.binding.bottomSheetDetails.chart3days
-        chart3days.setNoDataText(getString(R.string.chart_no_data))
-        chart3days.setDrawGridBackground(false)
-        chart3days.setDrawBorders(false)
-        chart3days.description.isEnabled = false
-        chart3days.xAxis.isEnabled = false
-        chart3days.axisRight.isEnabled = false
     }
 
     override fun onStart() {
@@ -202,10 +200,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      *
      * // TODO: Maybe use a dedicated viewmodel?
      */
-    fun updateSensorUi(sensor: SensorViewModel) {
+    private fun updateSensorUi(sensor: SensorViewModel, measurements: List<Measurement>) {
         this.binding.bottomSheetPeek.sensorCompose.setContent {
             MaterialTheme(typography = GfroerliTypography) {
                 SensorPreview(sensor)
+            }
+        }
+        this.binding.bottomSheetDetails.sensorDetailsCompose.setContent {
+            MaterialTheme(typography = GfroerliTypography) {
+                SensorDetails(sensor, measurements)
             }
         }
     }
@@ -432,9 +435,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         symbolManager?.update(marker)
         this.activeMarker = marker
 
-        // Clear old data
-        this.binding.bottomSheetDetails.detailsSectionSponsor.visibility = View.GONE
-
         // Lookup sensor for that marker
         val sensorMeasurements = sensors[sensorId]
         if (sensorMeasurements == null) {
@@ -444,11 +444,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         val sensor = sensorMeasurements.sensor
 
-        // Initialize viewmodel
-        val viewmodel = SensorViewModel.fromSensor(sensor)
-
-        // Initialize UI
-        this.updateSensorUi(viewmodel)
+        // Create viewmodel and update UI
+        SensorViewModel.fromSensor(sensor).let {
+            this.sensor = it
+            this.sensorMeasurements = emptyList()
+            this.updateSensorUi(it, emptyList())
+        }
 
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
@@ -466,7 +467,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 // Cache hit!
                 Log.d(TAG, "Sponsor " + sensor.sponsorId + " cache hit")
-                updateDetailsSponsor(sponsor)
+                this.sensor?.withSponsor(sponsor)?.let {
+                    this.sensor = it
+                    this.updateSensorUi(it, this.sensorMeasurements)
+                }
             }
         }
 
@@ -500,8 +504,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.i(TAG, "Processing sensor details response")
-                response?.body()?.let {
-                    updateDetailsDataSummary(it)
+                response?.body()?.let { details ->
+                    this@MapActivity.sensor?.withDetails(details)?.let {
+                        this@MapActivity.sensor = it
+                        this@MapActivity.updateSensorUi(it, this@MapActivity.sensorMeasurements)
+                    }
                 }
             }
 
@@ -523,12 +530,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.i(TAG, "Processing sponsor response")
-                response?.body()?.let {
-                    // Update details
-                    updateDetailsSponsor(it)
+                response?.body()?.let { sponsor ->
+                    // Update sensor
+                    this@MapActivity.sensor?.withSponsor(sponsor)?.let {
+                        this@MapActivity.sensor = it
+                        this@MapActivity.updateSensorUi(it, this@MapActivity.sensorMeasurements)
+                    }
 
                     // Store in cache
-                    this@MapActivity.sponsors.put(it.id, it)
+                    this@MapActivity.sponsors.put(sponsor.id, sponsor)
                 }
             }
 
@@ -551,7 +561,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 Log.i(TAG, "Processing measurements response")
                 response?.body()?.let {
-                    drawChart3Days(it)
+                    this@MapActivity.sensorMeasurements = it
+                    updateSensorUi(this@MapActivity.sensor!!, it)
                 }
             }
 
@@ -565,84 +576,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
         }
-    }
-
-    /**
-     * Draw the temperature line chart for the measurements during the last 3 days.
-     */
-    private fun drawChart3Days(measurements: List<Measurement>) {
-        // This is the start of the X axis
-        val duration = Duration.of(3, ChronoUnit.DAYS)
-        val startEpoch = Instant.now().minus(duration).toEpochMilli()
-
-        // Create an entry for every measurement
-        val entries: MutableList<Entry> = ArrayList()
-        for (measurement in measurements) {
-            val x = measurement.createdAt.toInstant().toEpochMilli() - startEpoch
-            val y = measurement.temperature
-            entries.add(Entry(x.toFloat(), y))
-        }
-        // See https://github.com/gfroerli/gfroerli-api/issues/40
-        entries.sortBy { it.x }
-
-        // Create a data set
-        val dataSet = LineDataSet(entries, getString(R.string.temperature) + " (°C)")
-
-        // X axis value range
-        this@MapActivity.binding.bottomSheetDetails.chart3days.xAxis.axisMinimum = 0f
-        this@MapActivity.binding.bottomSheetDetails.chart3days.xAxis.axisMaximum = duration.toMillis().toFloat()
-
-        // Styling
-        dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-        dataSet.lineWidth = 4f
-        dataSet.circleRadius = 2f
-        dataSet.color = resources.getColor(R.color.colorAccentAlpha)
-        dataSet.setCircleColor(dataSet.color)
-        dataSet.setDrawCircleHole(false)
-        dataSet.setDrawHighlightIndicators(false)
-
-        // Draw data
-        val data = LineData(dataSet)
-        data.setDrawValues(false)
-        this@MapActivity.binding.bottomSheetDetails.chart3days.data = data
-        this@MapActivity.binding.bottomSheetDetails.chart3days.invalidate()
-    }
-
-    /**
-     * Update the summary of the sensor with aggregated data (min/max/avg temperature).
-     */
-    @SuppressLint("SetTextI18n")
-    private fun updateDetailsDataSummary(sensorDetails: SensorDetails) {
-        Log.d(TAG, "Update sensor ${sensorDetails.id} details: Summary")
-        this.binding.bottomSheetDetails.detailsSensorCaption.text = "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
-            sensorDetails.minimumTemperature, sensorDetails.maximumTemperature, sensorDetails.averageTemperature
-        )
-    }
-
-    /**
-     * Update the sponsor details of the sensor.
-     */
-    private fun updateDetailsSponsor(sponsor: Sponsor) {
-        Log.d(TAG, "Update sensor details: Sponsor ${sponsor.id}")
-
-        // Header
-        this.binding.bottomSheetDetails.detailsSponsorSectionHeader.text = getString(R.string.section_header_sponsor, sponsor.name)
-
-        // Description
-        val sponsorDescriptionBuilder = StringBuilder()
-        sponsorDescriptionBuilder.append(getString(R.string.sponsor_description, sponsor.name))
-        sponsorDescriptionBuilder.append("\n")
-        sponsorDescriptionBuilder.append(sponsor.description)
-        this.binding.bottomSheetDetails.detailsSponsorDescription.text = sponsorDescriptionBuilder.toString()
-
-        // Logo
-        if (sponsor.logoUrl != null) {
-            val imageView: ImageView = this.binding.bottomSheetDetails.detailsSponsorLogo
-            Glide.with(this).load(sponsor.logoUrl).into(imageView)
-        }
-
-        // Show section
-        this.binding.bottomSheetDetails.detailsSectionSponsor.visibility = View.VISIBLE
     }
 
     // Lifecycle methods
@@ -716,11 +649,40 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val timestamp: Date,
     )
 
+    data class SensorStats(
+        val minTemp: Double,
+        val maxTemp: Double,
+        val avgTemp: Double,
+    )
+
+    data class SponsorViewModel(
+        val name: String,
+        val description: String?,
+        val logoUrl: String?,
+    )
+
     data class SensorViewModel(
         val name: String,
         val caption: String?,
         val latestMeasurement: MeasurementViewModel?,
+        val statsAllTime: SensorStats? = null,
+        val sponsor: SponsorViewModel? = null,
     ) {
+        fun withDetails(details: SensorDetails): SensorViewModel {
+            var stats: SensorStats? = null
+            if (details.minimumTemperature != null && details.maximumTemperature != null && details.averageTemperature != null) {
+                stats = SensorStats(details.minimumTemperature, details.maximumTemperature, details.averageTemperature)
+            }
+            return SensorViewModel(this.name, this.caption, this.latestMeasurement, stats, this.sponsor)
+        }
+
+        fun withSponsor(sponsor: Sponsor): SensorViewModel {
+            return SensorViewModel(
+                this.name, this.caption, this.latestMeasurement, this.statsAllTime,
+                SponsorViewModel(sponsor.name, sponsor.description, sponsor.logoUrl),
+            )
+        }
+
         companion object {
             fun fromSensor(sensor: Sensor): SensorViewModel {
                 var latestMeasurement: MeasurementViewModel? = null
@@ -730,7 +692,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         Date(sensor.latestMeasurementAt * 1000),
                     )
                 }
-                return SensorViewModel(sensor.deviceName, sensor.caption, latestMeasurement)
+                return SensorViewModel(sensor.deviceName, sensor.caption, latestMeasurement, null)
             }
         }
     }
@@ -742,14 +704,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     @Composable
     private fun SensorPreview(sensor: SensorViewModel) {
-        Column() {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = sensor.name,
+                sensor.name,
                 style = MaterialTheme.typography.h2,
                 modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 4.dp),
             )
             Text(
-                text = sensor.caption ?: "",
+                sensor.caption ?: "",
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier
                     .padding(0.dp, 0.dp, 0.dp, 8.dp)
@@ -778,24 +740,145 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 contentDescription = "Temperature icon",
             )
             Text(
-                text = summary,
+                summary,
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(4.dp, 0.dp, 0.dp, 0.dp),
             )
         }
     }
 
+    @Composable
+    fun SensorDetails(sensor: SensorViewModel, measurements: List<Measurement>) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Section: History (last 3 days)
+            Text(
+                stringResource(R.string.section_header_3days),
+                style = MaterialTheme.typography.h3,
+            )
+            TemperatureChart(
+                measurements,
+                modifier = Modifier.fillMaxWidth().height(144.dp)
+            )
+
+            // Section: Summary
+            sensor.statsAllTime?.let {
+                Text(
+                    stringResource(R.string.section_header_summary),
+                    style = MaterialTheme.typography.h3,
+                    modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 4.dp),
+                )
+                Text(
+                    "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(it.minTemp, it.maxTemp, it.avgTemp),
+                    style = MaterialTheme.typography.body2,
+                )
+            }
+
+            // Section: Sponsor
+            sensor.sponsor?.let {
+                Text(
+                    stringResource(R.string.section_header_sponsor, it.name),
+                    style = MaterialTheme.typography.h3,
+                    modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 4.dp),
+                )
+                Text(
+                    stringResource(R.string.sponsor_description, it.name),
+                    style = MaterialTheme.typography.body2,
+                )
+                it.logoUrl?.let { url ->
+                    GlideImage(
+                        imageModel = url,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxWidth().padding(32.dp, 24.dp),
+                        previewPlaceholder = R.drawable.app_icon_foreground,
+                    )
+                }
+                it.description?.let { description ->
+                    Text(
+                        description,
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun TemperatureChart(measurements: List<Measurement>, modifier: Modifier) {
+        var temperatureLabel = ""
+        AndroidView(
+            modifier = modifier,
+            factory = { context -> LineChart(context).apply {
+                // Basic styling
+                setNoDataText(context.getString(R.string.chart_no_data))
+                setDrawGridBackground(false)
+                setDrawBorders(false)
+                description.isEnabled = false
+                xAxis.isEnabled = false
+                axisRight.isEnabled = false
+
+                // Look up resources
+                temperatureLabel = context.getString(R.string.temperature)
+            }},
+            update = { chart ->
+                // This is the start of the X axis
+                val duration = Duration.of(3, ChronoUnit.DAYS)
+                val startEpoch = Instant.now().minus(duration).toEpochMilli()
+
+                // Create an entry for every measurement
+                val entries: MutableList<Entry> = ArrayList()
+                for (measurement in measurements) {
+                    val x = measurement.createdAt.toInstant().toEpochMilli() - startEpoch
+                    val y = measurement.temperature
+                    entries.add(Entry(x.toFloat(), y))
+                }
+                // See https://github.com/gfroerli/gfroerli-api/issues/40
+                entries.sortBy { it.x }
+
+                // Create a data set
+                val dataSet = LineDataSet(entries, "$labelTemperature (°C)")
+
+                // X axis value range
+                chart.xAxis.axisMinimum = 0f
+                chart.xAxis.axisMaximum = duration.toMillis().toFloat()
+
+                // Styling
+                dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+                dataSet.lineWidth = 4f
+                dataSet.circleRadius = 2f
+                this.colorAccentAlpha?.let { dataSet.color = it }
+                dataSet.setCircleColor(dataSet.color)
+                dataSet.setDrawCircleHole(false)
+                dataSet.setDrawHighlightIndicators(false)
+
+                // Draw data
+                val data = LineData(dataSet)
+                data.setDrawValues(false)
+                chart.data = data
+                chart.invalidate()
+            }
+        )
+    }
+
     @Preview
     @Composable
-    fun PreviewSensorPreview() {
-        MaterialTheme(typography = GfroerliTypography) {
-            SensorPreview(
-                SensorViewModel(
-                    "Testsensor",
-                    "The bestest sensor of all!",
-                    MeasurementViewModel(13.37373737, Date()),
-                )
+    fun PreviewSensor() {
+        val sensor = SensorViewModel(
+            "Testsensor",
+            "The bestest sensor of all!",
+            MeasurementViewModel(13.37373737, Date()),
+            SensorStats(3.7, 31.2, 14.56),
+            SponsorViewModel(
+                "Reynholm Industries",
+                "Our primary focus is on trending and disruptive technologies and their potential impacts on existing markets!",
+                "https://www.reynholm.industries/images/logo/logo.png"
             )
+        )
+        MaterialTheme(typography = GfroerliTypography) {
+            Column {
+                SensorPreview(sensor)
+                Spacer(modifier = Modifier.height(24.dp))
+                SensorDetails(sensor, emptyList())
+            }
         }
     }
 
