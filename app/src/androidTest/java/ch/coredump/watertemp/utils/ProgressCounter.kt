@@ -20,7 +20,7 @@ class ProgressCounterTest {
     fun initialize() {
         // Get context
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        context.setTheme(R.style.Theme_AppCompat)
+        context.setTheme(androidx.appcompat.R.style.Theme_AppCompat)
         this.context = context
 
         // Initialize handler

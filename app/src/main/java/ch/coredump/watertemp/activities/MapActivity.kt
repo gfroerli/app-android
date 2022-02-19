@@ -225,7 +225,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             // Load marker icon
             style.addImage(MARKER_DEFAULT, ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
-            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, R.drawable.mapbox_marker_icon_default)!!)
+            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default)!!)
 
             // Initialize symbol manager
             this.symbolManager = SymbolManager(this.binding.mapView, mapboxMap, style)

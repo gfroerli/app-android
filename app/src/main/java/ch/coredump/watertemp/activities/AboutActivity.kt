@@ -27,7 +27,7 @@ class AboutActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.home -> {
+            android.R.id.home -> {
                 this.finish()
                 return true
             }
