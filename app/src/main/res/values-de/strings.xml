@@ -4,6 +4,7 @@
     <string name="activity_map">Gfrör.li: Wassertemperaturen</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
     <string name="no_measurement">Keine aktuelle Messung</string>
+    <string name="loading_data">Daten werden geladen…</string>
     <string name="section_header_3days">Messungen der letzten 3 Tage</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">Dieser Sensor wurde von \"%1$s\" gesponsert.</string>

@@ -112,9 +112,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.8.1'
 
-    // Java 8 date/time API backport
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
-
     // Relative time calculation
     implementation 'org.ocpsoft.prettytime:prettytime:5.0.0.Final'
 

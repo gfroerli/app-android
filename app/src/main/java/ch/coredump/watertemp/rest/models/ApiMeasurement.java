@@ -1,6 +1,6 @@
 package ch.coredump.watertemp.rest.models;
 
-import org.threeten.bp.ZonedDateTime;
+import java.time.ZonedDateTime;
 
 public class ApiMeasurement {
     private final int id;

@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Gfrör.li</string>
     <string name="thermometer_icon_description">Thermometer icon</string>
     <string name="no_measurement">No current measurement</string>
+    <string name="loading_data">Loading data…</string>
 
     <!-- Common -->
     <string name="temperature">Temperature</string>

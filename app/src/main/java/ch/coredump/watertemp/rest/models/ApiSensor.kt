@@ -9,7 +9,7 @@ data class ApiSensor(
     val caption: String?,
     val latitude: Double?,
     val longitude: Double?,
-    val latestTemperature: Double?,
-    val latestMeasurementAt: Long?,
+    val latestTemperature: Float?,
+    val latestMeasurementAt: Long?, // TODO: Datetime?
     val sponsorId: Int?,
 )

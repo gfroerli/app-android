@@ -4,11 +4,11 @@ import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
-import org.threeten.bp.Instant
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.time.Instant
 
 /**
  * Async API interface.

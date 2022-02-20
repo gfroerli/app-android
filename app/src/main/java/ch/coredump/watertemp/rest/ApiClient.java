@@ -4,9 +4,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.threeten.bp.ZonedDateTime;
-
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import ch.coredump.watertemp.BuildConfig;
 import ch.coredump.watertemp.rest.models.ApiError;
