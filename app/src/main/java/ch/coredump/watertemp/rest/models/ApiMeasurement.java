@@ -2,14 +2,14 @@ package ch.coredump.watertemp.rest.models;
 
 import org.threeten.bp.ZonedDateTime;
 
-public class Measurement {
+public class ApiMeasurement {
     private final int id;
     private final int sensorId;
     private final float temperature;
     private final ZonedDateTime createdAt;
     private final ZonedDateTime updatedAt;
 
-    public Measurement(int id, int sensorId, float temperature, ZonedDateTime createdAt, ZonedDateTime updatedAt) {
+    public ApiMeasurement(int id, int sensorId, float temperature, ZonedDateTime createdAt, ZonedDateTime updatedAt) {
         this.id = id;
         this.sensorId = sensorId;
         this.temperature = temperature;

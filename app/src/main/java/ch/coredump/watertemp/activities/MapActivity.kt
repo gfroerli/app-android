@@ -33,10 +33,10 @@ import ch.coredump.watertemp.databinding.ActivityMapBinding
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
-import ch.coredump.watertemp.rest.models.Measurement
-import ch.coredump.watertemp.rest.models.Sensor
-import ch.coredump.watertemp.rest.models.SensorDetails
-import ch.coredump.watertemp.rest.models.Sponsor
+import ch.coredump.watertemp.rest.models.ApiMeasurement
+import ch.coredump.watertemp.rest.models.ApiSensor
+import ch.coredump.watertemp.rest.models.ApiSensorDetails
+import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.github.mikephil.charting.charts.LineChart
@@ -91,14 +91,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val sensors = HashMap<Int, SensorMeasurements>()
 
     // Mapping from sponsor IDs to `Sponsor` instances
-    private val sponsors = SparseArray<Sponsor>()
+    private val sponsors = SparseArray<ApiSponsor>()
 
     // The currently active marker
     private var activeMarker: Symbol? = null
 
     // The currently active sensor (and its data)
     private var sensor: SensorViewModel? = null
-    private var sensorMeasurements: List<Measurement> = emptyList()
+    private var sensorMeasurements: List<ApiMeasurement> = emptyList()
 
     // Class to control how the bottom sheet behaves
     private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
@@ -200,7 +200,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      *
      * // TODO: Maybe use a dedicated viewmodel?
      */
-    private fun updateSensorUi(sensor: SensorViewModel, measurements: List<Measurement>) {
+    private fun updateSensorUi(sensor: SensorViewModel, measurements: List<ApiMeasurement>) {
         this.binding.bottomSheetPeek.sensorCompose.setContent {
             MaterialTheme(typography = GfroerliTypography) {
                 SensorPreview(sensor)
@@ -257,9 +257,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // TODO: Do we need to re-fetch sensor-details of currently showing sensor?
     }
 
-    private fun onSensorsFetched(): Callback<List<Sensor>> {
-        return object : Callback<List<Sensor>> {
-            override fun onResponse(call: Call<List<Sensor>>, response: Response<List<Sensor>>?) {
+    private fun onSensorsFetched(): Callback<List<ApiSensor>> {
+        return object : Callback<List<ApiSensor>> {
+            override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>?) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 // Handle null response
@@ -303,7 +303,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 //                measurementCall.enqueue(onMeasurementsFetched())
             }
 
-            override fun onFailure(call: Call<List<Sensor>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ApiSensor>>, t: Throwable) {
                 this@MapActivity.progressCounter!!.decrement()
                 Log.e(TAG, "Fetching sensors failed: $t")
                 Utils.showError(
@@ -498,9 +498,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun onSensorDetailsFetched(): Callback<SensorDetails> {
-        return object : Callback<SensorDetails> {
-            override fun onResponse(call: Call<SensorDetails>, response: Response<SensorDetails>?) {
+    private fun onSensorDetailsFetched(): Callback<ApiSensorDetails> {
+        return object : Callback<ApiSensorDetails> {
+            override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>?) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.i(TAG, "Processing sensor details response")
@@ -512,7 +512,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
-            override fun onFailure(call: Call<SensorDetails>, t: Throwable) {
+            override fun onFailure(call: Call<ApiSensorDetails>, t: Throwable) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.e(TAG, "Fetching sensor details failed: $t")
@@ -524,9 +524,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun onSponsorFetched(): Callback<Sponsor> {
-        return object : Callback<Sponsor> {
-            override fun onResponse(call: Call<Sponsor>, response: Response<Sponsor>?) {
+    private fun onSponsorFetched(): Callback<ApiSponsor> {
+        return object : Callback<ApiSponsor> {
+            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>?) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.i(TAG, "Processing sponsor response")
@@ -542,7 +542,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
-            override fun onFailure(call: Call<Sponsor>, t: Throwable) {
+            override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.e(TAG, "Fetching sponsor failed: $t")
@@ -554,9 +554,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun onMeasurementsFetched(): Callback<List<Measurement>> {
-        return object : Callback<List<Measurement>> {
-            override fun onResponse(call: Call<List<Measurement>>, response: Response<List<Measurement>>?) {
+    private fun onMeasurementsFetched(): Callback<List<ApiMeasurement>> {
+        return object : Callback<List<ApiMeasurement>> {
+            override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>?) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.i(TAG, "Processing measurements response")
@@ -566,7 +566,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
-            override fun onFailure(call: Call<List<Measurement>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ApiMeasurement>>, t: Throwable) {
                 this@MapActivity.progressCounter!!.decrement()
 
                 Log.e(TAG, "Fetching measurements failed: $t")
@@ -668,7 +668,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val statsAllTime: SensorStats? = null,
         val sponsor: SponsorViewModel? = null,
     ) {
-        fun withDetails(details: SensorDetails): SensorViewModel {
+        fun withDetails(details: ApiSensorDetails): SensorViewModel {
             var stats: SensorStats? = null
             if (details.minimumTemperature != null && details.maximumTemperature != null && details.averageTemperature != null) {
                 stats = SensorStats(details.minimumTemperature, details.maximumTemperature, details.averageTemperature)
@@ -676,7 +676,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             return SensorViewModel(this.name, this.caption, this.latestMeasurement, stats, this.sponsor)
         }
 
-        fun withSponsor(sponsor: Sponsor): SensorViewModel {
+        fun withSponsor(sponsor: ApiSponsor): SensorViewModel {
             return SensorViewModel(
                 this.name, this.caption, this.latestMeasurement, this.statsAllTime,
                 SponsorViewModel(sponsor.name, sponsor.description, sponsor.logoUrl),
@@ -684,7 +684,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         companion object {
-            fun fromSensor(sensor: Sensor): SensorViewModel {
+            fun fromSensor(sensor: ApiSensor): SensorViewModel {
                 var latestMeasurement: MeasurementViewModel? = null
                 if (sensor.latestTemperature != null && sensor.latestMeasurementAt != null) {
                     latestMeasurement = MeasurementViewModel(
@@ -748,7 +748,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun SensorDetails(sensor: SensorViewModel, measurements: List<Measurement>) {
+    fun SensorDetails(sensor: SensorViewModel, measurements: List<ApiMeasurement>) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Section: History (last 3 days)
             Text(
@@ -803,7 +803,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun TemperatureChart(measurements: List<Measurement>, modifier: Modifier) {
+    fun TemperatureChart(measurements: List<ApiMeasurement>, modifier: Modifier) {
         var temperatureLabel = ""
         AndroidView(
             modifier = modifier,

@@ -3,7 +3,7 @@ package ch.coredump.watertemp.rest.models
 /**
  * Gson Sponsor model.
  */
-data class Sponsor(
+data class ApiSponsor(
     val id: Int,
     val name: String,
     val description: String?,

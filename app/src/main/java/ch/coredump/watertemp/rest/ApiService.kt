@@ -1,9 +1,9 @@
 package ch.coredump.watertemp.rest
 
-import ch.coredump.watertemp.rest.models.Measurement
-import ch.coredump.watertemp.rest.models.Sensor
-import ch.coredump.watertemp.rest.models.SensorDetails
-import ch.coredump.watertemp.rest.models.Sponsor
+import ch.coredump.watertemp.rest.models.ApiMeasurement
+import ch.coredump.watertemp.rest.models.ApiSensor
+import ch.coredump.watertemp.rest.models.ApiSensorDetails
+import ch.coredump.watertemp.rest.models.ApiSponsor
 import org.threeten.bp.Instant
 import retrofit2.Call
 import retrofit2.http.GET
@@ -15,17 +15,17 @@ import retrofit2.http.Query
  */
 interface ApiService {
     @GET("mobile_app/sensors")
-    fun listSensors(): Call<List<Sensor>>
+    fun listSensors(): Call<List<ApiSensor>>
 
     @GET("mobile_app/sensors/{id}")
     fun getSensorDetails(
             @Path("id") sensorId: Int,
-    ): Call<SensorDetails>
+    ): Call<ApiSensorDetails>
 
     @GET("mobile_app/sensors/{id}/sponsor")
     fun getSponsor(
             @Path("id") sensorId: Int,
-    ): Call<Sponsor>
+    ): Call<ApiSponsor>
 
     // Old API endpoints, deprecated!
 
@@ -33,5 +33,5 @@ interface ApiService {
     fun listMeasurementsSince(
             @Query("sensor_id") sensorId: Int,
             @Query("created_after") createdAfter: Instant
-    ): Call<List<Measurement>>
+    ): Call<List<ApiMeasurement>>
 }
