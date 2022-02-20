@@ -108,6 +108,14 @@ data class SensorViewModel(
         }
     }
 
+    /**
+     * Clear inner data.
+     */
+    fun clear() {
+        this.sensor.value = null
+        this.measurements.value = null
+    }
+
     companion object {
         fun fromSensor(sensor: Sensor): SensorViewModel {
             return SensorViewModel(mutableStateOf(sensor), mutableStateOf(null))

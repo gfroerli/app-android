@@ -5,17 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -24,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -31,7 +32,6 @@ import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
-import ch.coredump.watertemp.databinding.ActivityMapBinding
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -39,6 +39,7 @@ import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
+import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.ui.viewmodels.*
 import ch.coredump.watertemp.utils.ProgressCounter
@@ -46,16 +47,17 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.WellKnownTileServer
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
@@ -78,10 +80,8 @@ private const val MARKER_ACTIVE = "marker_active"
 // Log tag
 private const val TAG = "MapActivity"
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback {
-    // View bindings
-    private lateinit var binding: ActivityMapBinding
-
+@ExperimentalMaterialApi
+class MapActivity : ComponentActivity() {
     // The map instance
     private var map: MapboxMap? = null
     private var symbolManager: SymbolManager? = null
@@ -103,10 +103,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val sensor: SensorViewModel = SensorViewModel()
 
     // Class to control how the bottom sheet behaves
-    private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
+    private val showBottomSheet = mutableStateOf(false)
 
     // Activity indicator
-    private var progressCounter: ProgressCounter? = null
+    private lateinit var progressCounter: ProgressCounter
 
     // Animation values
     private var shortAnimationDuration: Int = 0
@@ -116,104 +116,31 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize mapbox
-        Mapbox.getInstance(this, BuildConfig.MAPBOX_ACCESS_TOKEN, WellKnownTileServer.Mapbox)
+        // Get resource values
+        this.shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
+        this.colorAccentAlpha = resources.getColor(R.color.colorAccentAlpha)
+        this.labelTemperature = getString(R.string.temperature)
 
         // Initialize the layout
-        this.binding = ActivityMapBinding.inflate(layoutInflater)
-        setContentView(this.binding.root)
-        this.binding.bottomSheetPeek.sensorCompose.setContent {
-            MaterialTheme(typography = GfroerliTypography) {
-                SensorPreview(this.sensor)
-            }
+        setContent {
+            RootComposable(this.sensor, this.showBottomSheet)
         }
-        this.binding.bottomSheetDetails.sensorDetailsCompose.setContent {
-            MaterialTheme(typography = GfroerliTypography) {
-                SensorDetails(this.sensor)
-            }
-        }
-
-        // Initialize the action bar
-        setSupportActionBar(this.binding.mainActionBar)
-        supportActionBar!!.title = getString(R.string.activity_map)
-
-        // Get resource values
-        shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
-        colorAccentAlpha = resources.getColor(R.color.colorAccentAlpha)
-        labelTemperature = getString(R.string.temperature)
 
         // Progress counter
-        this.progressCounter = ProgressCounter(binding.loadingbar)
-
-        // Create map view
-        this.binding.mapView.onCreate(savedInstanceState)
-
-        // Initialize map
-        this.binding.mapView.getMapAsync(this)
+        this.progressCounter = ProgressCounter()
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
         val apiClient = ApiClient(BuildConfig.GFROERLI_API_KEY_PUBLIC)
         apiService = apiClient.apiService
-
-        // Initialize bottom sheet behavior
-        this.bottomSheetBehavior = BottomSheetBehavior.from(this.binding.detailsBottomSheet)
-
-        // Initially hidden
-        this.bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-
-        // We want two sizes: Peek height and full height
-        this.bottomSheetBehavior!!.isFitToContents = false
-
-        // Add bottom sheet listener
-        this.bottomSheetBehavior!!.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                // Bottom sheet state changed
-
-                // Deselect markers when hidden
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    // Deselect all markers
-                    this@MapActivity.deselectMarkers()
-                }
-
-                // Show/hide grab handle
-                val grabHandle = this@MapActivity.binding.bottomSheetPeek.grabHandle
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    grabHandle.animate()
-                        .alpha(0f)
-                        .setDuration(shortAnimationDuration.toLong())
-                        .setListener(null)
-                } else {
-                    grabHandle.animate()
-                        .alpha(1f)
-                        .setDuration(shortAnimationDuration.toLong())
-                        .setListener(null)
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // Called repeatedly while bottom sheet slides up
-            }
-        })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        this.binding.mapView.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        this.binding.mapView.onStop()
     }
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      */
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    private fun onMapReady(mapboxMap: MapboxMap, mapView: MapView) {
         Log.d(TAG, "Map is ready")
-
         mapboxMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
 
@@ -222,7 +149,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default)!!)
 
             // Initialize symbol manager
-            this.symbolManager = SymbolManager(this.binding.mapView, mapboxMap, style)
+            this.symbolManager = SymbolManager(mapView, mapboxMap, style)
 
             // Save map as attribute
             this.map = mapboxMap
@@ -245,7 +172,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
-        this.progressCounter!!.increment()
+        this.progressCounter.increment()
         sensorCall.enqueue(this.onSensorsFetched())
 
         // TODO: Do we need to re-fetch sensor-details of currently showing sensor?
@@ -254,7 +181,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onSensorsFetched(): Callback<List<ApiSensor>> {
         return object : Callback<List<ApiSensor>> {
             override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>?) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 // Handle null response
                 if (response == null) {
@@ -276,8 +203,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Success!
                 Log.d(TAG, "Sensors response successful")
 
-                // Clear old sensor list
+                // Ensure bottom sheet is hidden
+                hideBottomSheet()
+
+                // Clear old sensor data
                 sensors.clear()
+                sensor.clear()
 
                 // Prepare list for sensor IDs
                 val idList = ArrayList<String>()
@@ -298,7 +229,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<ApiSensor>>, t: Throwable) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
                 Log.e(TAG, "Fetching sensors failed: $t")
                 Utils.showError(
                     this@MapActivity,
@@ -313,22 +244,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * Show the bottom sheet if it isn't already visible.
      */
     private fun showBottomSheet() {
-        bottomSheetBehavior?.let {
-            if (it.state == BottomSheetBehavior.STATE_HIDDEN) {
-                it.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-        }
+        // Compose
+        this.showBottomSheet.value = true
     }
 
     /**
      * Hide the bottom sheet if it's visible.
      */
     private fun hideBottomSheet() {
-        bottomSheetBehavior?.let {
-            if (it.state != BottomSheetBehavior.STATE_HIDDEN) {
-                it.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-        }
+        // Compose
+        this.showBottomSheet.value = false
     }
 
     private fun updateMarkers() {
@@ -443,7 +368,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
-        this.progressCounter!!.increment()
+        this.progressCounter.increment()
         apiService!!.getSensorDetails(sensor.id).enqueue(onSensorDetailsFetched())
 
         // Look up sponsor in cache. If not found, fetch it asynchronously.
@@ -452,7 +377,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (sponsor == null) {
                 // Not found in cache, fetch it from the API
                 Log.i(TAG, "Fetching sponsor ${sensor.id}")
-                this.progressCounter!!.increment()
+                this.progressCounter.increment()
                 apiService!!.getSponsor(sensor.id).enqueue(onSponsorFetched())
             } else {
                 // Cache hit!
@@ -465,7 +390,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         // TODO: Use new API
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
-        this.progressCounter!!.increment()
+        this.progressCounter.increment()
         measurementCall.enqueue(onMeasurementsFetched())
 
         // Show the details pane
@@ -488,7 +413,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onSensorDetailsFetched(): Callback<ApiSensorDetails> {
         return object : Callback<ApiSensorDetails> {
             override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>?) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing sensor details response")
                 response?.body()?.let { details ->
@@ -497,7 +422,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<ApiSensorDetails>, t: Throwable) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.e(TAG, "Fetching sensor details failed: $t")
                 Utils.showError(
@@ -511,7 +436,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onSponsorFetched(): Callback<ApiSponsor> {
         return object : Callback<ApiSponsor> {
             override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>?) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing sponsor response")
                 response?.body()?.let { sponsor ->
@@ -524,7 +449,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.e(TAG, "Fetching sponsor failed: $t")
                 Utils.showError(
@@ -538,7 +463,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun onMeasurementsFetched(): Callback<List<ApiMeasurement>> {
         return object : Callback<List<ApiMeasurement>> {
             override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>?) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing measurements response")
                 response?.body()?.let {
@@ -550,7 +475,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<List<ApiMeasurement>>, t: Throwable) {
-                this@MapActivity.progressCounter!!.decrement()
+                this@MapActivity.progressCounter.decrement()
 
                 Log.e(TAG, "Fetching measurements failed: $t")
                 Utils.showError(
@@ -561,71 +486,214 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // Lifecycle methods
-
-    public override fun onResume() {
-        super.onResume()
-        this.binding.mapView.onResume()
-    }
-
-    public override fun onPause() {
-        super.onPause()
-        this.binding.mapView.onPause()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        this.binding.mapView.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        this.binding.mapView.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        this.binding.mapView.onSaveInstanceState(outState)
-    }
-
     // Menu
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+    private enum class MenuItem {
+        REFRESH, ABOUT
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_about -> {
-                Log.d(TAG, "Menu: About")
-                val intent = Intent(this, AboutActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.action_refresh -> {
-                Log.d(TAG, "Menu: Refresh")
+    /**
+     * Called when a menu entry from the app bar dropdown menu has been selected.
+     */
+    private fun onMenuItemSelected(item: MenuItem, showMenu: MutableState<Boolean>?) {
+        Log.d(TAG, "Menu: $item")
+
+        // Hide menu
+        showMenu?.value = false
+
+        // Dispatch item
+        when (item) {
+            MenuItem.REFRESH -> {
                 if (this.map != null) {
                     fetchInitialData()
                 }
             }
-            else -> Log.w(TAG, "Selected unknown menu entry: $item")
+            MenuItem.ABOUT -> {
+                val intent = Intent(this, AboutActivity::class.java)
+                startActivity(intent)
+            }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     // Key events
 
     override fun onBackPressed() {
-        // If the bottom sheet is visible, close it on back button press.
+        // If a sensor is selected, deselect it and hide the bottom sheet.
         // Otherwise, fall back to default behavior.
-        if (bottomSheetBehavior!!.state != BottomSheetBehavior.STATE_HIDDEN) {
-            bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
+        if (activeMarker != null) {
+            hideBottomSheet()
+            deselectMarkers()
         } else {
             super.onBackPressed()
         }
     }
 
+    // Composable helpers
+
+    class IgnoreBottomPadding(val wrapped: PaddingValues) : PaddingValues {
+        override fun calculateBottomPadding(): Dp {
+            // Override
+            return 0.dp
+        }
+
+        override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp {
+            return wrapped.calculateLeftPadding(layoutDirection)
+        }
+
+        override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp {
+            return wrapped.calculateRightPadding(layoutDirection)
+        }
+
+        override fun calculateTopPadding(): Dp {
+            return wrapped.calculateTopPadding()
+        }
+    }
+
     // Composables
+
+    @Composable
+    private fun RootComposable(viewModel: SensorViewModel, showBottomSheet: MutableState<Boolean>) {
+        // State: Bottom sheet scaffold
+        val scaffoldState = rememberBottomSheetScaffoldState(
+            DrawerState(DrawerValue.Closed),
+            rememberBottomSheetState(BottomSheetValue.Collapsed)
+        )
+
+        // State: Show menu
+        val showMenu = remember { mutableStateOf(false) }
+
+        // State: Height of the bottom sheet peek pane
+        val baseBottomSheetPeekHeight by remember { mutableStateOf(125.dp) }
+        val bottomSheetPeekHeight = if (showBottomSheet.value) baseBottomSheetPeekHeight else 0.dp
+
+        // Wrap everything in our theme
+        MaterialTheme(
+            colors = GfroerliColorsLight,
+            typography = GfroerliTypography,
+        ) {
+
+            // Use the scaffold with app bar and bottom sheet
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+
+                // The app bar (AKA action bar)
+                topBar = {
+                    TopAppBar(
+                        title = { Text(stringResource(id = R.string.activity_map)) },
+                        backgroundColor = MaterialTheme.colors.primary,
+                        actions = {
+                            OverflowMenu({
+                                DropdownMenuItem(
+                                    onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
+                                ) {
+                                    Text(stringResource(id = R.string.action_refresh_all))
+                                }
+                                DropdownMenuItem(
+                                    onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
+                                ) {
+                                    Text(stringResource(id = R.string.action_about_this_app))
+                                }
+                            }, showMenu)
+                        },
+                    )
+                },
+
+                // Main content
+                content = { innerPadding ->
+                    // Note: Ignore bottom padding, because we want to avoid re-layouting the map
+                    //       when showing / hiding the bottom sheet.
+                    Box(Modifier.padding(IgnoreBottomPadding(innerPadding))) {
+                        // Mapbox map
+                        Map()
+
+                        // Note: The progress indicator intentionally overlays the content
+                        this@MapActivity.progressCounter.Composable()
+                    }
+                },
+
+                // Bottom sheet
+                sheetPeekHeight = bottomSheetPeekHeight,
+                sheetContent = {
+                    // Peek area (same height as sheetPeekHeight)
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(bottomSheetPeekHeight)
+                            .padding(16.dp, 0.dp, 0.dp, 16.dp)
+                            /*.swipeable(
+                                state = swipeableState,
+                                anchors = anchors,
+                                thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                                orientation = Orientation.Vertical,
+                            )*/
+                    ) {
+                        SensorPreview(viewModel)
+                    }
+
+                    // Divider
+                    Divider()
+
+                    // Expanded content
+                    Box(Modifier.padding(16.dp)) {
+                        SensorDetails(viewModel)
+                    }
+                },
+            )
+        }
+    }
+
+    /**
+     * Simple reusable overflow menu.
+     *
+     * Source: https://stackoverflow.com/a/68354402/284318
+     */
+    @Composable
+    fun OverflowMenu(content: @Composable () -> Unit, show: MutableState<Boolean>) {
+        IconButton(
+            onClick = { show.value = !show.value },
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.MoreVert,
+                contentDescription = "More",
+            )
+        }
+        DropdownMenu(
+            expanded = show.value,
+            onDismissRequest = { show.value = false },
+        ) {
+            content()
+        }
+    }
+
+    @Composable
+    private fun Map(modifier: Modifier = Modifier) {
+        AndroidView(
+            modifier = modifier,
+            factory = { context ->
+                // Initialize mapbox
+                Mapbox.getInstance(
+                    context,
+                    BuildConfig.MAPBOX_ACCESS_TOKEN,
+                    WellKnownTileServer.Mapbox
+                )
+                val mapOptions = MapboxMapOptions()
+                    .logoEnabled(false)
+                    .attributionMargins(intArrayOf(10, 10, 10, 10))
+                    .camera(
+                        CameraPosition.Builder()
+                            .target(LatLng(47.209587, 8.823612))
+                            .zoom(11.0)
+                            .tilt(0.0)
+                            .build()
+                    )
+                MapView(context, mapOptions).apply {
+                    getMapAsync { map ->
+                        onMapReady(map, this)
+                    }
+                }
+            },
+        )
+    }
 
     /**
      * The sensor preview shown in the bottom sheet peek pane.
@@ -634,7 +702,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun SensorPreview(viewModel: SensorViewModel) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                viewModel.sensor.value?.name ?: "No sensor",
+                viewModel.sensor.value?.name ?: "No sensor. If you can see this, that's a bug.",
                 style = MaterialTheme.typography.h2,
                 modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 4.dp),
             )
@@ -824,7 +892,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 "https://www.reynholm.industries/images/logo/logo.png"
             )
         ))
-        MaterialTheme(typography = GfroerliTypography) {
+        MaterialTheme(
+            colors = GfroerliColorsLight,
+            typography = GfroerliTypography,
+        ) {
             Column {
                 SensorPreview(viewModel)
                 Spacer(modifier = Modifier.height(24.dp))
@@ -832,5 +903,4 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
 }

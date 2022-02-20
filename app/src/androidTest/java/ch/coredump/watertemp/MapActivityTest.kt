@@ -1,5 +1,6 @@
 package ch.coredump.watertemp
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -9,6 +10,7 @@ import ch.coredump.watertemp.activities.MapActivity
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalMaterialApi
 class MapActivityTest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MapActivity::class.java)

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import ch.coredump.watertemp.R
 import ch.coredump.watertemp.databinding.ActivityAboutBinding
 
 private const val TAG = "AboutActivity"
