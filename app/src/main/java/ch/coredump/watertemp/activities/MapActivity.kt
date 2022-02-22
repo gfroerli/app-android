@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -61,6 +62,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
 import org.ocpsoft.prettytime.PrettyTime
 import retrofit2.Call
 import retrofit2.Callback
@@ -512,19 +514,6 @@ class MapActivity : ComponentActivity() {
         }
     }
 
-    // Key events
-
-    override fun onBackPressed() {
-        // If a sensor is selected, deselect it and hide the bottom sheet.
-        // Otherwise, fall back to default behavior.
-        if (activeMarker != null) {
-            hideBottomSheet()
-            deselectMarkers()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     // Composable helpers
 
     class IgnoreBottomPadding(val wrapped: PaddingValues) : PaddingValues {
@@ -562,6 +551,29 @@ class MapActivity : ComponentActivity() {
         // State: Height of the bottom sheet peek pane
         val baseBottomSheetPeekHeight by remember { mutableStateOf(125.dp) }
         val bottomSheetPeekHeight = if (showBottomSheet.value) baseBottomSheetPeekHeight else 0.dp
+
+        // State: Scroll state of the bottom sheet
+        val sheetContentScrollState = rememberScrollState()
+
+        // State: Coroutine scope
+        val scope = rememberCoroutineScope()
+
+        // Handle back event when bottom sheet is expanded
+        BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
+            // Scroll sheet content all the way to the top
+            scope.launch { sheetContentScrollState.scrollTo(0) }
+            // Collapse bottom sheet with an animation
+            scope.launch { scaffoldState.bottomSheetState.collapse() }
+        }
+
+        // Handle back event when bottom sheet is collapsed
+        BackHandler(enabled = scaffoldState.bottomSheetState.isCollapsed) {
+            // Hide bottom sheet
+            showBottomSheet.value = false
+
+            // Deselect markers
+            scope.launch { deselectMarkers() }
+        }
 
         // Wrap everything in our theme
         MaterialTheme(
@@ -611,9 +623,7 @@ class MapActivity : ComponentActivity() {
                 // Bottom sheet
                 sheetPeekHeight = bottomSheetPeekHeight,
                 sheetContent = {
-                    val scrollState = rememberScrollState()
-
-                    Column(Modifier.verticalScroll(scrollState).fillMaxWidth()) {
+                    Column(Modifier.verticalScroll(sheetContentScrollState).fillMaxWidth()) {
                         // Peek area (same height as sheetPeekHeight)
                         Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
                             /*.swipeable(
