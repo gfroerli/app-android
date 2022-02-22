@@ -7,9 +7,7 @@ import android.util.Log
 import android.util.SparseArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -71,7 +69,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-
 
 // Marker image names
 private const val MARKER_DEFAULT = "marker_default"
@@ -614,28 +611,28 @@ class MapActivity : ComponentActivity() {
                 // Bottom sheet
                 sheetPeekHeight = bottomSheetPeekHeight,
                 sheetContent = {
-                    // Peek area (same height as sheetPeekHeight)
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(bottomSheetPeekHeight)
-                            .padding(16.dp, 0.dp, 0.dp, 16.dp)
+                    val scrollState = rememberScrollState()
+
+                    Column(Modifier.verticalScroll(scrollState).fillMaxWidth()) {
+                        // Peek area (same height as sheetPeekHeight)
+                        Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
                             /*.swipeable(
                                 state = swipeableState,
                                 anchors = anchors,
                                 thresholds = { _, _ -> FractionalThreshold(0.3f) },
                                 orientation = Orientation.Vertical,
                             )*/
-                    ) {
-                        SensorPreview(viewModel)
-                    }
+                        ) {
+                            SensorPreview(viewModel)
+                        }
 
-                    // Divider
-                    Divider()
+                        // Divider
+                        Divider()
 
-                    // Expanded content
-                    Box(Modifier.padding(16.dp)) {
-                        SensorDetails(viewModel)
+                        // Expanded content
+                        Box(Modifier.padding(16.dp)) {
+                            SensorDetails(viewModel)
+                        }
                     }
                 },
             )
@@ -747,7 +744,7 @@ class MapActivity : ComponentActivity() {
 
     @Composable
     fun SensorDetails(viewModel: SensorViewModel) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column() {
             viewModel.sensor.value?.let { sensor ->
                 // Section: History (last 3 days)
                 Text(
