@@ -5,6 +5,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 val GfroerliColorsLight = lightColors(
@@ -40,17 +41,14 @@ val GfroerliTypography = Typography(
     ),
     body1 = TextStyle(
         fontWeight = FontWeight.Light,
-        fontSize = 16.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 14.sp,
+        letterSpacing = 0.2.sp,
+        lineHeight = 1.5.em
     ),
     body2 = TextStyle(
         fontWeight = FontWeight.Light,
-        fontSize = 14.sp,
-        letterSpacing = 0.25.sp
-    ),
-    caption = TextStyle(
-        fontWeight = FontWeight.Light,
         fontSize = 12.sp,
-        letterSpacing = 0.4.sp
+        letterSpacing = 0.4.sp,
+        lineHeight = 1.2.em,
     ),
 )

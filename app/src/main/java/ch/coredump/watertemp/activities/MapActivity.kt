@@ -738,7 +738,7 @@ class MapActivity : ComponentActivity() {
             viewModel.sensor.value?.let { sensor ->
                 Text(
                     sensor.caption ?: "",
-                    style = MaterialTheme.typography.caption,
+                    style = MaterialTheme.typography.body2,
                     modifier = Modifier
                         .padding(0.dp, 0.dp, 0.dp, 8.dp)
                         .horizontalScroll(ScrollState(0)),
@@ -768,7 +768,7 @@ class MapActivity : ComponentActivity() {
             )
             Text(
                 summary,
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(4.dp, 0.dp, 0.dp, 0.dp),
             )
         }
@@ -786,14 +786,14 @@ class MapActivity : ComponentActivity() {
                 if (viewModel.measurements.value == null) {
                     Text(
                         stringResource(R.string.loading_data),
-                        style = MaterialTheme.typography.body2.plus(TextStyle(fontStyle = Italic)),
+                        style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic)),
                     )
                 }
                 viewModel.measurements.value?.let { measurements ->
                     if (measurements.isEmpty()) {
                         Text(
                             stringResource(R.string.chart_no_data),
-                            style = MaterialTheme.typography.body2.plus(TextStyle(fontStyle = Italic))
+                            style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic))
                         )
                     } else {
                         TemperatureChart(
@@ -818,7 +818,7 @@ class MapActivity : ComponentActivity() {
                             it.maxTemp,
                             it.avgTemp
                         ),
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.body1,
                     )
                 }
 
@@ -831,7 +831,7 @@ class MapActivity : ComponentActivity() {
                     )
                     Text(
                         stringResource(R.string.sponsor_description, it.name),
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.body1,
                     )
                     it.logoUrl?.let { url ->
                         GlideImage(
@@ -846,7 +846,7 @@ class MapActivity : ComponentActivity() {
                     it.description?.let { description ->
                         Text(
                             description,
-                            style = MaterialTheme.typography.body2,
+                            style = MaterialTheme.typography.body1,
                         )
                     }
                 }
