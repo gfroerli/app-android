@@ -1,11 +1,8 @@
 package ch.coredump.watertemp
 
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withSubstring
-import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import ch.coredump.watertemp.activities.MapActivity
 import org.junit.Rule
 import org.junit.Test
@@ -13,11 +10,11 @@ import org.junit.Test
 @ExperimentalMaterialApi
 class MapActivityTest {
     @get:Rule
-    val activityRule = ActivityScenarioRule(MapActivity::class.java)
+    val composeTestRule = createAndroidComposeRule<MapActivity>()
 
     @Test
     fun testTitle() {
-        onView(withSubstring("Gfrör.li"))
-            .check(matches(isDisplayed()))
+        val title = composeTestRule.activity.getString(R.string.activity_map)
+        composeTestRule.onNodeWithText(title).assertExists("Title text not found")
     }
 }
