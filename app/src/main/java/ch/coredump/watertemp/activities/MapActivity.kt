@@ -631,10 +631,11 @@ class MapActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth().padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
+                            val grabHandleAlpha = 0.2f * (1f - scaffoldState.currentBottomSheetFraction)
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                                        color = MaterialTheme.colors.onSurface.copy(alpha = grabHandleAlpha),
                                         shape = RoundedCornerShape(50),
                                     )
                                     .size(width = 36.dp, height = 4.dp),
@@ -932,3 +933,20 @@ class MapActivity : ComponentActivity() {
         }
     }
 }
+
+/**
+ * Return the current fraction, independent from the collapse state.
+ */
+@ExperimentalMaterialApi
+val BottomSheetScaffoldState.currentBottomSheetFraction: Float
+    get() {
+        val fraction = bottomSheetState.progress.fraction
+        val targetValue = bottomSheetState.targetValue
+        val currentValue = bottomSheetState.currentValue
+        return when {
+            currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Collapsed -> 0f
+            currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Expanded -> 1f
+            currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Expanded -> fraction
+            else -> 1f - fraction
+        }
+    }
