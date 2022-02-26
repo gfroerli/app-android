@@ -88,7 +88,7 @@ class AboutActivity : ComponentActivity() {
                             Text(stringResource(R.string.about_project_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_project_text1), style = MaterialTheme.typography.body1)
                             Text(stringResource(R.string.about_project_text2), style = MaterialTheme.typography.body1)
-                            Text(stringResource(R.string.about_project_text3), style = MaterialTheme.typography.body1)
+                            LinkifyText(stringResource(R.string.about_project_text3), style = MaterialTheme.typography.body1)
 
                             Text(stringResource(R.string.about_us_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_us_text1), style = MaterialTheme.typography.body1)
