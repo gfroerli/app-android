@@ -10,6 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
@@ -623,25 +624,45 @@ class MapActivity : ComponentActivity() {
                 // Bottom sheet
                 sheetPeekHeight = bottomSheetPeekHeight,
                 sheetContent = {
-                    Column(Modifier.verticalScroll(sheetContentScrollState).fillMaxWidth()) {
-                        // Peek area (same height as sheetPeekHeight)
-                        Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
-                            /*.swipeable(
-                                state = swipeableState,
-                                anchors = anchors,
-                                thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                                orientation = Orientation.Vertical,
-                            )*/
+                    // Wrap content in a box to allow overlaying the grab handle and the main content.
+                    Box {
+                        // Grab handle
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            SensorPreview(viewModel)
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                                        shape = RoundedCornerShape(50),
+                                    )
+                                    .size(width = 36.dp, height = 4.dp),
+
+                            )
                         }
 
-                        // Divider
-                        Divider()
+                        // Main content
+                        Column(Modifier.verticalScroll(sheetContentScrollState).fillMaxWidth()) {
+                            // Peek area (same height as sheetPeekHeight)
+                            Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
+                                /*.swipeable(
+                                    state = swipeableState,
+                                    anchors = anchors,
+                                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                                    orientation = Orientation.Vertical,
+                                )*/
+                            ) {
+                                SensorPreview(viewModel)
+                            }
 
-                        // Expanded content
-                        Box(Modifier.padding(16.dp)) {
-                            SensorDetails(viewModel)
+                            // Divider
+                            Divider()
+
+                            // Expanded content
+                            Box(Modifier.padding(16.dp)) {
+                                SensorDetails(viewModel)
+                            }
                         }
                     }
                 },
