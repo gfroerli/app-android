@@ -3,7 +3,7 @@ package ch.coredump.watertemp.rest.models
 /**
  * Gson Sensor model with details.
  */
-data class SensorDetails(
+data class ApiSensorDetails(
     val id: Int,
     val deviceName: String,
     val caption: String?,

@@ -3,36 +3,36 @@ package ch.coredump.watertemp.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.coredump.watertemp.rest.models.Measurement;
-import ch.coredump.watertemp.rest.models.Sensor;
+import ch.coredump.watertemp.rest.models.ApiMeasurement;
+import ch.coredump.watertemp.rest.models.ApiSensor;
 
 /**
  * A class that bundles a sensor together with its measurements.
  */
 public class SensorMeasurements {
 
-    private final Sensor sensor;
-    private final List<Measurement> measurements;
+    private final ApiSensor apiSensor;
+    private final List<ApiMeasurement> apiMeasurements;
 
-    public SensorMeasurements(Sensor sensor) {
-        this.sensor = sensor;
-        this.measurements = new ArrayList<>();
+    public SensorMeasurements(ApiSensor apiSensor) {
+        this.apiSensor = apiSensor;
+        this.apiMeasurements = new ArrayList<>();
     }
 
-    public SensorMeasurements(Sensor sensor, List<Measurement> measurements) {
-        this.sensor = sensor;
-        this.measurements = measurements;
+    public SensorMeasurements(ApiSensor apiSensor, List<ApiMeasurement> apiMeasurements) {
+        this.apiSensor = apiSensor;
+        this.apiMeasurements = apiMeasurements;
     }
 
-    public Sensor getSensor() {
-        return sensor;
+    public ApiSensor getSensor() {
+        return apiSensor;
     }
 
-    public List<Measurement> getMeasurements() {
-        return measurements;
+    public List<ApiMeasurement> getMeasurements() {
+        return apiMeasurements;
     }
 
-    public void addMeasurement(Measurement measurement) {
-        this.measurements.add(measurement);
+    public void addMeasurement(ApiMeasurement apiMeasurement) {
+        this.apiMeasurements.add(apiMeasurement);
     }
 }

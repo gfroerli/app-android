@@ -1,35 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:statusBarColor">#FF1565C0</item>
     </style>
-
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-
-        <!-- Colors -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
-        <!-- Shadows -->
-        <item name="android:ambientShadowAlpha">0.1</item>
-        <item name="android:spotShadowAlpha">0.1</item>
-
-        <!-- Action and status bars -->
-        <item name="android:windowNoTitle">true</item> <!-- Hide the default action bar (we have our own) -->
-        <item name="android:windowFullscreen">false</item> <!-- Don't hide the status bar -->
-
-        <item name="actionOverflowMenuStyle">@style/Base.Widget.MaterialComponents.PopupMenu.Overflow</item>
-    </style>
-
 </resources>

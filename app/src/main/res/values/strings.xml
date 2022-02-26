@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Gfrör.li</string>
     <string name="thermometer_icon_description">Thermometer icon</string>
     <string name="no_measurement">No current measurement</string>
+    <string name="loading_data">Loading data…</string>
 
     <!-- Common -->
     <string name="temperature">Temperature</string>
@@ -11,9 +12,8 @@
     <string name="activity_map">Gfrör.li: Water Temperatures</string>
 
     <!-- Detail pane -->
-    <string name="section_header_details">Details</string>
-    <string name="section_subheader_3days">History (last 3 days)</string>
-    <string name="section_subheader_summary">Summary (all time)</string>
+    <string name="section_header_3days">History (last 3 days)</string>
+    <string name="section_header_summary">Summary (all time)</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">This sensor was sponsored by \"%1$s\".</string>
     <string name="chart_no_data">No data found</string>
@@ -25,13 +25,13 @@
     <string name="about_project_text3">We are building a network of low-cost low-energy water temperature sensors. This allows us to measure the water temperature locally and to show it to you in real time, for free.</string>
     <string name="about_us_heading">Who made this app?</string>
     <string name="about_us_text1">This app, the server infrastructure as well as the water temperature sensor hardware is developed by the Coredump hackerspace in Rapperswil-Jona.</string>
-    <string name="about_us_text2">Find more information about us on our website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+    <string name="about_us_text2">Find more information about us on our website: https://www.coredump.ch/</string>
     <string name="open_source_heading">Open Source</string>
-    <string name="open_source_text1">This app is open source! You can find the code on GitHub: <a href="https://github.com/gfroerli/app-android">github.com/gfroerli/app-android</a></string>
+    <string name="open_source_text1">This app is open source! You can find the code on GitHub: https://github.com/gfroerli/app-android</string>
 
     <!-- Action bar menu -->
-    <string name="action_about">About</string>
-    <string name="action_refresh">Reload data</string>
+    <string name="action_about_this_app">About this app</string>
+    <string name="action_refresh_all">Reload all data</string>
 
     <!-- Error messages -->
     <string name="fetching_sensor_data_failed">Could not fetch sensors (HTTP %1$d).\nIf the problem persists, please contact %2$s.</string>

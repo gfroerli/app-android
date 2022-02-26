@@ -2,10 +2,10 @@ package ch.coredump.watertemp.rest
 
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonParseException
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Based on https://stackoverflow.com/a/36418842/284318

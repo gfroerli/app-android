@@ -4,8 +4,8 @@
     <string name="activity_map">Gfrör.li: Wassertemperaturen</string>
     <string name="thermometer_icon_description">Thermometer-Symbol</string>
     <string name="no_measurement">Keine aktuelle Messung</string>
-    <string name="section_header_details">Details</string>
-    <string name="section_subheader_3days">Messungen der letzten 3 Tage</string>
+    <string name="loading_data">Daten werden geladen…</string>
+    <string name="section_header_3days">Messungen der letzten 3 Tage</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
     <string name="sponsor_description">Dieser Sensor wurde von \"%1$s\" gesponsert.</string>
     <string name="about_project_heading">Warum diese App?</string>
@@ -14,14 +14,14 @@
     <string name="about_project_text3">"Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf. Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen.</string>
     <string name="about_us_heading">Wer hat diese App entwickelt?</string>
     <string name="about_us_text1">Diese App, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt.</string>
-    <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: <a href="https://www.coredump.ch/">www.coredump.ch</a></string>
+    <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: https://www.coredump.ch/</string>
     <string name="open_source_heading">Open Source</string>
-    <string name="open_source_text1">Diese app ist open source! Du findest den Quellcode auf GitHub: <a href="https://github.com/gfroerli/app-android">github.com/gfroerli/app-android</a></string>
-    <string name="action_about">Über</string>
-    <string name="action_refresh">Daten aktualisieren</string>
+    <string name="open_source_text1">Diese app ist open source! Du findest den Quellcode auf GitHub: https://github.com/gfroerli/app-android</string>
+    <string name="action_about_this_app">Über diese App</string>
+    <string name="action_refresh_all">Alle Daten aktualisieren</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
-    <string name="section_subheader_summary">Zusammenfassung (insgesamt)</string>
+    <string name="section_header_summary">Zusammenfassung (insgesamt)</string>
     <string name="fetching_sensor_data_failed">Sensor-Daten konnten nicht geladen werden (HTTP %1$d).\nWenn das Problem fortbesteht, kontaktieren Sie bitte %2$s.</string>
     <string name="fetching_data_failed">%1$s konnten nicht geladen werden. Bitte prüfe deine Internetverbindung.</string>
     <string name="data_sensors">Sensoren</string>
