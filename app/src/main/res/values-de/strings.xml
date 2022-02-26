@@ -29,4 +29,6 @@
     <string name="data_sponsor">Sponsor</string>
     <string name="data_sponsors">Sponsoren</string>
     <string name="data_measurements">Messungen</string>
+    <string name="version_heading">Version</string>
+    <string name="version_text1">App-Version %1$s (build %2$d).</string>
 </resources>

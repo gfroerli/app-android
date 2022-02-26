@@ -19,6 +19,8 @@
     <string name="chart_no_data">No data found</string>
 
     <!-- About activity -->
+    <string name="version_heading">Version</string>
+    <string name="version_text1">App version %1$s (build %2$d).</string>
     <string name="about_project_heading">Why this app?</string>
     <string name="about_project_text1">The water temperature is a value relevant to a lot of people: Swimmers, divers, fishermen, and many others. But until now, there were no reliable ways to get real time information about the water temperature in the area you\'re interested in.</string>
     <string name="about_project_text2">Today there are already some water temperature sensor networks, but usually there is only one sensor per lake (ignoring temperature differences for example near the mouth of a cold river) and it is often published only once per day.</string>

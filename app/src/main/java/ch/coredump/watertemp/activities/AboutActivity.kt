@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
@@ -81,6 +82,9 @@ class AboutActivity : ComponentActivity() {
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
+                            Text(stringResource(R.string.version_heading), style = MaterialTheme.typography.h2)
+                            Text(stringResource(R.string.version_text1, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), style = MaterialTheme.typography.body1)
+
                             Text(stringResource(R.string.about_project_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_project_text1), style = MaterialTheme.typography.body1)
                             Text(stringResource(R.string.about_project_text2), style = MaterialTheme.typography.body1)
