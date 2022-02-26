@@ -42,6 +42,7 @@ import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.ui.viewmodels.*
+import ch.coredump.watertemp.utils.LinkifyText
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
@@ -842,7 +843,7 @@ class MapActivity : ComponentActivity() {
                         )
                     }
                     it.description?.let { description ->
-                        Text(
+                        LinkifyText(
                             description,
                             style = MaterialTheme.typography.body1,
                         )
