@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.0.0 (2022-02-27)
+
+- [change] Migrate entire UI to Jetpack Compose (#48)
+- [feature] Add grab handle to bottom sheet
+- [feature] Show app version in about dialog 
+- [bug] Default zoom: Add more padding
+- [bug] Fix crash when a bad API response is returned (#36)
+- [bug] Linkify sponsor description (#50)
+- [change] Build for target API 31 (#42)
+- [change] About screen: Improve text (#49)
+- [chore] Switch from Mapbox SDK to Maplibre SDK (#41)
+- [chore] Update many dependencies
+
 ## v0.6.0 (2021-03-16)
 
 - Adaptive app icon (#31)
