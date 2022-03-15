@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
@@ -101,7 +102,7 @@ class MapActivity : ComponentActivity() {
     private var activeMarker: Symbol? = null
 
     // The currently active sensor (and its data)
-    private val sensor: SensorViewModel = SensorViewModel()
+    private lateinit var sensor: SensorViewModel
 
     // Class to control how the bottom sheet behaves
     private val showBottomSheet = mutableStateOf(false)
@@ -121,6 +122,9 @@ class MapActivity : ComponentActivity() {
         this.shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
         this.colorAccentAlpha = resources.getColor(R.color.colorAccentAlpha)
         this.labelTemperature = getString(R.string.temperature)
+
+        // Initialize viewmodel
+        sensor = ViewModelProvider(this)[SensorViewModel::class.java]
 
         // Initialize the layout
         setContent {
