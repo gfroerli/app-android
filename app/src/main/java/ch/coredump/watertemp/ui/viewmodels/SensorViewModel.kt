@@ -55,6 +55,9 @@ data class Sensor(
     }
 }
 
+/**
+ * View model holding information about the currently selected sensor.
+ */
 data class SensorViewModel(
     val sensor: MutableState<Sensor?> = mutableStateOf(null),
     val measurements: MutableState<List<Measurement>?> = mutableStateOf(null),
