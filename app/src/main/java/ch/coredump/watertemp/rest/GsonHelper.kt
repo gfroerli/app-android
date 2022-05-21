@@ -18,9 +18,9 @@ internal object GsonHelper {
             if (jsonPrimitive.isString) {
                 return@JsonDeserializer ZonedDateTime.parse(jsonPrimitive.asString, DateTimeFormatter.ISO_DATE_TIME)
             }
-            // Parse epoch timestamps
+            // Parse epoch timestamps (in seconds)
             if (jsonPrimitive.isNumber) {
-                return@JsonDeserializer ZonedDateTime.ofInstant(Instant.ofEpochMilli(jsonPrimitive.asLong), ZoneId.of("UTC"))
+                return@JsonDeserializer ZonedDateTime.ofInstant(Instant.ofEpochSecond(jsonPrimitive.asLong), ZoneId.of("UTC"))
             }
         } catch (e: RuntimeException) {
             throw JsonParseException("Unable to parse ZonedDateTime", e)

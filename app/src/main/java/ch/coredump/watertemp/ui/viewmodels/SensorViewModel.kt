@@ -7,8 +7,6 @@ import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
-import java.time.Instant
-import java.time.ZoneId
 import java.time.ZonedDateTime
 
 data class Measurement(
@@ -46,7 +44,7 @@ data class Sensor(
             var latestMeasurement: Measurement? = null
             if (sensor.latestTemperature != null && sensor.latestMeasurementAt != null) {
                 latestMeasurement = Measurement(
-                    ZonedDateTime.ofInstant(Instant.ofEpochSecond(sensor.latestMeasurementAt), ZoneId.of("UTC")),
+                    sensor.latestMeasurementAt,
                     sensor.latestTemperature,
                 )
             }
