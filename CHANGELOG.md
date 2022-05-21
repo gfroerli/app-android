@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.1 (2022-05-21)
+
+- [feature] Hide inactive sensors
+- [chore] Upgrade dependencies
+
 ## v1.0.0 (2022-02-27)
 
 - [change] Migrate entire UI to Jetpack Compose (#48)
