@@ -219,9 +219,15 @@ class MapActivity : ComponentActivity() {
                 val idList = ArrayList<String>()
 
                 // Extract sensor information
+                val now = ZonedDateTime.now();
                 for (sensor in response.body()!!) {
-                    sensors[sensor.id] = SensorMeasurements(sensor)
-                    idList.add(sensor.id.toString())
+                    if (sensor.latestMeasurementAt != null && ChronoUnit.DAYS.between(sensor.latestMeasurementAt, now) < 3) {
+                        Log.d(TAG, "Adding sensor " + sensor.id);
+                        sensors[sensor.id] = SensorMeasurements(sensor)
+                        idList.add(sensor.id.toString())
+                    } else {
+                        Log.d(TAG, "Ignoring sensor " + sensor.id + " (missing or outdated measurement)");
+                    }
                 }
 
                 updateMarkers()
