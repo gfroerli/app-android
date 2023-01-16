@@ -23,7 +23,7 @@ To install the app to your device:
 
 ## License
 
-Copyright © 2016–2018 Coredump Hackerspace.
+Copyright © 2016–2023 Coredump Hackerspace.
 
 Licensed under the GPLv3 or later, see `LICENSE.txt`.
 
