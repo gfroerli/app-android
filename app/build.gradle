@@ -13,7 +13,7 @@ def getLocalProperties() {
 final Properties properties = getLocalProperties()
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion '30.0.3'
 
     namespace 'ch.coredump.watertemp'
@@ -22,7 +22,7 @@ android {
         applicationId "ch.coredump.watertemp"
         applicationIdSuffix ".zh"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 13
         versionName "1.0.1"
 
