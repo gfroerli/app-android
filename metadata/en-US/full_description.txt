@@ -1,0 +1,8 @@
+<p>The app "Gfrör.li" displays current water temperatures of Swiss lakes and
+rivers. Ideal for temperature-sensitive people, that still like swimming
+outside! Currently we have sensors in Lake Zürich and in Lake Lucerne. More
+sensors will follow.</p>
+
+<p>The data is coming from our own LoRaWAN based measuring stations and are
+updated multiple times per hour. You can find more information about the open
+source project at <a href="https://gfrör.li/">gfrör.li</a>.<p>

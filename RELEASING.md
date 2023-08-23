@@ -13,6 +13,8 @@ Update changelog:
 
     $ vim CHANGELOG.md
 
+Add the changelog to `metadata/{de,en-US}/changelogs/<versioncode>.txt` as well.
+
 Commit & tag:
 
     $ git commit -S${GPG_KEY} -m "Release v${VERSION}"
