@@ -23,8 +23,8 @@ android {
         applicationIdSuffix ".zh"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 13
-        versionName "1.0.1"
+        versionCode 14
+        versionName "1.0.2"
 
         buildConfigField 'String', 'GFROERLI_API_KEY_PUBLIC', '"' + properties['gfroerli_api_key_public'] + '"'
         buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + properties['mapbox_access_token'] + '"'

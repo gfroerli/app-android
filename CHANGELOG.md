@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.2 (2023-08-23)
+
+- [chore] Upgrade some dependencies (Gradle, AGP, appcompat)
+- [chore] Bump target API to 33
+
 ## v1.0.1 (2022-05-21)
 
 - [feature] Hide inactive sensors
