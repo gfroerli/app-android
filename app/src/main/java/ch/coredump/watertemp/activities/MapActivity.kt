@@ -151,7 +151,7 @@ class MapActivity : ComponentActivity() {
 
             // Load marker icon
             style.addImage(MARKER_DEFAULT, ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
-            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, com.mapbox.mapboxsdk.R.drawable.mapbox_marker_icon_default)!!)
+            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, com.mapbox.mapboxsdk.R.drawable.maplibre_marker_icon_default)!!)
 
             // Initialize symbol manager
             this.symbolManager = SymbolManager(mapView, mapboxMap, style)
@@ -708,7 +708,7 @@ class MapActivity : ComponentActivity() {
                     BuildConfig.MAPBOX_ACCESS_TOKEN,
                     WellKnownTileServer.Mapbox
                 )
-                val mapOptions = MapboxMapOptions()
+                val mapOptions = MapboxMapOptions.createFromAttributes(context)
                     .logoEnabled(false)
                     .attributionMargins(intArrayOf(10, 10, 10, 10))
                     .camera(
