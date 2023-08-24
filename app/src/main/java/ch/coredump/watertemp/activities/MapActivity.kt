@@ -155,6 +155,7 @@ class MapActivity : ComponentActivity() {
 
             // Initialize symbol manager
             this.symbolManager = SymbolManager(mapView, mapboxMap, style)
+            symbolManager!!.iconAllowOverlap = true
 
             // Save map as attribute
             this.map = mapboxMap
