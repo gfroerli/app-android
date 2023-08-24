@@ -33,6 +33,12 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
     }
 
+    lintOptions {
+        // Woraround for failing "./gradlew :app:lintDebug"
+        // See https://github.com/bumptech/glide/issues/4940#issuecomment-1507581182
+        lintConfig = file("$rootDir/lint-config.xml")
+    }
+
     buildTypes {
         release {
             minifyEnabled false
