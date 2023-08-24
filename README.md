@@ -2,7 +2,8 @@
 
 [![CircleCI][circle-ci-badge]][circle-ci]
 
-Android app written in Kotlin. Work in progress. Uses Mapbox API.
+Android app written in Kotlin. Displays temperature sensor data on a map (Maplibre SDK, map data
+provided by Mapbox).
 
 ## Building
 
