@@ -13,8 +13,7 @@ def getLocalProperties() {
 final Properties properties = getLocalProperties()
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion '30.0.3'
+    buildToolsVersion = '30.0.3'
 
     namespace 'ch.coredump.watertemp'
 
@@ -22,7 +21,8 @@ android {
         applicationId "ch.coredump.watertemp"
         applicationIdSuffix ".zh"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdk 33
+        compileSdk 33
         versionCode 14
         versionName "1.0.2"
 
@@ -31,6 +31,12 @@ android {
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         testInstrumentationRunnerArguments disableAnalytics: 'true'
+    }
+
+    lintOptions {
+        // Woraround for failing "./gradlew :app:lintDebug"
+        // See https://github.com/bumptech/glide/issues/4940#issuecomment-1507581182
+        lintConfig = file("$rootDir/lint-config.xml")
     }
 
     buildTypes {
@@ -108,7 +114,7 @@ dependencies {
     // Compose: Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01'
     // Compose: Image loading
-    implementation "com.github.skydoves:landscapist-glide:1.4.8"
+    implementation "com.github.skydoves:landscapist-glide:1.4.9"
 
     // Maplibre SDK
     implementation 'org.maplibre.gl:android-sdk:9.5.2'

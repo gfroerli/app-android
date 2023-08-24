@@ -185,14 +185,8 @@ class MapActivity : ComponentActivity() {
 
     private fun onSensorsFetched(): Callback<List<ApiSensor>> {
         return object : Callback<List<ApiSensor>> {
-            override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>?) {
+            override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>) {
                 this@MapActivity.progressCounter.decrement()
-
-                // Handle null response
-                if (response == null) {
-                    Log.e(TAG, "Received null response from sensors endpoint")
-                    return
-                }
 
                 // Handle unsuccessful response
                 if (!response.isSuccessful) {
@@ -423,11 +417,11 @@ class MapActivity : ComponentActivity() {
 
     private fun onSensorDetailsFetched(): Callback<ApiSensorDetails> {
         return object : Callback<ApiSensorDetails> {
-            override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>?) {
+            override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>) {
                 this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing sensor details response")
-                response?.body()?.let { details ->
+                response.body()?.let { details ->
                     this@MapActivity.sensor.addDetails(details)
                 }
             }
@@ -446,11 +440,11 @@ class MapActivity : ComponentActivity() {
 
     private fun onSponsorFetched(): Callback<ApiSponsor> {
         return object : Callback<ApiSponsor> {
-            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>?) {
+            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
                 this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing sponsor response")
-                response?.body()?.let { sponsor ->
+                response.body()?.let { sponsor ->
                     // Update sensor
                     this@MapActivity.sensor.addSponsor(sponsor)
 
@@ -473,11 +467,11 @@ class MapActivity : ComponentActivity() {
 
     private fun onMeasurementsFetched(): Callback<List<ApiMeasurement>> {
         return object : Callback<List<ApiMeasurement>> {
-            override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>?) {
+            override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>) {
                 this@MapActivity.progressCounter.decrement()
 
                 Log.i(TAG, "Processing measurements response")
-                response?.body()?.let {
+                response.body()?.let {
                     this@MapActivity.sensor
                         .setMeasurements(
                             it.map(Measurement::fromApiMeasurement)
@@ -922,7 +916,7 @@ class MapActivity : ComponentActivity() {
         val viewModel = SensorViewModel.fromSensor(Sensor(
             "Testsensor",
             "The bestest sensor of all!",
-            Measurement(ZonedDateTime.now(), 13.37373737f),
+            Measurement(ZonedDateTime.now(), 13.373737f),
             SensorStats(3.7, 31.2, 14.56),
             Sponsor(
                 "Reynholm Industries",
