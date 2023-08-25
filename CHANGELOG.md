@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.3 (2023-08-25)
+
+- [bug] Fix display of overlapping sensors
+- [chore] Upgrade MapLibre to get rid of proprietary transitive dependencies 
+- [chore] Upgrade some dependencies (Gradle, AGP, appcompat)
+
 ## v1.0.2 (2023-08-23)
 
 - [chore] Upgrade some dependencies (Gradle, AGP, appcompat)
