@@ -74,9 +74,9 @@ class AboutActivity : ComponentActivity() {
                 },
 
                 // Main content
-                content = {
+                content = { innerPadding ->
                     Box(
-                        modifier = Modifier.verticalScroll(scrollState)
+                        modifier = Modifier.padding(innerPadding).verticalScroll(scrollState)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
