@@ -13,7 +13,7 @@ def getLocalProperties() {
 final Properties properties = getLocalProperties()
 
 android {
-    buildToolsVersion = '30.0.3'
+    buildToolsVersion = '34.0.0'
 
     namespace 'ch.coredump.watertemp'
 
@@ -34,7 +34,7 @@ android {
     }
 
     lintOptions {
-        // Woraround for failing "./gradlew :app:lintDebug"
+        // Workaround for failing "./gradlew :app:lintDebug"
         // See https://github.com/bumptech/glide/issues/4940#issuecomment-1507581182
         lintConfig = file("$rootDir/lint-config.xml")
     }
