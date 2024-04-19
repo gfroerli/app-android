@@ -1,0 +1,3 @@
+- Bottom Sheet korrekt schliessen wenn auf Karte getippt wird
+- Abgerundete Ecken für Bottom Sheet
+- Viele Programmbibliotheken updatet

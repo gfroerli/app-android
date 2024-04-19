@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.4 (2024-04-19)
+
+- [bug] Properly close bottom sheet when tapping on map
+- [change] Rounded corners for bottom sheet
+- [chore] Upgrade many dependencies (Gradle, AGP, Kotlin, Compose, ...)
+- [chore] Bump target API to 34
+
 ## v1.0.3 (2023-08-25)
 
 - [bug] Fix display of overlapping sensors

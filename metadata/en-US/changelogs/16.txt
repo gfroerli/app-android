@@ -1,0 +1,3 @@
+- Properly close bottom sheet when tapping on map
+- Rounded corners for bottom sheet
+- Upgrade many dependencies (Gradle, AGP, Kotlin, Compose, ...)
