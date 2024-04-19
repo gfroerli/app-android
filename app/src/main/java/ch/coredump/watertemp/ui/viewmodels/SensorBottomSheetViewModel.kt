@@ -122,8 +122,9 @@ class SensorBottomSheetViewModel : ViewModel() {
      * Show the bottom sheet.
      */
     fun showBottomSheet() {
-        // TODO: Do we need to ensure that a sensor is set?
-        this._showBottomSheet.value = true
+        if (this._sensor.value != null) {
+            this._showBottomSheet.value = true
+        }
     }
 
     /**
