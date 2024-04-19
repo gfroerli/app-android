@@ -2,13 +2,13 @@ version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/android
-  android: circleci/android@2.0.0
+  android: circleci/android@2.5.0
 
 jobs:
   unittests:
     working_directory: ~/code
     docker:
-      - image: cimg/android:2022.01.1
+      - image: cimg/android:2024.01.1
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -39,7 +39,7 @@ jobs:
       system-image:
         type: string
     machine:
-      image: android:2022.01.1
+      image: android:2024.01.1
     resource_class: large
     steps:
       - checkout
@@ -58,5 +58,5 @@ workflows:
             parameters:
               system-image:
                 - system-images;android-21;default;x86
-                - system-images;android-30;google_apis;x86
+                - system-images;android-34;google_apis;x86_64
           name: "androidtests:<<matrix.system-image>>"

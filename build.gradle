@@ -2,18 +2,18 @@
 
 buildscript {
     ext {
-        kotlin_version = '1.6.10'
-        compose_version = '1.1.1'
+        kotlin_version = '1.9.23'
+        kotlin_compose_version = '1.5.12' // https://developer.android.com/jetpack/androidx/releases/compose-kotlin
+        compose_bom_version = '2023.10.01' // Compose 1.5, https://developer.android.com/develop/ui/compose/bom/bom-mapping
     }
 
     repositories {
         mavenCentral()
         google()
-        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.1'
+        classpath 'com.android.tools.build:gradle:8.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -25,10 +25,9 @@ allprojects {
         mavenCentral()
         google()
         maven { url "https://jitpack.io" }
-        jcenter()
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
