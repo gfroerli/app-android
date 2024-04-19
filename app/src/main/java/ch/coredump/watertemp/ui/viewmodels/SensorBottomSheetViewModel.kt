@@ -54,14 +54,20 @@ data class Sensor(
 }
 
 /**
- * View model holding information about the currently selected sensor.
+ * View model holding information about the currently selected sensor displayed in the bottom sheet.
  */
-class SensorViewModel : ViewModel() {
+class SensorBottomSheetViewModel : ViewModel() {
+    // Sensor information
     private val _sensor = MutableStateFlow<Sensor?>(null)
     val sensor = _sensor.asStateFlow()
 
+    // Measurements
     private val _measurements = MutableStateFlow<List<Measurement>?>(null)
     val measurements = _measurements.asStateFlow()
+
+    // Whether the bottom sheet is shown or not
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet = _showBottomSheet.asStateFlow()
 
     /**
      * Overwrite the current sensor and reset associated measurements.
@@ -113,16 +119,32 @@ class SensorViewModel : ViewModel() {
     }
 
     /**
-     * Clear inner data.
+     * Show the bottom sheet.
      */
-    fun clear() {
+    fun showBottomSheet() {
+        // TODO: Do we need to ensure that a sensor is set?
+        this._showBottomSheet.value = true
+    }
+
+    /**
+     * Hide the bottom sheet.
+     */
+    fun hideBottomSheet() {
+        this._showBottomSheet.value = false
+    }
+
+    /**
+     * Clear inner data and close bottom sheet.
+     */
+    fun clearData() {
         this._sensor.value = null
         this._measurements.value = null
+        this._showBottomSheet.value = false
     }
 
     companion object {
-        fun fromSensor(sensor: Sensor): SensorViewModel {
-            return SensorViewModel().apply {
+        fun fromSensor(sensor: Sensor): SensorBottomSheetViewModel {
+            return SensorBottomSheetViewModel().apply {
                 setSensor(sensor)
             }
         }
