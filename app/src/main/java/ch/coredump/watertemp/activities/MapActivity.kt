@@ -609,6 +609,7 @@ class MapActivity : ComponentActivity() {
 
                 // Bottom sheet
                 sheetPeekHeight = bottomSheetPeekHeight,
+                sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
                 sheetContent = {
                     // Wrap content in a box to allow overlaying the grab handle and the main content.
                     Box {
