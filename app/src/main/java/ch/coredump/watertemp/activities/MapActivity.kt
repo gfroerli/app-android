@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -527,8 +528,8 @@ class MapActivity : ComponentActivity() {
 
     @Composable
     private fun RootComposable(viewModel: SensorBottomSheetViewModel) {
-        // State: Bottom sheet visibility
-        val showBottomSheet by viewModel.showBottomSheet.collectAsState()
+        // State: Show menu
+        val showMenu = remember { mutableStateOf(false) }
 
         // State: Bottom sheet scaffold
         val scaffoldState = rememberBottomSheetScaffoldState(
@@ -536,8 +537,8 @@ class MapActivity : ComponentActivity() {
             rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
 
-        // State: Show menu
-        val showMenu = remember { mutableStateOf(false) }
+        // State: Bottom sheet visibility
+        val showBottomSheet by viewModel.showBottomSheet.collectAsState()
 
         // State: Height of the bottom sheet peek pane
         val baseBottomSheetPeekHeight by remember { mutableStateOf(125.dp) }
@@ -548,6 +549,13 @@ class MapActivity : ComponentActivity() {
 
         // State: Coroutine scope
         val scope = rememberCoroutineScope()
+
+        // Collapse bottom sheet if requested
+        LaunchedEffect(showBottomSheet) {
+            if (!showBottomSheet) {
+                scope.launch { scaffoldState.bottomSheetState.collapse() }
+            }
+        }
 
         // Handle back event when bottom sheet is expanded
         BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
