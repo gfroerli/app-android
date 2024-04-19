@@ -1,12 +1,12 @@
 package ch.coredump.watertemp.ui.viewmodels
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.ZonedDateTime
 
 data class Measurement(
@@ -54,18 +54,27 @@ data class Sensor(
 }
 
 /**
- * View model holding information about the currently selected sensor.
+ * View model holding information about the currently selected sensor displayed in the bottom sheet.
  */
-data class SensorViewModel(
-    val sensor: MutableState<Sensor?> = mutableStateOf(null),
-    val measurements: MutableState<List<Measurement>?> = mutableStateOf(null),
-) : ViewModel() {
+class SensorBottomSheetViewModel : ViewModel() {
+    // Sensor information
+    private val _sensor = MutableStateFlow<Sensor?>(null)
+    val sensor = _sensor.asStateFlow()
+
+    // Measurements
+    private val _measurements = MutableStateFlow<List<Measurement>?>(null)
+    val measurements = _measurements.asStateFlow()
+
+    // Whether the bottom sheet is shown or not
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet = _showBottomSheet.asStateFlow()
+
     /**
      * Overwrite the current sensor and reset associated measurements.
      */
     fun setSensor(sensor: Sensor) {
-        this.sensor.value = sensor
-        this.measurements.value = null
+        this._sensor.value = sensor
+        this._measurements.value = null
     }
 
     /**
@@ -77,7 +86,7 @@ data class SensorViewModel(
      */
     fun setMeasurements(measurements: List<Measurement>) {
         if (this.sensor.value != null) {
-            this.measurements.value = measurements
+            this._measurements.value = measurements
         }
     }
 
@@ -89,7 +98,7 @@ data class SensorViewModel(
     fun addDetails(details: ApiSensorDetails) {
         this.sensor.value?.let { sensor ->
             if (details.minimumTemperature != null && details.maximumTemperature != null && details.averageTemperature != null) {
-                this.sensor.value = sensor.copy(statsAllTime = SensorStats(
+                this._sensor.value = sensor.copy(statsAllTime = SensorStats(
                     details.minimumTemperature,
                     details.maximumTemperature,
                     details.averageTemperature
@@ -105,21 +114,40 @@ data class SensorViewModel(
      */
     fun addSponsor(sponsor: ApiSponsor) {
         this.sensor.value?.let { sensor ->
-            this.sensor.value = sensor.copy(sponsor = Sponsor(sponsor.name, sponsor.description, sponsor.logoUrl))
+            this._sensor.value = sensor.copy(sponsor = Sponsor(sponsor.name, sponsor.description, sponsor.logoUrl))
         }
     }
 
     /**
-     * Clear inner data.
+     * Show the bottom sheet.
      */
-    fun clear() {
-        this.sensor.value = null
-        this.measurements.value = null
+    fun showBottomSheet() {
+        if (this._sensor.value != null) {
+            this._showBottomSheet.value = true
+        }
+    }
+
+    /**
+     * Hide the bottom sheet.
+     */
+    fun hideBottomSheet() {
+        this._showBottomSheet.value = false
+    }
+
+    /**
+     * Clear inner data and close bottom sheet.
+     */
+    fun clearData() {
+        this._sensor.value = null
+        this._measurements.value = null
+        this._showBottomSheet.value = false
     }
 
     companion object {
-        fun fromSensor(sensor: Sensor): SensorViewModel {
-            return SensorViewModel(mutableStateOf(sensor), mutableStateOf(null))
+        fun fromSensor(sensor: Sensor): SensorBottomSheetViewModel {
+            return SensorBottomSheetViewModel().apply {
+                setSensor(sensor)
+            }
         }
     }
 }

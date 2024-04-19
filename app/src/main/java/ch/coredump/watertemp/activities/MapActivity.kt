@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -101,11 +102,8 @@ class MapActivity : ComponentActivity() {
     // The currently active marker
     private var activeMarker: Symbol? = null
 
-    // The currently active sensor (and its data)
-    private lateinit var sensor: SensorViewModel
-
-    // Class to control how the bottom sheet behaves
-    private val showBottomSheet = mutableStateOf(false)
+    // View model including the currently active sensor and its data
+    private lateinit var viewModel: SensorBottomSheetViewModel
 
     // Activity indicator
     private lateinit var progressCounter: ProgressCounter
@@ -124,11 +122,11 @@ class MapActivity : ComponentActivity() {
         this.labelTemperature = getString(R.string.temperature)
 
         // Initialize viewmodel
-        sensor = ViewModelProvider(this)[SensorViewModel::class.java]
+        viewModel = ViewModelProvider(this)[SensorBottomSheetViewModel::class.java]
 
         // Initialize the layout
         setContent {
-            RootComposable(this.sensor, this.showBottomSheet)
+            RootComposable(this.viewModel)
         }
 
         // Progress counter
@@ -204,11 +202,12 @@ class MapActivity : ComponentActivity() {
                 Log.d(TAG, "Sensors response successful")
 
                 // Ensure bottom sheet is hidden
-                hideBottomSheet()
+                // TODO(#6): Don't hide, but update data!
+                viewModel.hideBottomSheet()
 
                 // Clear old sensor data
                 sensors.clear()
-                sensor.clear()
+                viewModel.clearData()
 
                 // Prepare list for sensor IDs
                 val idList = ArrayList<String>()
@@ -244,22 +243,6 @@ class MapActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    /**
-     * Show the bottom sheet if it isn't already visible.
-     */
-    private fun showBottomSheet() {
-        // Compose
-        this.showBottomSheet.value = true
-    }
-
-    /**
-     * Hide the bottom sheet if it's visible.
-     */
-    private fun hideBottomSheet() {
-        // Compose
-        this.showBottomSheet.value = false
     }
 
     private fun updateMarkers() {
@@ -323,7 +306,7 @@ class MapActivity : ComponentActivity() {
             this.deselectMarkers()
 
             // Hide the details pane
-            this.hideBottomSheet()
+            viewModel.hideBottomSheet()
 
             return@OnMapClickListener true
         })
@@ -370,7 +353,7 @@ class MapActivity : ComponentActivity() {
         val sensor = sensorMeasurements.sensor
 
         // Create viewmodel and update UI
-        this.sensor.setSensor(Sensor.fromApiSensor(sensor))
+        this.viewModel.setSensor(Sensor.fromApiSensor(sensor))
 
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
@@ -388,7 +371,7 @@ class MapActivity : ComponentActivity() {
             } else {
                 // Cache hit!
                 Log.d(TAG, "Sponsor ${sensor.sponsorId} cache hit")
-                this.sensor.addSponsor(sponsor)
+                this.viewModel.addSponsor(sponsor)
             }
         }
 
@@ -399,8 +382,8 @@ class MapActivity : ComponentActivity() {
         this.progressCounter.increment()
         measurementCall.enqueue(onMeasurementsFetched())
 
-        // Show the details pane
-        this.showBottomSheet()
+        // Show the details pane (if not already visible)
+        this.viewModel.showBottomSheet()
 
         return true
     }
@@ -423,7 +406,7 @@ class MapActivity : ComponentActivity() {
 
                 Log.i(TAG, "Processing sensor details response")
                 response.body()?.let { details ->
-                    this@MapActivity.sensor.addDetails(details)
+                    this@MapActivity.viewModel.addDetails(details)
                 }
             }
 
@@ -442,20 +425,20 @@ class MapActivity : ComponentActivity() {
     private fun onSponsorFetched(): Callback<ApiSponsor> {
         return object : Callback<ApiSponsor> {
             override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
-                this@MapActivity.progressCounter.decrement()
+                progressCounter.decrement()
 
                 Log.i(TAG, "Processing sponsor response")
                 response.body()?.let { sponsor ->
                     // Update sensor
-                    this@MapActivity.sensor.addSponsor(sponsor)
+                    viewModel.addSponsor(sponsor)
 
                     // Store in cache
-                    this@MapActivity.sponsors.put(sponsor.id, sponsor)
+                    sponsors.put(sponsor.id, sponsor)
                 }
             }
 
             override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
+                progressCounter.decrement()
 
                 Log.e(TAG, "Fetching sponsor failed: $t")
                 Utils.showError(
@@ -473,10 +456,9 @@ class MapActivity : ComponentActivity() {
 
                 Log.i(TAG, "Processing measurements response")
                 response.body()?.let {
-                    this@MapActivity.sensor
-                        .setMeasurements(
-                            it.map(Measurement::fromApiMeasurement)
-                        )
+                    viewModel.setMeasurements(
+                        it.map(Measurement::fromApiMeasurement)
+                    )
                 }
             }
 
@@ -545,25 +527,35 @@ class MapActivity : ComponentActivity() {
     // Composables
 
     @Composable
-    private fun RootComposable(viewModel: SensorViewModel, showBottomSheet: MutableState<Boolean>) {
+    private fun RootComposable(viewModel: SensorBottomSheetViewModel) {
+        // State: Show menu
+        val showMenu = remember { mutableStateOf(false) }
+
         // State: Bottom sheet scaffold
         val scaffoldState = rememberBottomSheetScaffoldState(
             DrawerState(DrawerValue.Closed),
             rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
 
-        // State: Show menu
-        val showMenu = remember { mutableStateOf(false) }
+        // State: Bottom sheet visibility
+        val showBottomSheet by viewModel.showBottomSheet.collectAsState()
 
         // State: Height of the bottom sheet peek pane
         val baseBottomSheetPeekHeight by remember { mutableStateOf(125.dp) }
-        val bottomSheetPeekHeight = if (showBottomSheet.value) baseBottomSheetPeekHeight else 0.dp
+        val bottomSheetPeekHeight = if (showBottomSheet) baseBottomSheetPeekHeight else 0.dp
 
         // State: Scroll state of the bottom sheet
         val sheetContentScrollState = rememberScrollState()
 
         // State: Coroutine scope
         val scope = rememberCoroutineScope()
+
+        // Collapse bottom sheet if requested
+        LaunchedEffect(showBottomSheet) {
+            if (!showBottomSheet) {
+                scope.launch { scaffoldState.bottomSheetState.collapse() }
+            }
+        }
 
         // Handle back event when bottom sheet is expanded
         BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
@@ -576,7 +568,7 @@ class MapActivity : ComponentActivity() {
         // Handle back event when bottom sheet is collapsed
         BackHandler(enabled = scaffoldState.bottomSheetState.isCollapsed) {
             // Hide bottom sheet
-            showBottomSheet.value = false
+            viewModel.hideBottomSheet()
 
             // Deselect markers
             scope.launch { deselectMarkers() }
@@ -587,32 +579,12 @@ class MapActivity : ComponentActivity() {
             colors = GfroerliColorsLight,
             typography = GfroerliTypography,
         ) {
-
             // Use the scaffold with app bar and bottom sheet
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
 
                 // The app bar (AKA action bar)
-                topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(id = R.string.activity_map)) },
-                        backgroundColor = MaterialTheme.colors.primary,
-                        actions = {
-                            OverflowMenu({
-                                DropdownMenuItem(
-                                    onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
-                                ) {
-                                    Text(stringResource(id = R.string.action_refresh_all))
-                                }
-                                DropdownMenuItem(
-                                    onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
-                                ) {
-                                    Text(stringResource(id = R.string.action_about_this_app))
-                                }
-                            }, showMenu)
-                        },
-                    )
-                },
+                topBar = { TopBar(showMenu) },
 
                 // Main content
                 content = { innerPadding ->
@@ -629,12 +601,15 @@ class MapActivity : ComponentActivity() {
 
                 // Bottom sheet
                 sheetPeekHeight = bottomSheetPeekHeight,
+                sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
                 sheetContent = {
                     // Wrap content in a box to allow overlaying the grab handle and the main content.
                     Box {
                         // Grab handle
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Box(
@@ -648,9 +623,15 @@ class MapActivity : ComponentActivity() {
                         }
 
                         // Main content
-                        Column(Modifier.verticalScroll(sheetContentScrollState).fillMaxWidth()) {
+                        Column(
+                            Modifier
+                                .verticalScroll(sheetContentScrollState)
+                                .fillMaxWidth()) {
                             // Peek area (same height as sheetPeekHeight)
-                            Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
+                            Box(
+                                Modifier
+                                    .height(bottomSheetPeekHeight)
+                                    .padding(16.dp, 0.dp, 0.dp, 16.dp)
                                 /*.swipeable(
                                     state = swipeableState,
                                     anchors = anchors,
@@ -673,6 +654,28 @@ class MapActivity : ComponentActivity() {
                 },
             )
         }
+    }
+
+    @Composable
+    fun TopBar(showMenu: MutableState<Boolean>) {
+        TopAppBar(
+            title = { Text(stringResource(id = R.string.activity_map)) },
+            backgroundColor = MaterialTheme.colors.primary,
+            actions = {
+                OverflowMenu({
+                    DropdownMenuItem(
+                        onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
+                    ) {
+                        Text(stringResource(id = R.string.action_refresh_all))
+                    }
+                    DropdownMenuItem(
+                        onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
+                    ) {
+                        Text(stringResource(id = R.string.action_about_this_app))
+                    }
+                }, showMenu)
+            },
+        )
     }
 
     /**
@@ -732,14 +735,15 @@ class MapActivity : ComponentActivity() {
      * The sensor preview shown in the bottom sheet peek pane.
      */
     @Composable
-    private fun SensorPreview(viewModel: SensorViewModel) {
+    private fun SensorPreview(viewModel: SensorBottomSheetViewModel) {
+        val sensor by viewModel.sensor.collectAsState()
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 viewModel.sensor.value?.name ?: "No sensor. If you can see this, that's a bug.",
                 style = MaterialTheme.typography.h2,
                 modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 4.dp),
             )
-            viewModel.sensor.value?.let { sensor ->
+            sensor?.let { sensor ->
                 Text(
                     sensor.caption ?: "",
                     style = MaterialTheme.typography.body2,
@@ -779,51 +783,62 @@ class MapActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SensorDetails(viewModel: SensorViewModel) {
+    fun SensorDetails(viewModel: SensorBottomSheetViewModel) {
+        val sensor by viewModel.sensor.collectAsState()
+        val measurements by viewModel.measurements.collectAsState()
+
         Column() {
-            viewModel.sensor.value?.let { sensor ->
+            sensor?.let { sensor ->
                 // Section: History (last 3 days)
                 Text(
                     stringResource(R.string.section_header_3days),
                     style = MaterialTheme.typography.h3,
                 )
-                if (viewModel.measurements.value == null) {
-                    Text(
-                        stringResource(R.string.loading_data),
-                        style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic)),
-                    )
-                }
-                viewModel.measurements.value?.let { measurements ->
-                    if (measurements.isEmpty()) {
-                        Text(
-                            stringResource(R.string.chart_no_data),
-                            style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic))
-                        )
-                    } else {
-                        TemperatureChart(
-                            measurements,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(144.dp)
-                        )
+                Box(
+                    modifier = Modifier.height(144.dp)
+                ) {
+                    if (measurements == null) {
+                        LoadingDataText()
+                    }
+                    measurements?.let { measurements ->
+                        if (measurements.isEmpty()) {
+                            Text(
+                                stringResource(R.string.chart_no_data),
+                                style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic))
+                            )
+                        } else {
+                            TemperatureChart(
+                                measurements,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                            )
+                        }
                     }
                 }
 
                 // Section: Summary
+                Text(
+                    stringResource(R.string.section_header_summary),
+                    style = MaterialTheme.typography.h3,
+                    modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 4.dp),
+                )
+                if (sensor.statsAllTime == null) {
+                    LoadingDataText()
+                } else {
+                    sensor.statsAllTime.let {
+                        Text(
+                            "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
+                                it.minTemp,
+                                it.maxTemp,
+                                it.avgTemp
+                            ),
+                            style = MaterialTheme.typography.body1,
+                        )
+                    }
+                }
                 sensor.statsAllTime?.let {
-                    Text(
-                        stringResource(R.string.section_header_summary),
-                        style = MaterialTheme.typography.h3,
-                        modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 4.dp),
-                    )
-                    Text(
-                        "Min: %.1f°C | Max: %.1f°C | Avg: %.1f°C".format(
-                            it.minTemp,
-                            it.maxTemp,
-                            it.avgTemp
-                        ),
-                        style = MaterialTheme.typography.body1,
-                    )
+
                 }
 
                 // Section: Sponsor
@@ -911,10 +926,18 @@ class MapActivity : ComponentActivity() {
         )
     }
 
+    @Composable
+    fun LoadingDataText() {
+        Text(
+            stringResource(R.string.loading_data),
+            style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic)),
+        )
+    }
+
     @Preview
     @Composable
     fun PreviewSensor() {
-        val viewModel = SensorViewModel.fromSensor(Sensor(
+        val viewModel = SensorBottomSheetViewModel.fromSensor(Sensor(
             "Testsensor",
             "The bestest sensor of all!",
             Measurement(ZonedDateTime.now(), 13.373737f),
