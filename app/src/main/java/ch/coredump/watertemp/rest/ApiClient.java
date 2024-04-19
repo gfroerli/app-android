@@ -1,5 +1,7 @@
 package ch.coredump.watertemp.rest;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,8 +20,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private static final String API_URL = "https://watertemp-api.coredump.ch/api/";
-    private ApiService apiService;
+    private static final String API_URL = "https://api.gfrör.li/api/";
+    private final ApiService apiService;
 
     public ApiClient(final String authToken) {
         // Gson instance (for JSON (de)serialization)
@@ -32,7 +34,7 @@ public class ApiClient {
         // Request interceptor (add authentication)
         final Interceptor authInterceptor = new Interceptor() {
             @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
+            public @NonNull okhttp3.Response intercept(Chain chain) throws IOException {
                 final Request original = chain.request();
 
                 // Add request headers
