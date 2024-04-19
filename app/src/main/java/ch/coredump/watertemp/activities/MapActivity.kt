@@ -615,7 +615,9 @@ class MapActivity : ComponentActivity() {
                     Box {
                         // Grab handle
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Box(
@@ -629,9 +631,15 @@ class MapActivity : ComponentActivity() {
                         }
 
                         // Main content
-                        Column(Modifier.verticalScroll(sheetContentScrollState).fillMaxWidth()) {
+                        Column(
+                            Modifier
+                                .verticalScroll(sheetContentScrollState)
+                                .fillMaxWidth()) {
                             // Peek area (same height as sheetPeekHeight)
-                            Box(Modifier.height(bottomSheetPeekHeight).padding(16.dp, 0.dp, 0.dp, 16.dp)
+                            Box(
+                                Modifier
+                                    .height(bottomSheetPeekHeight)
+                                    .padding(16.dp, 0.dp, 0.dp, 16.dp)
                                 /*.swipeable(
                                     state = swipeableState,
                                     anchors = anchors,
@@ -736,13 +744,14 @@ class MapActivity : ComponentActivity() {
      */
     @Composable
     private fun SensorPreview(viewModel: SensorViewModel) {
+        val sensor by viewModel.sensor.collectAsState()
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 viewModel.sensor.value?.name ?: "No sensor. If you can see this, that's a bug.",
                 style = MaterialTheme.typography.h2,
                 modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 4.dp),
             )
-            viewModel.sensor.value?.let { sensor ->
+            sensor?.let { sensor ->
                 Text(
                     sensor.caption ?: "",
                     style = MaterialTheme.typography.body2,
@@ -783,20 +792,23 @@ class MapActivity : ComponentActivity() {
 
     @Composable
     fun SensorDetails(viewModel: SensorViewModel) {
+        val sensor by viewModel.sensor.collectAsState()
+        val measurements by viewModel.measurements.collectAsState()
+
         Column() {
-            viewModel.sensor.value?.let { sensor ->
+            sensor?.let { sensor ->
                 // Section: History (last 3 days)
                 Text(
                     stringResource(R.string.section_header_3days),
                     style = MaterialTheme.typography.h3,
                 )
-                if (viewModel.measurements.value == null) {
+                if (measurements == null) {
                     Text(
                         stringResource(R.string.loading_data),
                         style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic)),
                     )
                 }
-                viewModel.measurements.value?.let { measurements ->
+                measurements?.let { measurements ->
                     if (measurements.isEmpty()) {
                         Text(
                             stringResource(R.string.chart_no_data),

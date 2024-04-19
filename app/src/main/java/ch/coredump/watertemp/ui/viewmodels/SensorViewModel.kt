@@ -1,12 +1,12 @@
 package ch.coredump.watertemp.ui.viewmodels
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.ZonedDateTime
 
 data class Measurement(
@@ -56,16 +56,19 @@ data class Sensor(
 /**
  * View model holding information about the currently selected sensor.
  */
-data class SensorViewModel(
-    val sensor: MutableState<Sensor?> = mutableStateOf(null),
-    val measurements: MutableState<List<Measurement>?> = mutableStateOf(null),
-) : ViewModel() {
+class SensorViewModel : ViewModel() {
+    private val _sensor = MutableStateFlow<Sensor?>(null)
+    val sensor = _sensor.asStateFlow()
+
+    private val _measurements = MutableStateFlow<List<Measurement>?>(null)
+    val measurements = _measurements.asStateFlow()
+
     /**
      * Overwrite the current sensor and reset associated measurements.
      */
     fun setSensor(sensor: Sensor) {
-        this.sensor.value = sensor
-        this.measurements.value = null
+        this._sensor.value = sensor
+        this._measurements.value = null
     }
 
     /**
@@ -77,7 +80,7 @@ data class SensorViewModel(
      */
     fun setMeasurements(measurements: List<Measurement>) {
         if (this.sensor.value != null) {
-            this.measurements.value = measurements
+            this._measurements.value = measurements
         }
     }
 
@@ -89,7 +92,7 @@ data class SensorViewModel(
     fun addDetails(details: ApiSensorDetails) {
         this.sensor.value?.let { sensor ->
             if (details.minimumTemperature != null && details.maximumTemperature != null && details.averageTemperature != null) {
-                this.sensor.value = sensor.copy(statsAllTime = SensorStats(
+                this._sensor.value = sensor.copy(statsAllTime = SensorStats(
                     details.minimumTemperature,
                     details.maximumTemperature,
                     details.averageTemperature
@@ -105,7 +108,7 @@ data class SensorViewModel(
      */
     fun addSponsor(sponsor: ApiSponsor) {
         this.sensor.value?.let { sensor ->
-            this.sensor.value = sensor.copy(sponsor = Sponsor(sponsor.name, sponsor.description, sponsor.logoUrl))
+            this._sensor.value = sensor.copy(sponsor = Sponsor(sponsor.name, sponsor.description, sponsor.logoUrl))
         }
     }
 
@@ -113,13 +116,15 @@ data class SensorViewModel(
      * Clear inner data.
      */
     fun clear() {
-        this.sensor.value = null
-        this.measurements.value = null
+        this._sensor.value = null
+        this._measurements.value = null
     }
 
     companion object {
         fun fromSensor(sensor: Sensor): SensorViewModel {
-            return SensorViewModel(mutableStateOf(sensor), mutableStateOf(null))
+            return SensorViewModel().apply {
+                setSensor(sensor)
+            }
         }
     }
 }
