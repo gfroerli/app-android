@@ -587,32 +587,12 @@ class MapActivity : ComponentActivity() {
             colors = GfroerliColorsLight,
             typography = GfroerliTypography,
         ) {
-
             // Use the scaffold with app bar and bottom sheet
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
 
                 // The app bar (AKA action bar)
-                topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(id = R.string.activity_map)) },
-                        backgroundColor = MaterialTheme.colors.primary,
-                        actions = {
-                            OverflowMenu({
-                                DropdownMenuItem(
-                                    onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
-                                ) {
-                                    Text(stringResource(id = R.string.action_refresh_all))
-                                }
-                                DropdownMenuItem(
-                                    onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
-                                ) {
-                                    Text(stringResource(id = R.string.action_about_this_app))
-                                }
-                            }, showMenu)
-                        },
-                    )
-                },
+                topBar = { TopBar(showMenu) },
 
                 // Main content
                 content = { innerPadding ->
@@ -673,6 +653,28 @@ class MapActivity : ComponentActivity() {
                 },
             )
         }
+    }
+
+    @Composable
+    fun TopBar(showMenu: MutableState<Boolean>) {
+        TopAppBar(
+            title = { Text(stringResource(id = R.string.activity_map)) },
+            backgroundColor = MaterialTheme.colors.primary,
+            actions = {
+                OverflowMenu({
+                    DropdownMenuItem(
+                        onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
+                    ) {
+                        Text(stringResource(id = R.string.action_refresh_all))
+                    }
+                    DropdownMenuItem(
+                        onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
+                    ) {
+                        Text(stringResource(id = R.string.action_about_this_app))
+                    }
+                }, showMenu)
+            },
+        )
     }
 
     /**
