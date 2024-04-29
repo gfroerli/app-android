@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="thermometer_icon_description">Thermometer-Symbou</string>
+    <string name="no_measurement">Kei aktuelli Mässig</string>
+    <string name="loading_data">Date wärde glade…</string>
+    <string name="temperature">Temperatur</string>
+    <string name="activity_about">Über</string>
+    <string name="activity_map">Gfrör.li: Wassertemperature</string>
+    <string name="section_header_3days">Mässige vode letschte 3 Täg</string>
+    <string name="section_header_summary">Zämefassig (isgsamt)</string>
+    <string name="section_header_sponsor">Sponsor: %1$s</string>
+    <string name="sponsor_description">Dä Sensor isch vo \"%1$s\" gsponseret.</string>
+    <string name="chart_no_data">Kei Date vorhande</string>
+    <string name="version_heading">Version</string>
+    <string name="version_text1">App-Version %1$s (build %2$d).</string>
+    <string name="about_project_heading">Warum die App?</string>
+    <string name="about_project_text1">D Wassertemperatur isch für vili Lüt e wichtige Wärt, zum Bispiu für Schwümmer, Toucher, Fischer und vili meh. Aber bishär hets ider Schwiz chum e zueverlässigi Müglechkeit gä, zum Ächtzit-Temperature i dinere Gägend z gseh.</string>
+    <string name="about_project_text2">Mir boue es Netzwärch vo günstige Wassertemperatur-Sensore mit sehr gringem Energieverbruuch. Das machts müglech, d Wassertemperatur lokau z mässe, und se dir gratis in Quasi-Ächtzit azzeige.</string>
+    <string name="about_project_text3">Meh Informatione: https://gfrör.li/</string>
+    <string name="about_us_heading">Wär het die App entwicklet?</string>
+    <string name="about_us_text1">Die App, d Serverinfrastruktur und ou d Sensor-Hardware wird vom Hackerspace \"Coredump\" in Rapperswil-Jona entwicklet.</string>
+    <string name="about_us_text2">Meh Infos über üs gits uf üsere Website: https://www.coredump.ch/</string>
+    <string name="open_source_heading">Open Source</string>
+    <string name="open_source_text1">Die App isch Open Source! De Queucode isch uf GitHub: https://github.com/gfroerli/app-android</string>
+    <string name="action_about_this_app">Über die App</string>
+    <string name="action_refresh_all">Aui Date aktualisiere</string>
+    <string name="fetching_sensor_data_failed">Sensor-Daten hei nid chönne glade wärde (HTTP %1$d).\nWenn das Problem witerhin da isch, bitte kontaktier %2$s.</string>
+    <string name="fetching_data_failed">%1$s hei nid chönne glade wärde. Bitte kontrollier dini Internet-Verbindig.</string>
+    <string name="data_sensor_details">Sensor-Details</string>
+    <string name="data_sensors">Sensore</string>
+    <string name="data_sponsor">Sponsor</string>
+    <string name="data_sponsors">Sponsore</string>
+    <string name="data_measurements">Mässige</string>
+</resources>

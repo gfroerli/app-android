@@ -22,7 +22,7 @@
     <string name="version_heading">Version</string>
     <string name="version_text1">App version %1$s (build %2$d).</string>
     <string name="about_project_heading">Why this app?</string>
-    <string name="about_project_text1">The water temperature is a value relevant to a lot of people: Swimmers, divers, fishermen, and many others. But until now, there were often no reliable ways to get real time information about the water temperature in the area you\'re interested in.</string>
+    <string name="about_project_text1">The water temperature is a value relevant to a lot of people: Swimmers, divers, fishermen, and many others. But until now, in Switzerland, there were often no reliable ways to get real time information about the water temperature in the area you\'re interested in.</string>
     <string name="about_project_text2">We are building a network of low-cost low-energy water temperature sensors. This allows us to measure the water temperature locally and to show it to you in real time, for free.</string>
     <string name="about_project_text3">Find more information about this project: https://gfrör.li/</string>
     <string name="about_us_heading">Who made this app?</string>
