@@ -33,6 +33,13 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
     }
 
+    dependenciesInfo {
+        // Disable dependency metadata when building APKs
+        includeInApk = false
+        // Include dependency metadata when building Android App Bundles
+        includeInBundle = true
+    }
+
     androidResources {
         generateLocaleConfig true
     }
