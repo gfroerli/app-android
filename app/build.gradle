@@ -33,6 +33,10 @@ android {
         testInstrumentationRunnerArguments disableAnalytics: 'true'
     }
 
+    androidResources {
+        generateLocaleConfig true
+    }
+
     lintOptions {
         // Workaround for failing "./gradlew :app:lintDebug"
         // See https://github.com/bumptech/glide/issues/4940#issuecomment-1507581182
