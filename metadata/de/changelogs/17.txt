@@ -1,0 +1,2 @@
+- Übersetzung auf Berndeutsch
+- Unterstützung für App-spezifische Sprachen

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.5 (2024-05-10)
+
+- [feature] Add Swiss German translation (#66)
+- [feature] Add support for app-specific languages (#66)
+- [change] Exclude dependencies info when building APK (#67)
+
 ## v1.0.4 (2024-04-19)
 
 - [bug] Properly close bottom sheet when tapping on map

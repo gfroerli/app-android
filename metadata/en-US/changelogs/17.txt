@@ -1,0 +1,2 @@
+- Add Swiss German translation
+- Add support for app-specific languages
