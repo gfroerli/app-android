@@ -144,8 +144,11 @@ dependencies {
     // Relative time calculation
     implementation 'org.ocpsoft.prettytime:prettytime:5.0.0.Final'
 
-    // Charts
+    // Charts: MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:3.1.0'
+
+    // Charts: Vico
+    implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.19")
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
