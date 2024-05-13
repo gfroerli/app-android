@@ -1,12 +1,19 @@
 package ch.coredump.watertemp.ui.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import java.time.ZonedDateTime
 
 data class Measurement(
@@ -68,6 +75,24 @@ class SensorBottomSheetViewModel : ViewModel() {
     // Whether the bottom sheet is shown or not
     private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet = _showBottomSheet.asStateFlow()
+
+    // Chart model producer
+    val modelProducer = measurements.map {
+        val producer = CartesianChartModelProducer.build()
+        Log.i("ViewModel", "run")
+        it?.let {
+            Log.i("ViewModel", "Updating value")
+            producer.tryRunTransaction {
+                lineSeries {
+                    series(
+                        it.map { measurement -> measurement.timestamp.toInstant().toEpochMilli() },
+                        it.map { measurement -> measurement.temperature },
+                    )
+                }
+            }
+        }
+        producer
+    }
 
     /**
      * Overwrite the current sensor and reset associated measurements.

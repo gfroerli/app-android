@@ -2,12 +2,14 @@ package ch.coredump.watertemp.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.collection.mutableFloatListOf
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,7 +19,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,8 +67,30 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineSpec
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.compose.common.of
+import com.patrykandpatrick.vico.compose.common.shader.color
+import com.patrykandpatrick.vico.core.cartesian.Zoom
+import com.patrykandpatrick.vico.core.cartesian.data.AxisValueOverrider
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.component.TextComponent
+import com.patrykandpatrick.vico.core.common.shader.DynamicShader
+import com.patrykandpatrick.vico.core.common.shape.Shape
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.ocpsoft.prettytime.PrettyTime
 import retrofit2.Call
 import retrofit2.Callback
@@ -75,6 +99,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.random.Random
 
 // Marker image names
 private const val MARKER_DEFAULT = "marker_default"
@@ -533,7 +558,6 @@ class MapActivity : ComponentActivity() {
 
         // State: Bottom sheet scaffold
         val scaffoldState = rememberBottomSheetScaffoldState(
-            DrawerState(DrawerValue.Closed),
             rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
 
@@ -786,6 +810,7 @@ class MapActivity : ComponentActivity() {
     fun SensorDetails(viewModel: SensorBottomSheetViewModel) {
         val sensor by viewModel.sensor.collectAsState()
         val measurements by viewModel.measurements.collectAsState()
+        val chartModelProducer = viewModel.modelProducer.collectAsState(CartesianChartModelProducer.build())
 
         Column() {
             sensor?.let { sensor ->
@@ -807,7 +832,29 @@ class MapActivity : ComponentActivity() {
                                 style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic))
                             )
                         } else {
-                            TemperatureChart(
+                            TemperatureChartNew(
+                                chartModelProducer.value,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                            )
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier.height(144.dp)
+                ) {
+                    if (measurements == null) {
+                        LoadingDataText()
+                    }
+                    measurements?.let { measurements ->
+                        if (measurements.isEmpty()) {
+                            Text(
+                                stringResource(R.string.chart_no_data),
+                                style = MaterialTheme.typography.body1.plus(TextStyle(fontStyle = Italic))
+                            )
+                        } else {
+                            TemperatureChartOld(
                                 measurements,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -874,7 +921,7 @@ class MapActivity : ComponentActivity() {
     }
 
     @Composable
-    fun TemperatureChart(measurements: List<Measurement>, modifier: Modifier) {
+    fun TemperatureChartOld(measurements: List<Measurement>, modifier: Modifier) {
         AndroidView(
             modifier = modifier,
             factory = { context -> LineChart(context).apply {
@@ -923,6 +970,24 @@ class MapActivity : ComponentActivity() {
                 chart.data = data
                 chart.invalidate()
             }
+        )
+    }
+
+    @Composable
+    fun TemperatureChartNew(chartModelProducer: CartesianChartModelProducer, modifier: Modifier) {
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberLineCartesianLayer(
+                    lines = listOf(rememberLineSpec(DynamicShader.color(Color(0xffa485e0)))),
+                    axisValueOverrider = AxisValueOverrider.adaptiveYValues(yFraction = 1f, round = true),
+                ),
+                startAxis = rememberStartAxis(),
+                bottomAxis = rememberBottomAxis(guideline = null),
+            ),
+            modelProducer = chartModelProducer,
+            modifier = modifier,
+            scrollState = rememberVicoScrollState(),
+            zoomState = rememberVicoZoomState(initialZoom = remember { Zoom.Content }, zoomEnabled = true),
         )
     }
 
