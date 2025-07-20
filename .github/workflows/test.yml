@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   unittests:
     runs-on: ubuntu-latest
@@ -53,6 +58,14 @@ jobs:
           name: Test Results
           path: app/build/test-results
           retention-days: 60
+
+      - name: Generate test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Report
+          path: app/build/test-results/**/TEST-*.xml
+          reporter: java-junit
 
   androidtests:
     runs-on: ubuntu-latest
@@ -109,3 +122,11 @@ jobs:
           name: Android Test Reports API ${{ matrix.api-level }}
           path: app/build/reports/androidTests
           retention-days: 60
+
+      - name: Generate test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Android API ${{ matrix.api-level }} Test Report
+          path: app/build/outputs/androidTest-results/**/TEST-*.xml
+          reporter: java-junit
