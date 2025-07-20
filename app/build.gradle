@@ -142,7 +142,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.8.1'
 
     // Relative time calculation
-    implementation 'org.ocpsoft.prettytime:prettytime:5.0.0.Final'
+    implementation 'org.ocpsoft.prettytime:prettytime:5.0.9.Final'
 
     // Charts
     implementation 'com.github.PhilJay:MPAndroidChart:3.1.0'
