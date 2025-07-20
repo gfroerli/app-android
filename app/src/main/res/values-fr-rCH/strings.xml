@@ -7,7 +7,7 @@
     <string name="loading_data">Chargement des données…</string>
     <string name="section_header_3days">Mesures des 3 derniers jours</string>
     <string name="section_header_sponsor">Sponsor : %1$s</string>
-    <string name="sponsor_description">Ce capteur a été sponsorisé par « %1$s ».</string>
+    <string name="sponsor_description">Ce capteur est sponsorisé par « %1$s ».</string>
     <string name="about_project_heading">Pourquoi cette app ?</string>
     <string name="about_project_text1">La température de l’eau est importante pour plein de gens : nageurs, plongeurs, pêcheurs, et bien d’autres. Mais jusque-là, c’était galère de trouver des infos fiables en temps réel en Suisse.</string>
     <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>

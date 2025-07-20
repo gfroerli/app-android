@@ -7,7 +7,7 @@
     <string name="loading_data">Caricamento dei dati…</string>
     <string name="section_header_3days">Misurazioni degli ultimi 3 giorni</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">Questo sensore è stato offerto da «%1$s».</string>
+    <string name="sponsor_description">Questo sensore è sponsorizzato da «%1$s».</string>
     <string name="about_project_heading">Perche quest\'app?</string>
     <string name="about_project_text1">La temperatura dell\'acqua è importante per tanti: chi nuota, chi pesca, chi fa immersioni e altri ancora. Ma finora era difficile trovare info affidabili in tempo reale in Svizzera.</string>
     <string name="about_project_text2">Stiamo creando una rete di sensori economici a basso consumo. Così possiamo misurare la temperatura dell\'acqua vicino a te e mostrartela quasi in tempo reale – gratis.</string>
