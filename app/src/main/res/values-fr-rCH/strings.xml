@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_about">À propos</string>
+    <string name="activity_map">Gfrör.li : Températures de l’eau</string>
+    <string name="thermometer_icon_description">Icône thermomètre</string>
+    <string name="no_measurement">Pas de mesure actuelle</string>
+    <string name="loading_data">Chargement des données…</string>
+    <string name="section_header_3days">Mesures des 3 derniers jours</string>
+    <string name="section_header_sponsor">Sponsor : %1$s</string>
+    <string name="sponsor_description">Ce capteur est sponsorisé par « %1$s ».</string>
+    <string name="about_project_heading">Pourquoi cette app ?</string>
+    <string name="about_project_text1">La température de l’eau est importante pour plein de gens : nageurs, plongeurs, pêcheurs, et bien d’autres. Mais jusque-là, c’était galère de trouver des infos fiables en temps réel en Suisse.</string>
+    <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>
+    <string name="about_project_text3">Plus d’infos : https://gfrör.li/</string>
+    <string name="about_us_heading">Qui a créé cette app ?</string>
+    <string name="about_us_text1">L’app, les serveurs et le matos des capteurs sont développés par le hackerspace Coredump à Rapperswil-Jona.</string>
+    <string name="about_us_text2">Tu peux en savoir plus sur nous ici : https://www.coredump.ch/</string>
+    <string name="open_source_heading">Open source</string>
+    <string name="open_source_text1">Cette app est open source ! Le code est sur GitHub : https://github.com/gfroerli/app-android</string>
+    <string name="action_about_this_app">À propos de l’app</string>
+    <string name="action_refresh_all">Rafraîchis toutes les données</string>
+    <string name="chart_no_data">Aucune donnée dispo</string>
+    <string name="temperature">Température</string>
+    <string name="section_header_summary">Résumé (total)</string>
+    <string name="fetching_sensor_data_failed">On n’a pas pu charger les données du capteur (HTTP %1$d).\nSi ça continue, écris à %2$s.</string>
+    <string name="fetching_data_failed">On n’a pas réussi à charger %1$s. Vérifie ta connexion internet.</string>
+    <string name="data_sensors">Capteurs</string>
+    <string name="data_sensor_details">Détails du capteur</string>
+    <string name="data_sponsor">Sponsor</string>
+    <string name="data_sponsors">Sponsors</string>
+    <string name="data_measurements">Mesures</string>
+    <string name="version_heading">Version</string>
+    <string name="version_text1">Version de l’app %1$s (build %2$d).</string>
+</resources>
