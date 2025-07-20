@@ -2,8 +2,8 @@
 
 [![GitHub Actions][github-actions-badge]][github-actions]
 
-Android app written in Kotlin. Displays temperature sensor data on a map (Maplibre SDK, map data
-provided by Mapbox).
+Android app written in Kotlin. Displays temperature sensor data on a map
+(Maplibre SDK, map data provided by Mapbox).
 
 ## Building
 
@@ -22,9 +22,17 @@ To install the app to your device:
 
 (Alternatively, do all that stuff through Android Studio.)
 
+## Translations
+
+The translations can be found in the XML resource files at
+`app/src/main/res/values-<qualifier>/strings.xml`.
+
+We prefer informal, simple language. For all languages, the Swiss variety
+should be used (as indicated by the `-rCH` regional qualifier).
+
 ## License
 
-Copyright © 2016–2023 Coredump Hackerspace.
+Copyright © 2016–2025 Coredump Hackerspace.
 
 Licensed under the GPLv3 or later, see `LICENSE.txt`.
 
