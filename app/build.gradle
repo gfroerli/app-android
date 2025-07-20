@@ -1,5 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.0.21'
+}
 apply plugin: 'project-report'
 
 def getLocalProperties() {
@@ -75,9 +78,7 @@ android {
         buildConfig true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion kotlin_compose_version
-    }
+
 
     testOptions {
         unitTests.all {
