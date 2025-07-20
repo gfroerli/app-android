@@ -133,7 +133,7 @@ dependencies {
     implementation "com.github.skydoves:landscapist-glide:1.4.9"
 
     // Maplibre SDK
-    implementation 'org.maplibre.gl:android-sdk:10.3.0'
+    implementation 'org.maplibre.gl:android-sdk:11.12.1'
     implementation 'org.maplibre.gl:android-plugin-annotation-v9:1.0.0'
 
     // REST client
