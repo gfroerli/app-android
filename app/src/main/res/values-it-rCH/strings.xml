@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_about">Info</string>
+    <string name="activity_map">Gfroerli: Temperature dell\'acqua</string>
+    <string name="thermometer_icon_description">Icona del termometro</string>
+    <string name="no_measurement">Nessuna misurazione attuale</string>
+    <string name="loading_data">Caricamento dei dati…</string>
+    <string name="section_header_3days">Misurazioni degli ultimi 3 giorni</string>
+    <string name="section_header_sponsor">Sponsor: %1$s</string>
+    <string name="sponsor_description">Questo sensore è stato offerto da «%1$s».</string>
+    <string name="about_project_heading">Perche quest\'app?</string>
+    <string name="about_project_text1">La temperatura dell\'acqua è importante per tanti: chi nuota, chi pesca, chi fa immersioni e altri ancora. Ma finora era difficile trovare info affidabili in tempo reale in Svizzera.</string>
+    <string name="about_project_text2">Stiamo creando una rete di sensori economici a basso consumo. Così possiamo misurare la temperatura dell\'acqua vicino a te e mostrartela quasi in tempo reale – gratis.</string>
+    <string name="about_project_text3">Più info su: https://gfrör.li/</string>
+    <string name="about_us_heading">Chi ha fatto quest\'app?</string>
+    <string name="about_us_text1">L\'app, l\'infrastruttura server e l\'hardware dei sensori sono sviluppati dallo spazio hacker Coredump a Rapperswil-Jona.</string>
+    <string name="about_us_text2">Scopri di più su di noi su: https://www.coredump.ch/</string>
+    <string name="open_source_heading">Open Source</string>
+    <string name="open_source_text1">Quest\'app è open source! Trovi il codice su GitHub: https://github.com/gfroerli/app-android</string>
+    <string name="action_about_this_app">Info sull\'app</string>
+    <string name="action_refresh_all">Rinfresca tutti i dati</string>
+    <string name="chart_no_data">Nessun dato disponibile</string>
+    <string name="temperature">Temperatura</string>
+    <string name="section_header_summary">Riepilogo (totale)</string>
+    <string name="fetching_sensor_data_failed">Non siamo riusciti a caricare i dati del sensore (HTTP %1$d).\nSe il problema continua, scrivici a %2$s.</string>
+    <string name="fetching_data_failed">Non si riesce a caricare %1$s. Controlla la tua connessione Internet.</string>
+    <string name="data_sensors">Sensori</string>
+    <string name="data_sensor_details">Dettagli del sensore</string>
+    <string name="data_sponsor">Sponsor</string>
+    <string name="data_sponsors">Sponsor</string>
+    <string name="data_measurements">Misurazioni</string>
+    <string name="version_heading">Versione</string>
+    <string name="version_text1">Versione dell\'app %1$s (build %2$d).</string>
+</resources>
