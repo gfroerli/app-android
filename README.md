@@ -1,6 +1,6 @@
 # Water Temperatures Android App
 
-[![CircleCI][circle-ci-badge]][circle-ci]
+[![GitHub Actions][github-actions-badge]][github-actions]
 
 Android app written in Kotlin. Displays temperature sensor data on a map (Maplibre SDK, map data
 provided by Mapbox).
@@ -30,5 +30,5 @@ Licensed under the GPLv3 or later, see `LICENSE.txt`.
 
 
 <!-- Badges -->
-[circle-ci]: https://circleci.com/gh/gfroerli/app-android/tree/master
-[circle-ci-badge]: https://circleci.com/gh/gfroerli/app-android/tree/master.svg?style=shield
+[github-actions]: https://github.com/gfroerli/app-android/actions/workflows/test.yml
+[github-actions-badge]: https://github.com/gfroerli/app-android/actions/workflows/test.yml/badge.svg
