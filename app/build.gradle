@@ -133,7 +133,7 @@ dependencies {
     // Compose: Material Icons
     implementation "androidx.compose.material:material-icons-extended" // Compose BOM
     // Compose: Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2'
     // Compose: Image loading
     implementation "com.github.skydoves:landscapist-glide:1.4.9"
 
