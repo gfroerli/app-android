@@ -2,9 +2,8 @@
 
 buildscript {
     ext {
-        kotlin_version = '1.9.23'
-        kotlin_compose_version = '1.5.12' // https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-        compose_bom_version = '2023.10.01' // Compose 1.5, https://developer.android.com/develop/ui/compose/bom/bom-mapping
+        kotlin_version = '2.0.21'
+        compose_bom_version = '2024.11.00' // Compose 1.7, https://developer.android.com/develop/ui/compose/bom/bom-mapping
     }
 
     repositories {
@@ -13,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.2'
+        classpath 'com.android.tools.build:gradle:8.5.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

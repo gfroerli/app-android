@@ -533,8 +533,7 @@ class MapActivity : ComponentActivity() {
 
         // State: Bottom sheet scaffold
         val scaffoldState = rememberBottomSheetScaffoldState(
-            DrawerState(DrawerValue.Closed),
-            rememberBottomSheetState(BottomSheetValue.Collapsed)
+            bottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed)
         )
 
         // State: Bottom sheet visibility
