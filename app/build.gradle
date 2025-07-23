@@ -31,8 +31,6 @@ def getLocalProperties() {
 final Properties properties = getLocalProperties()
 
 android {
-    buildToolsVersion = '34.0.0'
-
     namespace 'ch.coredump.watertemp'
 
     defaultConfig {
