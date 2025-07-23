@@ -3,7 +3,7 @@
 [![GitHub Actions][github-actions-badge]][github-actions]
 
 Android app written in Kotlin. Displays temperature sensor data on a map
-(Maplibre SDK, map data provided by Mapbox).
+(MapLibre SDK, map data provided by Mapbox).
 
 ## Building
 
