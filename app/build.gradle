@@ -7,9 +7,24 @@ apply plugin: 'project-report'
 
 def getLocalProperties() {
     final Properties props = new Properties()
+
+    // Primary location: ./app/secrets.properties
     if (file('secrets.properties').exists()) {
         props.load(new FileInputStream(file('secrets.properties')))
+        println "Secrets loaded from app/secrets.properties"
+        return props
     }
+
+    // Fallback location: ~/.config/gfroerli-android/secrets.properties
+    final String homeDir = System.getProperty("user.home")
+    final File fallbackFile = new File(homeDir, ".config/gfroerli-android/secrets.properties")
+    if (fallbackFile.exists()) {
+        props.load(new FileInputStream(fallbackFile))
+        println "Secrets loaded from ${fallbackFile.absolutePath}"
+        return props
+    }
+
+    // Return empty properties if neither file exists
     return props
 }
 
