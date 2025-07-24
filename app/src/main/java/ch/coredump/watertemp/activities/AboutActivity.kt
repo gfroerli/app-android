@@ -10,9 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.DrawerState
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.R
-import ch.coredump.watertemp.theme.GfroerliColorsLight
-import ch.coredump.watertemp.theme.GfroerliTypography
+import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
 
 private const val TAG = "AboutActivity"
@@ -48,10 +54,7 @@ class AboutActivity : ComponentActivity() {
         val scrollState = rememberScrollState()
 
         // Wrap everything in our theme
-        MaterialTheme(
-            colors = GfroerliColorsLight,
-            typography = GfroerliTypography,
-        ) {
+        GfroerliThemeWrapper {
             Scaffold(
                 scaffoldState = scaffoldState,
 
@@ -62,7 +65,7 @@ class AboutActivity : ComponentActivity() {
                         backgroundColor = MaterialTheme.colors.primary,
                         navigationIcon = {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
                                 modifier = Modifier
                                     .padding(12.dp)
