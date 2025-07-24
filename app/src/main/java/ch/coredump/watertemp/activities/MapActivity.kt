@@ -392,7 +392,7 @@ class MapActivity : ComponentActivity() {
             for (location in locations) {
                 boundingBoxBuilder.include(location)
             }
-            map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 350))
+            map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 180))
         }
     }
 
