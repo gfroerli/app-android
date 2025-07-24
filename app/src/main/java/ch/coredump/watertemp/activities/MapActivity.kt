@@ -2,6 +2,11 @@ package ch.coredump.watertemp.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
@@ -52,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,7 +68,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
@@ -115,6 +122,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.math.roundToInt
 
 // Marker image names
 private const val MARKER_DEFAULT = "marker_default"
@@ -196,6 +204,44 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
+     * Creates a circular marker using ShapeDrawable.
+     */
+    private fun createCircularMarker(
+        size: Int,
+        fillColor: Int,
+        strokeColor: Int,
+        strokeWidth: Int
+    ): Bitmap {
+        // Create bitmap and canvas
+        val bitmap = createBitmap(size, size)
+        val canvas = Canvas(bitmap)
+
+        // Draw the shape
+        val shapeDrawable = ShapeDrawable(OvalShape()).apply {
+            intrinsicWidth = size
+            intrinsicHeight = size
+            paint.color = fillColor
+            paint.isAntiAlias = true
+        }
+        shapeDrawable.setBounds(0, 0, size, size)
+        shapeDrawable.draw(canvas)
+
+        // Add stroke if needed
+        if (strokeWidth > 0) {
+            val strokePaint = Paint().apply {
+                color = strokeColor
+                style = Paint.Style.STROKE
+                this.strokeWidth = strokeWidth.toFloat()
+                isAntiAlias = true
+            }
+            val radius = (size - strokeWidth) / 2f
+            canvas.drawCircle(size / 2f, size / 2f, radius, strokePaint)
+        }
+
+        return bitmap
+    }
+
+    /**
      * Initialize the map style and symbol manager.
      * This should be called whenever the style is loaded or reloaded.
      */
@@ -203,11 +249,26 @@ class MapActivity : ComponentActivity() {
         // Clean up existing symbol manager
         symbolManager?.onDestroy()
 
+        // Create marker bitmaps
+        val markerSize = 72
+        val strokeWidth = 8
+        val fillColor = "#BBFFFFFF".toColorInt()
+        val defaultMarkerBitmap = createCircularMarker(
+            size = markerSize,
+            fillColor = fillColor,
+            strokeColor = GfroerliColorsLight.primary.toArgb(),
+            strokeWidth = strokeWidth
+        )
+        val activeMarkerBitmap = createCircularMarker(
+            size = markerSize,
+            fillColor = fillColor,
+            strokeColor = "#C62828".toColorInt(),
+            strokeWidth = strokeWidth
+        )
+
         // Load marker icons
-        style.addImage(MARKER_DEFAULT,
-            ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
-        style.addImage(MARKER_ACTIVE,
-            ContextCompat.getDrawable(this, org.maplibre.android.R.drawable.maplibre_marker_icon_default)!!)
+        style.addImage(MARKER_DEFAULT, defaultMarkerBitmap)
+        style.addImage(MARKER_ACTIVE, activeMarkerBitmap)
 
         // Initialize symbol manager with proper configuration
         symbolManager = SymbolManager(mapView, mapLibreMap, style).apply {
@@ -350,6 +411,12 @@ class MapActivity : ComponentActivity() {
                 SymbolOptions()
                     .withLatLng(LatLng(lat, lng))
                     .withIconImage(MARKER_DEFAULT)
+                    .withTextField("${sensor.latestTemperature?.roundToInt() ?: "?"}")
+                    .withTextSize(12f)
+                    .withTextColor("#111111")
+                    .withTextAnchor("center")
+                    .withTextFont(arrayOf("Open Sans Bold"))
+                    .withSymbolSortKey(sensor.id.toFloat()) // Control z-order
             )
 
             // Attach data to marker
