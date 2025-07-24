@@ -136,7 +136,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     // Compose: Integration with activities
-    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation 'androidx.activity:activity-compose:1.10.1'
     // Compose: Compose Material Design
     implementation "androidx.compose.material:material" // Compose BOM
     // Compose: Animations
@@ -146,18 +146,18 @@ dependencies {
     // Compose: Material Icons
     implementation "androidx.compose.material:material-icons-extended" // Compose BOM
     // Compose: Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2'
     // Compose: Image loading
-    implementation "com.github.skydoves:landscapist-glide:1.4.9"
+    implementation "com.github.skydoves:landscapist-glide:2.5.1"
 
-    // Maplibre SDK
-    implementation 'org.maplibre.gl:android-sdk:10.3.0'
-    implementation 'org.maplibre.gl:android-plugin-annotation-v9:1.0.0'
+    // MapLibre SDK
+    implementation 'org.maplibre.gl:android-sdk:11.12.1'
+    implementation 'org.maplibre.gl:android-plugin-annotation-v9:3.0.2'
 
     // REST client
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.8.1'
+    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.1.0'
 
     // Relative time calculation
     implementation 'org.ocpsoft.prettytime:prettytime:5.0.9.Final'
