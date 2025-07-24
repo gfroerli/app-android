@@ -91,22 +91,22 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.WellKnownTileServer
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions
-import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
+import org.maplibre.android.MapLibre
+import org.maplibre.android.WellKnownTileServer
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.plugins.annotation.Symbol
+import org.maplibre.android.plugins.annotation.SymbolManager
+import org.maplibre.android.plugins.annotation.SymbolOptions
 import org.ocpsoft.prettytime.PrettyTime
 import retrofit2.Call
 import retrofit2.Callback
@@ -126,7 +126,7 @@ private const val TAG = "MapActivity"
 @ExperimentalMaterialApi
 class MapActivity : ComponentActivity() {
     // The map instance
-    private var map: MapboxMap? = null
+    private var map: MapLibreMap? = null
     private var symbolManager: SymbolManager? = null
 
     // Access the water-sensor service
@@ -178,33 +178,65 @@ class MapActivity : ComponentActivity() {
         apiService = apiClient.apiService
     }
 
+    override fun onDestroy() {
+        symbolManager?.onDestroy()
+        super.onDestroy()
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      */
-    private fun onMapReady(mapboxMap: MapboxMap, mapView: MapView) {
+    private fun onMapReady(mapLibreMap: MapLibreMap, mapView: MapView) {
         Log.d(TAG, "Map is ready")
-        mapboxMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
+        mapLibreMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
+            initializeMapStyle(mapLibreMap, mapView, style)
+        }
+    }
 
-            // Load marker icon
-            style.addImage(MARKER_DEFAULT, ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
-            style.addImage(MARKER_ACTIVE, ContextCompat.getDrawable(this, com.mapbox.mapboxsdk.R.drawable.maplibre_marker_icon_default)!!)
+    /**
+     * Initialize the map style and symbol manager.
+     * This should be called whenever the style is loaded or reloaded.
+     */
+    private fun initializeMapStyle(mapLibreMap: MapLibreMap, mapView: MapView, style: Style) {
+        // Clean up existing symbol manager
+        symbolManager?.onDestroy()
 
-            // Initialize symbol manager
-            this.symbolManager = SymbolManager(mapView, mapboxMap, style)
-            symbolManager!!.iconAllowOverlap = true
+        // Load marker icons
+        style.addImage(MARKER_DEFAULT,
+            ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
+        style.addImage(MARKER_ACTIVE,
+            ContextCompat.getDrawable(this, org.maplibre.android.R.drawable.maplibre_marker_icon_default)!!)
 
-            // Save map as attribute
-            this.map = mapboxMap
+        // Initialize symbol manager with proper configuration
+        symbolManager = SymbolManager(mapView, mapLibreMap, style).apply {
+            iconAllowOverlap = true
+            iconIgnorePlacement = true
+            textAllowOverlap = true
+            textIgnorePlacement = true
 
-            // Disable interactions that might confuse the user
-            val settings = map!!.uiSettings
-            settings.isRotateGesturesEnabled = false
-            settings.isTiltGesturesEnabled = false
-            settings.isCompassEnabled = false
+            // Add click listener
+            addClickListener { marker ->
+                onMarkerSelected(marker)
+            }
+        }
 
+        // Save map as attribute
+        this.map = mapLibreMap
+
+        // Disable interactions that might confuse the user
+        val settings = mapLibreMap.uiSettings
+        settings.isRotateGesturesEnabled = false
+        settings.isTiltGesturesEnabled = false
+        settings.isCompassEnabled = false
+
+        // Fetch initial data only after everything is set up
+        if (sensors.isEmpty()) {
             this.fetchInitialData()
+        } else {
+            // If we already have sensor data, just update the markers
+            updateMarkers()
         }
     }
 
@@ -335,7 +367,7 @@ class MapActivity : ComponentActivity() {
         }
 
         // Add map click listener
-        map!!.addOnMapClickListener(MapboxMap.OnMapClickListener {
+        map!!.addOnMapClickListener(MapLibreMap.OnMapClickListener {
             Log.d(TAG, "Clicked on map")
 
             if (this@MapActivity.activeMarker == null) {
@@ -627,7 +659,7 @@ class MapActivity : ComponentActivity() {
                     // Note: Ignore bottom padding, because we want to avoid re-layouting the map
                     //       when showing / hiding the bottom sheet.
                     Box(Modifier.padding(IgnoreBottomPadding(innerPadding))) {
-                        // Mapbox map
+                        // MapLibre map
                         Map()
 
                         // Note: The progress indicator intentionally overlays the content
@@ -743,13 +775,13 @@ class MapActivity : ComponentActivity() {
         AndroidView(
             modifier = modifier,
             factory = { context ->
-                // Initialize mapbox
-                Mapbox.getInstance(
+                // Initialize maplibre
+                MapLibre.getInstance(
                     context,
                     BuildConfig.MAPBOX_ACCESS_TOKEN,
                     WellKnownTileServer.Mapbox
                 )
-                val mapOptions = MapboxMapOptions.createFromAttributes(context)
+                val mapOptions = MapLibreMapOptions.createFromAttributes(context)
                     .logoEnabled(false)
                     .attributionMargins(intArrayOf(10, 10, 10, 10))
                     .camera(
