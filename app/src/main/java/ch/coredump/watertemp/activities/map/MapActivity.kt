@@ -203,25 +203,9 @@ class MapActivity : ComponentActivity() {
         symbolManager?.onDestroy()
 
         // Create marker bitmaps
-        val markerSize = 72
-        val strokeWidth = 8
-        val fillColor = "#BBFFFFFF".toColorInt()
-        val defaultMarkerBitmap = createCircularMarker(
-            size = markerSize,
-            fillColor = fillColor,
-            strokeColor = GfroerliColorsLight.primary.toArgb(),
-            strokeWidth = strokeWidth
-        )
-        val activeMarkerBitmap = createCircularMarker(
-            size = markerSize,
-            fillColor = fillColor,
-            strokeColor = "#C62828".toColorInt(),
-            strokeWidth = strokeWidth
-        )
-
-        // Load marker icons
-        style.addImage(MarkerType.DEFAULT.name, defaultMarkerBitmap)
-        style.addImage(MarkerType.ACTIVE.name, activeMarkerBitmap)
+        for (markerType in MarkerType.entries) {
+            addStyleMarker(style, markerType)
+        }
 
         // Initialize symbol manager with proper configuration
         symbolManager = SymbolManager(mapView, mapLibreMap, style).apply {
@@ -363,7 +347,7 @@ class MapActivity : ComponentActivity() {
             val marker = this.symbolManager!!.create(
                 SymbolOptions()
                     .withLatLng(LatLng(lat, lng))
-                    .withIconImage(MarkerType.DEFAULT.name)
+                    .withIconImage(MarkerType.forTemperature(sensor.latestTemperature).name)
                     .withTextField("${sensor.latestTemperature?.roundToInt() ?: "?"}")
                     .withTextSize(12f)
                     .withTextColor("#111111")
@@ -428,7 +412,7 @@ class MapActivity : ComponentActivity() {
 
         // Update active marker icon
         this.activeMarker?.let {
-            it.iconImage = MarkerType.DEFAULT.name
+            it.iconImage = MarkerType.ACTIVE.name
             symbolManager?.update(it)
         }
         marker.iconImage = MarkerType.ACTIVE.name
@@ -485,7 +469,7 @@ class MapActivity : ComponentActivity() {
      */
     private fun deselectMarkers() {
         this.activeMarker?.let {
-            it.iconImage = MarkerType.DEFAULT.name
+            it.iconImage = MarkerType.UNKNOWN.name // TODO: Revert to correct color
             this.symbolManager?.update(it)
             this.activeMarker = null
         }
