@@ -8,7 +8,6 @@ import android.util.SparseArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -18,16 +17,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -67,7 +63,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
@@ -87,6 +82,7 @@ import ch.coredump.watertemp.ui.viewmodels.Sensor
 import ch.coredump.watertemp.ui.viewmodels.SensorBottomSheetViewModel
 import ch.coredump.watertemp.ui.viewmodels.SensorStats
 import ch.coredump.watertemp.ui.viewmodels.Sponsor
+import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
 import ch.coredump.watertemp.utils.ProgressCounter
 import com.github.mikephil.charting.charts.LineChart
@@ -158,13 +154,6 @@ class MapActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Enable edge-to-edge mode (can be removed once upgrading to API 35)
-        enableEdgeToEdge()
-        // Set status bar color to match TopAppBar
-        window.statusBarColor = android.graphics.Color.parseColor("#1565c0")
-        // Set light status bar content for better contrast with blue background
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
 
         // Get resource values
         this.shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
@@ -624,10 +613,7 @@ class MapActivity : ComponentActivity() {
         }
 
         // Wrap everything in our theme
-        MaterialTheme(
-            colors = GfroerliColorsLight,
-            typography = GfroerliTypography,
-        ) {
+        GfroerliThemeWrapper {
             // Use the scaffold with app bar and bottom sheet
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
@@ -675,7 +661,8 @@ class MapActivity : ComponentActivity() {
                         Column(
                             Modifier
                                 .verticalScroll(sheetContentScrollState)
-                                .fillMaxWidth()) {
+                                .fillMaxWidth()
+                        ) {
                             // Peek area (same height as sheetPeekHeight)
                             Box(
                                 Modifier
@@ -724,7 +711,6 @@ class MapActivity : ComponentActivity() {
                     }
                 }, showMenu)
             },
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
         )
     }
 
