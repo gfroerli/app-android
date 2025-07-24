@@ -3,7 +3,7 @@
 buildscript {
     ext {
         kotlin_version = '2.0.21'
-        compose_bom_version = '2024.11.00' // Compose 1.7, https://developer.android.com/develop/ui/compose/bom/bom-mapping
+        compose_bom_version = '2025.06.01' // Compose 1.8, https://developer.android.com/develop/ui/compose/bom/bom-mapping
     }
 
     repositories {

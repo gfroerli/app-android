@@ -38,7 +38,7 @@ android {
         applicationIdSuffix ".zh"
         minSdkVersion 21
         targetSdk 34
-        compileSdk 34
+        compileSdk 35
         versionCode 17
         versionName "1.0.5"
 
