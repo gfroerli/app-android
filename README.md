@@ -7,7 +7,12 @@ Android app written in Kotlin. Displays temperature sensor data on a map
 
 ## Building
 
-First, create a file at `app/secrets.properties` containing the API keys:
+First, create a file containing the API keys. You can use either:
+
+- `app/secrets.properties` (project-specific, takes precedence)
+- `~/.config/gfroerli-android/secrets.properties` (global fallback)
+
+For example:
 
     echo "gfroerli_api_key_public=<VALUE>" >> app/secrets.properties
     echo "mapbox_access_token=<VALUE>" >> app/secrets.properties
