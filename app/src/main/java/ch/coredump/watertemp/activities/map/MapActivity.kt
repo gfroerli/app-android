@@ -1,4 +1,4 @@
-package ch.coredump.watertemp.activities
+package ch.coredump.watertemp.activities.map
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -75,6 +75,7 @@ import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
+import ch.coredump.watertemp.activities.AboutActivity
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements

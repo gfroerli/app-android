@@ -18,7 +18,7 @@
 
         <!-- Primary activity -->
         <activity
-            android:name=".activities.MapActivity"
+            android:name=".activities.map.MapActivity"
             android:icon="@mipmap/app_icon"
             android:exported="true"
             android:configChanges="orientation|screenSize">
@@ -32,7 +32,7 @@
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/activity_about"
-            android:parentActivityName=".activities.MapActivity"
+            android:parentActivityName=".activities.map.MapActivity"
             android:exported="false" />
 
     </application>
