@@ -72,10 +72,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - api-level: 21
+          - api-level: 27 # Note: 26 had issues with missing WebView
             target: default
             arch: x86
-          - api-level: 34
+          - api-level: 35
             target: google_apis
             arch: x86_64
 
