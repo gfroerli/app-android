@@ -104,6 +104,7 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
 import org.ocpsoft.prettytime.PrettyTime
@@ -890,12 +891,15 @@ class MapActivity : ComponentActivity() {
                     )
                     it.logoUrl?.let { url ->
                         GlideImage(
-                            imageModel = url,
-                            contentScale = ContentScale.Fit,
+                            imageModel = { url },
+                            imageOptions = ImageOptions(
+                                contentScale = ContentScale.Fit,
+                                alignment = Alignment.Center,
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(32.dp, 24.dp),
-                            previewPlaceholder = R.drawable.app_icon_foreground,
+                            previewPlaceholder = painterResource(id = R.drawable.app_icon_foreground),
                         )
                     }
                     it.description?.let { description ->

@@ -148,7 +148,7 @@ dependencies {
     // Compose: Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2'
     // Compose: Image loading
-    implementation "com.github.skydoves:landscapist-glide:1.4.9"
+    implementation "com.github.skydoves:landscapist-glide:2.5.1"
 
     // Maplibre SDK
     implementation 'org.maplibre.gl:android-sdk:10.3.0'
