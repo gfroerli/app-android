@@ -1,9 +1,7 @@
 package ch.coredump.watertemp.activities.map
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.util.SparseArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -57,16 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
-import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
-import ch.coredump.watertemp.rest.SensorMeasurements
-import ch.coredump.watertemp.rest.models.ApiMeasurement
-import ch.coredump.watertemp.rest.models.ApiSensor
-import ch.coredump.watertemp.rest.models.ApiSensorDetails
-import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.ui.viewmodels.Measurement
@@ -100,9 +92,6 @@ import org.maplibre.android.plugins.annotation.Symbol
 import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
 import org.ocpsoft.prettytime.PrettyTime
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -124,18 +113,14 @@ class MapActivity : ComponentActivity() {
     // Access the API service
     private var apiService: ApiService? = null
 
-    // Mapping from sensor IDs to `SensorMeasurements` instances
-    @SuppressLint("UseSparseArrays")
-    internal val sensors = HashMap<Int, SensorMeasurements>()
-
-    // Mapping from sponsor IDs to `Sponsor` instances
-    internal val sponsors = SparseArray<ApiSponsor>()
-
     // The currently active marker
     private var activeMarker: Symbol? = null
 
-    // View model including the currently active sensor and its data
-    internal lateinit var viewModel: SensorBottomSheetViewModel
+    // Data holder for sensors and sponsors
+    private lateinit var mapData: MapData
+
+    // View model for bottom sheet UI state
+    private lateinit var bottomSheetViewModel: SensorBottomSheetViewModel
 
     // Activity indicator
     private lateinit var progressCounter: ProgressCounter
@@ -160,11 +145,14 @@ class MapActivity : ComponentActivity() {
         this.labelTemperature = getString(R.string.temperature)
 
         // Initialize viewmodel
-        viewModel = ViewModelProvider(this)[SensorBottomSheetViewModel::class.java]
+        bottomSheetViewModel = ViewModelProvider(this)[SensorBottomSheetViewModel::class.java]
+
+        // Initialize data holder
+        mapData = MapData()
 
         // Initialize the layout
         setContent {
-            RootComposable(this.viewModel)
+            RootComposable(bottomSheetViewModel)
         }
 
         // Progress counter
@@ -174,7 +162,7 @@ class MapActivity : ComponentActivity() {
         menu = MapActivityMenu(this)
 
         // Initialize API handler
-        apiHandler = MapActivityApiHandler(this, progressCounter, ::updateMarkers)
+        apiHandler = MapActivityApiHandler(this, progressCounter, mapData, bottomSheetViewModel, ::updateMarkers)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -236,7 +224,7 @@ class MapActivity : ComponentActivity() {
         settings.isCompassEnabled = false
 
         // Fetch initial data only after everything is set up
-        if (sensors.isEmpty()) {
+        if (!mapData.hasSensors()) {
             this.fetchInitialData()
         } else {
             // If we already have sensor data, just update the markers
@@ -278,8 +266,7 @@ class MapActivity : ComponentActivity() {
 
         // Process sensors
         val locations = ArrayList<LatLng>()
-        for (sensorMeasurement in sensors.values) {
-            val sensor = sensorMeasurement.sensor
+        for (sensor in mapData.getAllSensors()) {
             Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
 
             // Create location object
@@ -333,7 +320,7 @@ class MapActivity : ComponentActivity() {
             this.deselectMarkers()
 
             // Hide the details pane
-            viewModel.hideBottomSheet()
+            bottomSheetViewModel.hideBottomSheet()
 
             return@OnMapClickListener true
         })
@@ -342,7 +329,7 @@ class MapActivity : ComponentActivity() {
         if (locations.size == 1) {
             val location = locations[0]
             map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13.0))
-        } else if (sensors.size > 1) {
+        } else if (mapData.sensorCount() > 1) {
             val boundingBoxBuilder = LatLngBounds.Builder()
             for (location in locations) {
                 boundingBoxBuilder.include(location)
@@ -387,16 +374,15 @@ class MapActivity : ComponentActivity() {
         this.setMarkerAsActive(marker)
 
         // Lookup sensor for that marker
-        val sensorMeasurements = sensors[sensorId]
-        if (sensorMeasurements == null) {
+        val sensor = mapData.getSensor(sensorId)
+        if (sensor == null) {
             Log.e(TAG, "Sensor with id $sensorId not found")
             Utils.showError(this, "Sensor not found")
             return
         }
-        val sensor = sensorMeasurements.sensor
 
         // Create viewmodel and update UI
-        this.viewModel.setSensor(Sensor.fromApiSensor(sensor))
+        bottomSheetViewModel.setSensor(Sensor.fromApiSensor(sensor))
 
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
@@ -405,7 +391,7 @@ class MapActivity : ComponentActivity() {
 
         // Look up sponsor in cache. If not found, fetch it asynchronously.
         if (sensor.sponsorId != null) {
-            val sponsor = sponsors.get(sensor.sponsorId)
+            val sponsor = mapData.getSponsor(sensor.sponsorId)
             if (sponsor == null) {
                 // Not found in cache, fetch it from the API
                 Log.i(TAG, "Fetching sponsor ${sensor.id}")
@@ -414,7 +400,7 @@ class MapActivity : ComponentActivity() {
             } else {
                 // Cache hit!
                 Log.d(TAG, "Sponsor ${sensor.sponsorId} cache hit")
-                this.viewModel.addSponsor(sponsor)
+                bottomSheetViewModel.addSponsor(sponsor)
             }
         }
 
@@ -426,7 +412,7 @@ class MapActivity : ComponentActivity() {
         measurementCall.enqueue(apiHandler.onMeasurementsFetched())
 
         // Show the details pane (if not already visible)
-        this.viewModel.showBottomSheet()
+        bottomSheetViewModel.showBottomSheet()
 
         return
     }

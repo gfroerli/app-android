@@ -6,12 +6,12 @@ import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
-import ch.coredump.watertemp.rest.SensorMeasurements
 import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.ui.viewmodels.Measurement
+import ch.coredump.watertemp.ui.viewmodels.SensorBottomSheetViewModel
 import ch.coredump.watertemp.utils.ProgressCounter
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,7 +26,9 @@ import java.time.temporal.ChronoUnit
 class MapActivityApiHandler(
     private val activity: MapActivity,
     private val progressCounter: ProgressCounter,
-    private val updateMarkers: () -> Unit
+    private val mapData: MapData,
+    private val bottomSheetViewModel: SensorBottomSheetViewModel,
+    private val updateMapMarkers: () -> Unit
 ) {
 
     companion object {
@@ -54,13 +56,11 @@ class MapActivityApiHandler(
                 // Success!
                 Log.d(TAG, "Sensors response successful")
 
-                // Ensure bottom sheet is hidden
+                // Ensure bottom sheet is hidden and clear old sensor data
                 // TODO(#6): Don't hide, but update data!
-                activity.viewModel.hideBottomSheet()
-
-                // Clear old sensor data
-                activity.sensors.clear()
-                activity.viewModel.clearData()
+                bottomSheetViewModel.hideBottomSheet()
+                bottomSheetViewModel.clearData()
+                mapData.clearSensors()
 
                 // Prepare list for sensor IDs
                 val idList = ArrayList<String>()
@@ -70,14 +70,14 @@ class MapActivityApiHandler(
                 for (sensor in response.body()!!) {
                     if (sensor.latestMeasurementAt != null && ChronoUnit.DAYS.between(sensor.latestMeasurementAt, now) < 3) {
                         Log.d(TAG, "Adding sensor " + sensor.id)
-                        activity.sensors[sensor.id] = SensorMeasurements(sensor)
+                        mapData.addSensor(sensor)
                         idList.add(sensor.id.toString())
                     } else {
                         Log.d(TAG, "Ignoring sensor " + sensor.id + " (missing or outdated measurement)")
                     }
                 }
 
-                updateMarkers()
+                updateMapMarkers()
 
                 // Fetch measurements
                 // TODO: Fetch aggregations instead
@@ -105,7 +105,7 @@ class MapActivityApiHandler(
 
                 Log.i(TAG, "Processing sensor details response")
                 response.body()?.let { details ->
-                    activity.viewModel.addDetails(details)
+                    bottomSheetViewModel.addDetails(details)
                 }
             }
 
@@ -129,11 +129,8 @@ class MapActivityApiHandler(
 
                 Log.i(TAG, "Processing sponsor response")
                 response.body()?.let { sponsor ->
-                    // Update sensor
-                    activity.viewModel.addSponsor(sponsor)
-
-                    // Store in cache
-                    activity.sponsors.put(sponsor.id, sponsor)
+                    mapData.addSponsor(sponsor)
+                    bottomSheetViewModel.addSponsor(sponsor)
                 }
             }
 
@@ -157,7 +154,7 @@ class MapActivityApiHandler(
 
                 Log.i(TAG, "Processing measurements response")
                 response.body()?.let {
-                    activity.viewModel.setMeasurements(
+                    bottomSheetViewModel.setMeasurements(
                         it.map(Measurement::fromApiMeasurement)
                     )
                 }
