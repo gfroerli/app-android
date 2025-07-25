@@ -634,8 +634,7 @@ class MapActivity : ComponentActivity() {
                     sensor.caption ?: "",
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier
-                        .padding(0.dp, 0.dp, 0.dp, 8.dp)
-                        .horizontalScroll(ScrollState(0)),
+                        .padding(0.dp, 0.dp, 0.dp, 8.dp),
                 )
                 sensor.latestMeasurement?.let { measurement ->
                     SensorMeasurement(measurement)
