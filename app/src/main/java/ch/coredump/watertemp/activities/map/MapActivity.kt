@@ -126,16 +126,16 @@ class MapActivity : ComponentActivity() {
 
     // Mapping from sensor IDs to `SensorMeasurements` instances
     @SuppressLint("UseSparseArrays")
-    private val sensors = HashMap<Int, SensorMeasurements>()
+    internal val sensors = HashMap<Int, SensorMeasurements>()
 
     // Mapping from sponsor IDs to `Sponsor` instances
-    private val sponsors = SparseArray<ApiSponsor>()
+    internal val sponsors = SparseArray<ApiSponsor>()
 
     // The currently active marker
     private var activeMarker: Symbol? = null
 
     // View model including the currently active sensor and its data
-    private lateinit var viewModel: SensorBottomSheetViewModel
+    internal lateinit var viewModel: SensorBottomSheetViewModel
 
     // Activity indicator
     private lateinit var progressCounter: ProgressCounter
@@ -147,6 +147,9 @@ class MapActivity : ComponentActivity() {
 
     // Menu handler
     private lateinit var menu: MapActivityMenu
+
+    // API response handler
+    private lateinit var apiHandler: MapActivityApiHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,6 +172,9 @@ class MapActivity : ComponentActivity() {
 
         // Initialize menu handler
         menu = MapActivityMenu(this)
+
+        // Initialize API handler
+        apiHandler = MapActivityApiHandler(this, progressCounter, ::updateMarkers)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -256,73 +262,12 @@ class MapActivity : ComponentActivity() {
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
         this.progressCounter.increment()
-        sensorCall.enqueue(this.onSensorsFetched())
+        sensorCall.enqueue(apiHandler.onSensorsFetched())
 
         // TODO: Do we need to re-fetch sensor-details of currently showing sensor?
     }
 
-    private fun onSensorsFetched(): Callback<List<ApiSensor>> {
-        return object : Callback<List<ApiSensor>> {
-            override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>) {
-                this@MapActivity.progressCounter.decrement()
 
-                // Handle unsuccessful response
-                if (!response.isSuccessful) {
-                    val error = ApiClient.parseError(response)
-                    Log.e(TAG, "Could not fetch sensors (HTTP " + error.statusCode + "): " + error.message)
-                    Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_sensor_data_failed, error.statusCode, Config.SUPPORT_EMAIL)
-                    )
-                    return
-                }
-
-                // Success!
-                Log.d(TAG, "Sensors response successful")
-
-                // Ensure bottom sheet is hidden
-                // TODO(#6): Don't hide, but update data!
-                viewModel.hideBottomSheet()
-
-                // Clear old sensor data
-                sensors.clear()
-                viewModel.clearData()
-
-                // Prepare list for sensor IDs
-                val idList = ArrayList<String>()
-
-                // Extract sensor information
-                val now = ZonedDateTime.now();
-                for (sensor in response.body()!!) {
-                    if (sensor.latestMeasurementAt != null && ChronoUnit.DAYS.between(sensor.latestMeasurementAt, now) < 3) {
-                        Log.d(TAG, "Adding sensor " + sensor.id);
-                        sensors[sensor.id] = SensorMeasurements(sensor)
-                        idList.add(sensor.id.toString())
-                    } else {
-                        Log.d(TAG, "Ignoring sensor " + sensor.id + " (missing or outdated measurement)");
-                    }
-                }
-
-                updateMarkers()
-
-                // Fetch measurements
-                // TODO: Fetch aggregations instead
-//                val ids = Utils.join(",", idList)
-//                val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
-//                measurementCall.enqueue(onMeasurementsFetched())
-            }
-
-            override fun onFailure(call: Call<List<ApiSensor>>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
-                Log.e(TAG, "Fetching sensors failed: $t")
-                Utils.showError(
-                    this@MapActivity,
-                    getString(R.string.fetching_data_failed, getString(R.string.data_sensors)
-                )
-                )
-            }
-        }
-    }
 
     /**
      * Remove all sensor markers and recreate them.
@@ -456,7 +401,7 @@ class MapActivity : ComponentActivity() {
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
         this.progressCounter.increment()
-        apiService!!.getSensorDetails(sensor.id).enqueue(onSensorDetailsFetched())
+        apiService!!.getSensorDetails(sensor.id).enqueue(apiHandler.onSensorDetailsFetched())
 
         // Look up sponsor in cache. If not found, fetch it asynchronously.
         if (sensor.sponsorId != null) {
@@ -465,7 +410,7 @@ class MapActivity : ComponentActivity() {
                 // Not found in cache, fetch it from the API
                 Log.i(TAG, "Fetching sponsor ${sensor.id}")
                 this.progressCounter.increment()
-                apiService!!.getSponsor(sensor.id).enqueue(onSponsorFetched())
+                apiService!!.getSponsor(sensor.id).enqueue(apiHandler.onSponsorFetched())
             } else {
                 // Cache hit!
                 Log.d(TAG, "Sponsor ${sensor.sponsorId} cache hit")
@@ -478,7 +423,7 @@ class MapActivity : ComponentActivity() {
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
         this.progressCounter.increment()
-        measurementCall.enqueue(onMeasurementsFetched())
+        measurementCall.enqueue(apiHandler.onMeasurementsFetched())
 
         // Show the details pane (if not already visible)
         this.viewModel.showBottomSheet()
@@ -496,80 +441,11 @@ class MapActivity : ComponentActivity() {
         }
     }
 
-    private fun onSensorDetailsFetched(): Callback<ApiSensorDetails> {
-        return object : Callback<ApiSensorDetails> {
-            override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>) {
-                this@MapActivity.progressCounter.decrement()
 
-                Log.i(TAG, "Processing sensor details response")
-                response.body()?.let { details ->
-                    this@MapActivity.viewModel.addDetails(details)
-                }
-            }
 
-            override fun onFailure(call: Call<ApiSensorDetails>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
 
-                Log.e(TAG, "Fetching sensor details failed: $t")
-                Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sensor_details))
-                )
-            }
-        }
-    }
 
-    private fun onSponsorFetched(): Callback<ApiSponsor> {
-        return object : Callback<ApiSponsor> {
-            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
-                progressCounter.decrement()
 
-                Log.i(TAG, "Processing sponsor response")
-                response.body()?.let { sponsor ->
-                    // Update sensor
-                    viewModel.addSponsor(sponsor)
-
-                    // Store in cache
-                    sponsors.put(sponsor.id, sponsor)
-                }
-            }
-
-            override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
-                progressCounter.decrement()
-
-                Log.e(TAG, "Fetching sponsor failed: $t")
-                Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sponsor))
-                )
-            }
-        }
-    }
-
-    private fun onMeasurementsFetched(): Callback<List<ApiMeasurement>> {
-        return object : Callback<List<ApiMeasurement>> {
-            override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>) {
-                this@MapActivity.progressCounter.decrement()
-
-                Log.i(TAG, "Processing measurements response")
-                response.body()?.let {
-                    viewModel.setMeasurements(
-                        it.map(Measurement::fromApiMeasurement)
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<List<ApiMeasurement>>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
-
-                Log.e(TAG, "Fetching measurements failed: $t")
-                Utils.showError(
-                    this@MapActivity,
-                    getString(R.string.fetching_data_failed, getString(R.string.data_measurements))
-                )
-            }
-        }
-    }
 
 
 
