@@ -1,7 +1,6 @@
 package ch.coredump.watertemp.activities.map
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
@@ -30,16 +29,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -67,7 +60,6 @@ import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
-import ch.coredump.watertemp.activities.AboutActivity
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -117,11 +109,14 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
-// Log tag
-private const val TAG = "MapActivity"
-
 @ExperimentalMaterialApi
 class MapActivity : ComponentActivity() {
+
+    companion object {
+        // Log tag
+        private const val TAG = "MapActivity"
+    }
+
     // The map instance
     private var map: MapLibreMap? = null
     private var symbolManager: SymbolManager? = null
@@ -150,6 +145,9 @@ class MapActivity : ComponentActivity() {
     private var colorAccentAlpha: Int? = null
     private lateinit var labelTemperature: String
 
+    // Menu handler
+    private lateinit var menu: MapActivityMenu
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -168,6 +166,9 @@ class MapActivity : ComponentActivity() {
 
         // Progress counter
         this.progressCounter = ProgressCounter()
+
+        // Initialize menu handler
+        menu = MapActivityMenu(this)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -234,6 +235,15 @@ class MapActivity : ComponentActivity() {
         } else {
             // If we already have sensor data, just update the markers
             updateMarkers()
+        }
+    }
+
+    /**
+     * Public method to refresh data, called by menu
+     */
+    fun refreshData() {
+        if (this.map != null) {
+            fetchInitialData()
         }
     }
 
@@ -561,34 +571,7 @@ class MapActivity : ComponentActivity() {
         }
     }
 
-    // Menu
 
-    private enum class MenuItem {
-        REFRESH, ABOUT
-    }
-
-    /**
-     * Called when a menu entry from the app bar dropdown menu has been selected.
-     */
-    private fun onMenuItemSelected(item: MenuItem, showMenu: MutableState<Boolean>?) {
-        Log.d(TAG, "Menu: $item")
-
-        // Hide menu
-        showMenu?.value = false
-
-        // Dispatch item
-        when (item) {
-            MenuItem.REFRESH -> {
-                if (this.map != null) {
-                    fetchInitialData()
-                }
-            }
-            MenuItem.ABOUT -> {
-                val intent = Intent(this, AboutActivity::class.java)
-                startActivity(intent)
-            }
-        }
-    }
 
     // Composable helpers
 
@@ -745,44 +728,8 @@ class MapActivity : ComponentActivity() {
         TopAppBar(
             title = { Text(stringResource(id = R.string.activity_map)) },
             backgroundColor = MaterialTheme.colors.primary,
-            actions = {
-                OverflowMenu({
-                    DropdownMenuItem(
-                        onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
-                    ) {
-                        Text(stringResource(id = R.string.action_refresh_all))
-                    }
-                    DropdownMenuItem(
-                        onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
-                    ) {
-                        Text(stringResource(id = R.string.action_about_this_app))
-                    }
-                }, showMenu)
-            },
+            actions = menu.topAppBarActions(showMenu),
         )
-    }
-
-    /**
-     * Simple reusable overflow menu.
-     *
-     * Source: https://stackoverflow.com/a/68354402/284318
-     */
-    @Composable
-    fun OverflowMenu(content: @Composable () -> Unit, show: MutableState<Boolean>) {
-        IconButton(
-            onClick = { show.value = !show.value },
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.MoreVert,
-                contentDescription = "More",
-            )
-        }
-        DropdownMenu(
-            expanded = show.value,
-            onDismissRequest = { show.value = false },
-        ) {
-            content()
-        }
     }
 
     @Composable
