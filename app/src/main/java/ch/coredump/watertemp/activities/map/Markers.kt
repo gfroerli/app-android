@@ -11,6 +11,13 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 import org.maplibre.android.maps.Style
 
+// Marker data keys
+val MARKER_DATA_SENSOR_ID = "sensorId"
+val MARKER_DATA_ICON_IMAGE_NAME = "iconImageName"
+
+/**
+ * Enum of the different marker types, depending on temperature.
+ */
 enum class MarkerType(val color: Color) {
     // Unknown temperature
     UNKNOWN(Color(0xff777777)),
