@@ -1,0 +1,11 @@
+- Show colored markers with temperature values directly on map (#97)
+- Add French and Italian translations (#70)
+- Support Android edge-to-edge mode (#91)
+- Compensate for rounded device corners in UI (#101, #102)
+- Zoom level does not reset anymore when reloading data (#99)
+- Improve "About" screen (#102)
+- Fix line wrapping of sensor preview caption text (#100)
+
+Note: This version increases the minimal required Android version from Android
+5 to Android 8. Additionally, OpenGL ES 3.0 needs to be supported by your
+device in order to properly render the map.

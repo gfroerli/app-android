@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.1.0 (2025-07-26)
+
+- [feature] Show colored markers with temperature values directly on map (#97)
+- [feature] Add French and Italian translations (#70)
+- [feature] Support Android edge-to-edge mode (#91)
+- [feature] Compensate for rounded device corners in UI (#101, #102)
+- [change] Zoom level does not reset anymore when reloading data (#99)
+- [change] Improve "About" screen (#102)
+- [bug] Fix line wrapping of sensor preview caption text (#100)
+- [chore] Upgrade many dependencies (Gradle, AGP, Kotlin, Compose, ...)
+- [chore] Bump target API to 35
+
+Note: This version increases the minimal required Android version from Android
+5 to Android 8. Additionally, OpenGL ES 3.0 needs to be supported by your
+device in order to properly render the map.
+
 ## v1.0.5 (2024-05-10)
 
 - [feature] Add Swiss German translation (#66)

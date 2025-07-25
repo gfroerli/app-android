@@ -1,0 +1,11 @@
+- Farbige Temperatur-Anzeige direkt auf der Übersichtskarte (#97)
+- Neue Übersetzung auf Französisch und Italienisch (#70)
+- Unterstützung für Android Edge-to-Edge-Mode (#91)
+- Kompensation im UI für abgerundete Geräte-Ecken (#101, #102)
+- Zoom-Level wird beim Aktualisieren der Daten nicht mehr zurückgesetzt (#99)
+- Verbesserter "Über diese App"-Screen (#102)
+- Korrektur des Zeilenumbruchs bei Sensor-Kurzbeschreibung (#100)
+
+Hinweis: Diese Version erhöht die minimal unterstützte Android-Version von
+Android 5 auf Android 8. Zusätzlich muss OpenGL ES 3.0 von deinem Gerät
+unterstützt werden, um die Karte ordnungsgemäss anzuzeigen.
