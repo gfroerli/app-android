@@ -3,14 +3,17 @@ package ch.coredump.watertemp.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,6 +37,11 @@ import ch.coredump.watertemp.R
 import ch.coredump.watertemp.utils.BottomSpacer
 import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
+import ch.coredump.watertemp.utils.bottomSpacerHeight
+import com.composables.core.ScrollArea
+import com.composables.core.Thumb
+import com.composables.core.VerticalScrollbar
+import com.composables.core.rememberScrollAreaState
 
 private const val TAG = "AboutActivity"
 
@@ -55,6 +64,7 @@ class AboutActivity : ComponentActivity() {
 
         // State: Scroll state
         val scrollState = rememberScrollState()
+        val scrollAreaState = rememberScrollAreaState(scrollState)
 
         // Wrap everything in our theme
         GfroerliThemeWrapper {
@@ -81,11 +91,12 @@ class AboutActivity : ComponentActivity() {
 
                 // Main content
                 content = { innerPadding ->
-                    Box(
-                        modifier = Modifier.padding(innerPadding).verticalScroll(scrollState)
+                    ScrollArea(
+                        state = scrollAreaState,
+                        modifier = Modifier.padding(innerPadding),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(16.dp).verticalScroll(scrollState),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(stringResource(R.string.version_heading), style = MaterialTheme.typography.h2)
@@ -117,6 +128,21 @@ class AboutActivity : ComponentActivity() {
 
                             BottomSpacer()
                         }
+
+                        VerticalScrollbar(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .fillMaxHeight()
+                                .width(4    .dp)
+                                .padding(top = 4.dp, bottom = bottomSpacerHeight() + 4.dp)
+                        ) {
+                            Thumb(
+                                modifier = Modifier.background(
+                                    Color.Black.copy(0.3f), RoundedCornerShape(100)
+                                ),
+                            )
+                        }
+
                     }
                 }
             )

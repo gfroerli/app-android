@@ -149,6 +149,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2'
     // Compose: Image loading
     implementation "com.github.skydoves:landscapist-glide:2.5.1"
+    // Compose: Various composables (used for scrollbars)
+    implementation "com.composables:core:1.38.1"
 
     // MapLibre SDK
     implementation 'org.maplibre.gl:android-sdk:11.12.1'
