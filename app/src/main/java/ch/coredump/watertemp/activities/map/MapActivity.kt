@@ -1,4 +1,4 @@
-package ch.coredump.watertemp.activities
+package ch.coredump.watertemp.activities.map
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -62,12 +62,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
+import ch.coredump.watertemp.activities.AboutActivity
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
 import ch.coredump.watertemp.rest.SensorMeasurements
@@ -115,10 +115,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-
-// Marker image names
-private const val MARKER_DEFAULT = "marker_default"
-private const val MARKER_ACTIVE = "marker_active"
+import kotlin.math.roundToInt
 
 // Log tag
 private const val TAG = "MapActivity"
@@ -129,7 +126,7 @@ class MapActivity : ComponentActivity() {
     private var map: MapLibreMap? = null
     private var symbolManager: SymbolManager? = null
 
-    // Access the water-sensor service
+    // Access the API service
     private var apiService: ApiService? = null
 
     // Mapping from sensor IDs to `SensorMeasurements` instances
@@ -203,11 +200,10 @@ class MapActivity : ComponentActivity() {
         // Clean up existing symbol manager
         symbolManager?.onDestroy()
 
-        // Load marker icons
-        style.addImage(MARKER_DEFAULT,
-            ContextCompat.getDrawable(this, R.drawable.blue_marker)!!)
-        style.addImage(MARKER_ACTIVE,
-            ContextCompat.getDrawable(this, org.maplibre.android.R.drawable.maplibre_marker_icon_default)!!)
+        // Create marker bitmaps
+        for (markerType in MarkerType.entries) {
+            addStyleMarker(style, markerType)
+        }
 
         // Initialize symbol manager with proper configuration
         symbolManager = SymbolManager(mapView, mapLibreMap, style).apply {
@@ -219,6 +215,7 @@ class MapActivity : ComponentActivity() {
             // Add click listener
             addClickListener { marker ->
                 onMarkerSelected(marker)
+                true
             }
         }
 
@@ -317,6 +314,9 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Remove all sensor markers and recreate them.
+     */
     private fun updateMarkers() {
         // Clear old markers
         this.symbolManager!!.deleteAll()
@@ -325,16 +325,7 @@ class MapActivity : ComponentActivity() {
         val locations = ArrayList<LatLng>()
         for (sensorMeasurement in sensors.values) {
             val sensor = sensorMeasurement.sensor
-            val measurements = sensorMeasurement.measurements
             Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
-
-            // Sort measurements by ID
-            // See https://github.com/gfroerli/gfroerli-api/issues/40
-            measurements.sortWith { lhs, rhs ->
-                val leftId = lhs.id
-                val rightId = rhs.id
-                leftId.compareTo(rightId)
-            }
 
             // Create location object
             val lat = sensor.latitude
@@ -346,20 +337,29 @@ class MapActivity : ComponentActivity() {
             val location = LatLng(lat, lng)
 
             // Create marker on map
+            val iconImageName = MarkerType.forTemperature(sensor.latestTemperature).name
             val marker = this.symbolManager!!.create(
                 SymbolOptions()
                     .withLatLng(LatLng(lat, lng))
-                    .withIconImage(MARKER_DEFAULT)
+                    .withIconImage(iconImageName)
+                    .withTextField("${sensor.latestTemperature?.roundToInt() ?: "?"}")
+                    .withTextSize(12f)
+                    .withTextColor("#111111")
+                    .withTextAnchor("center")
+                    .withTextFont(arrayOf("Open Sans Bold"))
+                    .withSymbolSortKey(sensor.id.toFloat()) // Control z-order
             )
 
             // Attach data to marker
             val markerData = JsonObject()
-            markerData.add("sensorId", JsonPrimitive(sensor.id))
+            markerData.add(MARKER_DATA_SENSOR_ID, JsonPrimitive(sensor.id))
+            markerData.add(MARKER_DATA_ICON_IMAGE_NAME, JsonPrimitive(iconImageName))
             marker.data = markerData
 
             // Add click listener
             symbolManager!!.addClickListener {
                 onMarkerSelected(it)
+                true
             }
 
             // Store location
@@ -397,30 +397,46 @@ class MapActivity : ComponentActivity() {
     }
 
     /**
+     * Set the specified marker as the active marker.
+     */
+    private fun setMarkerAsActive(marker: Symbol) {
+        marker.iconImage = MarkerType.ACTIVE.name
+        symbolManager?.update(marker)
+        this.activeMarker = marker
+    }
+
+    /**
+     * Reset the marker type.
+     */
+    private fun resetMarkerType(marker: Symbol) {
+        val originalIconImageName =
+            marker.data?.asJsonObject?.get(MARKER_DATA_ICON_IMAGE_NAME)?.asString
+        marker.iconImage = originalIconImageName ?: MarkerType.UNKNOWN.name
+        this.symbolManager?.update(marker)
+    }
+
+    /**
      * Called when a marker is selected.
      */
-    private fun onMarkerSelected(marker: Symbol): Boolean {
+    private fun onMarkerSelected(marker: Symbol) {
         val sensorId: Int? = marker.data?.asJsonObject?.get("sensorId")?.asInt
         Log.d(TAG, "Selected marker ID: ${marker.id} (sensor ID: $sensorId)")
         if (sensorId == null) {
-            return true
+            return
         }
 
         // Update active marker icon
         this.activeMarker?.let {
-            it.iconImage = MARKER_DEFAULT
-            symbolManager?.update(it)
+            this.resetMarkerType(it)
         }
-        marker.iconImage = MARKER_ACTIVE
-        symbolManager?.update(marker)
-        this.activeMarker = marker
+        this.setMarkerAsActive(marker)
 
         // Lookup sensor for that marker
         val sensorMeasurements = sensors[sensorId]
         if (sensorMeasurements == null) {
             Log.e(TAG, "Sensor with id $sensorId not found")
             Utils.showError(this, "Sensor not found")
-            return true
+            return
         }
         val sensor = sensorMeasurements.sensor
 
@@ -457,7 +473,7 @@ class MapActivity : ComponentActivity() {
         // Show the details pane (if not already visible)
         this.viewModel.showBottomSheet()
 
-        return true
+        return
     }
 
     /**
@@ -465,8 +481,7 @@ class MapActivity : ComponentActivity() {
      */
     private fun deselectMarkers() {
         this.activeMarker?.let {
-            it.iconImage = MARKER_DEFAULT
-            this.symbolManager?.update(it)
+            this.resetMarkerType(it)
             this.activeMarker = null
         }
     }

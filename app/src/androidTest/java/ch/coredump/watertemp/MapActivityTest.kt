@@ -3,7 +3,7 @@ package ch.coredump.watertemp
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import ch.coredump.watertemp.activities.MapActivity
+import ch.coredump.watertemp.activities.map.MapActivity
 import org.junit.Rule
 import org.junit.Test
 
