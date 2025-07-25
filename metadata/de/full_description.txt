@@ -1,8 +1,10 @@
-<p>Die App "Gfrör.li" zeigt dir die Wassertemperaturen von Schweizer Gewässern
-an. Also ideal für Gfrörlis, die trotzdem gerne im See oder Fluss baden
-möchten! Bisher sind Sensoren im Zürichsee und Vierwaldstädtersee in Betrieb.
-Weitere Sensoren werden folgen.</p>
+<p>Die App "Gfrör.li" zeigt dir die Wassertemperaturen von Schweizer Seen und
+Flüssen and dutzenden verschiedenen Standorten an. Also ideal für Gfrörlis, die
+bei genügend hohen Temperaturen trotzdem gerne im See oder Fluss baden
+möchten!</p>
 
-<p>Die Daten stammen aus selber entwickelten LoRaWAN-basierten Messstationen
-und werden alle mehrmals pro Stunde aktualisiert. Mehr Informationen zum
-Projekt finden sich unter <a href="https://gfrör.li/">gfrör.li</a>.<p>
+<p>Die Daten stammen aus selber betriebenen LoRaWAN-basierten Messstationen und
+werden alle mehrmals pro Stunde aktualisiert. Zusätzlich integrieren wir
+öffentliche Messstationen (zum Beispiel vom Schweizer BAFU), sofern diese unter
+einer freien Lizenz verfügbar sind. Mehr Informationen zum Projekt finden sich
+unter <a href="https://gfrör.li/">gfrör.li</a>.<p>
