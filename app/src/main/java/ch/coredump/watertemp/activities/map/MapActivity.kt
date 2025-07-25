@@ -80,7 +80,6 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
-import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
@@ -183,6 +182,19 @@ class MapActivity : ComponentActivity() {
         Log.d(TAG, "Map is ready")
         mapLibreMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
+
+            // Set up bounding box for Switzerland
+            val boundingBoxBuilder = LatLngBounds.Builder()
+            boundingBoxBuilder.include(LatLng(47.80845, 8.56803)) // CH N
+            boundingBoxBuilder.include(LatLng(46.61296, 10.49219)) // CH E
+            boundingBoxBuilder.include(LatLng(45.81796, 9.01734)) // CH S
+            boundingBoxBuilder.include(LatLng(46.13236, 5.95590)) // CH W
+            val boundingBox = boundingBoxBuilder.build()
+
+            // Set camera to fit the bounding box with padding
+            val cameraUpdate = CameraUpdateFactory.newLatLngBounds(boundingBox, 100)
+            mapLibreMap.moveCamera(cameraUpdate)
+
             initializeMapStyle(mapLibreMap, mapView, style)
         }
     }
@@ -324,18 +336,6 @@ class MapActivity : ComponentActivity() {
 
             return@OnMapClickListener true
         })
-
-        // Change zoom to include all markers
-        if (locations.size == 1) {
-            val location = locations[0]
-            map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13.0))
-        } else if (mapData.sensorCount() > 1) {
-            val boundingBoxBuilder = LatLngBounds.Builder()
-            for (location in locations) {
-                boundingBoxBuilder.include(location)
-            }
-            map!!.moveCamera(CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 180))
-        }
     }
 
     /**
@@ -608,13 +608,6 @@ class MapActivity : ComponentActivity() {
                 val mapOptions = MapLibreMapOptions.createFromAttributes(context)
                     .logoEnabled(false)
                     .attributionMargins(intArrayOf(10, 10, 10, 10))
-                    .camera(
-                        CameraPosition.Builder()
-                            .target(LatLng(47.209587, 8.823612))
-                            .zoom(11.0)
-                            .tilt(0.0)
-                            .build()
-                    )
                 MapView(context, mapOptions).apply {
                     getMapAsync { map ->
                         onMapReady(map, this)
