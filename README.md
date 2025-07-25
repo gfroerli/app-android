@@ -23,9 +23,15 @@ Then, build the app with Gradle:
 
 To install the app to your device:
 
-    ./gradlew installZhDebug
+    ./gradlew installDebug
 
 (Alternatively, do all that stuff through Android Studio.)
+
+## Development Tips
+
+- If you use the Android Studio emulator, make sure to enable hardware graphics
+  acceleration (_Edit > Additional Settings > Graphics acceleration >
+  Hardware_), otherwise the sensors won't render correctly on the map.
 
 ## Translations
 
