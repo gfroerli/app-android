@@ -10,13 +10,14 @@
     <string name="sponsor_description">Questo sensore è sponsorizzato da «%1$s».</string>
     <string name="about_project_heading">Perche quest\'app?</string>
     <string name="about_project_text1">La temperatura dell\'acqua è importante per tanti: chi nuota, chi pesca, chi fa immersioni e altri ancora. Ma finora era difficile trovare info affidabili in tempo reale in Svizzera.</string>
-    <string name="about_project_text2">Stiamo creando una rete di sensori economici a basso consumo. Così possiamo misurare la temperatura dell\'acqua vicino a te e mostrartela quasi in tempo reale – gratis.</string>
-    <string name="about_project_text3">Più info su: https://gfrör.li/</string>
+    <string name="about_project_text2">Stiamo creando una rete di sensori economici a basso consumo gestiti dalla comunità. Così possiamo misurare la temperatura dell\'acqua vicino a te e mostrartela quasi in tempo reale – gratis.</string>
+    <string name="about_project_text3">Inoltre, integriamo stazioni di misurazione pubbliche (come le temperature dei fiumi dell\'UFAM svizzero) dove la licenza ce lo permette.</string>
+    <string name="about_project_text4">Più info su: https://gfrör.li/</string>
     <string name="about_us_heading">Chi ha fatto quest\'app?</string>
-    <string name="about_us_text1">L\'app, l\'infrastruttura server e l\'hardware dei sensori sono sviluppati dallo spazio hacker Coredump a Rapperswil-Jona.</string>
+    <string name="about_us_text1">L\'app e l\'infrastruttura server sono sviluppate e gestite dallo spazio hacker Coredump a Rapperswil-Jona.</string>
     <string name="about_us_text2">Scopri di più su di noi su: https://www.coredump.ch/</string>
     <string name="open_source_heading">Open Source</string>
-    <string name="open_source_text1">Quest\'app è open source! Trovi il codice su GitHub: https://github.com/gfroerli/app-android</string>
+    <string name="open_source_text1">Quest\'app è open source sotto licenza GPL! Trovi il codice su GitHub: https://github.com/gfroerli/app-android I contributi sono benvenuti!</string>
     <string name="action_about_this_app">Info sull\'app</string>
     <string name="action_refresh_all">Rinfresca tutti i dati</string>
     <string name="chart_no_data">Nessun dato disponibile</string>
@@ -31,4 +32,6 @@
     <string name="data_measurements">Misurazioni</string>
     <string name="version_heading">Versione</string>
     <string name="version_text1">Versione dell\'app %1$s (build %2$d).</string>
+    <string name="placement_heading">Posizionare, richiedere o sponsorizzare nuovi sensori</string>
+    <string name="placement_text1">Sei interessato a posizionare un sensore tu stesso? Conosci una buona posizione potenziale? O vorresti sponsorizzare uno o più sensori per supportare questo progetto? In tal caso, contattaci a gfroerli@coredump.ch!</string>
 </resources>

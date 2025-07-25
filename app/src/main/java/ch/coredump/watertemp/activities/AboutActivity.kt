@@ -96,13 +96,19 @@ class AboutActivity : ComponentActivity() {
                             Text(stringResource(R.string.about_project_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_project_text1), style = MaterialTheme.typography.body1)
                             Text(stringResource(R.string.about_project_text2), style = MaterialTheme.typography.body1)
-                            LinkifyText(stringResource(R.string.about_project_text3), style = MaterialTheme.typography.body1)
+                            Text(stringResource(R.string.about_project_text3), style = MaterialTheme.typography.body1)
+                            LinkifyText(stringResource(R.string.about_project_text4), style = MaterialTheme.typography.body1)
 
                             Spacer(modifier = Modifier.height(4.dp))
 
                             Text(stringResource(R.string.about_us_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_us_text1), style = MaterialTheme.typography.body1)
                             LinkifyText(stringResource(R.string.about_us_text2), style = MaterialTheme.typography.body1)
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Text(stringResource(R.string.placement_heading), style = MaterialTheme.typography.h2)
+                            LinkifyText(stringResource(R.string.placement_text1), style = MaterialTheme.typography.body1)
 
                             Spacer(modifier = Modifier.height(4.dp))
 
