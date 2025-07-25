@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.R
+import ch.coredump.watertemp.utils.BottomSpacer
 import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
 
@@ -107,6 +108,8 @@ class AboutActivity : ComponentActivity() {
 
                             Text(stringResource(R.string.open_source_heading), style = MaterialTheme.typography.h2)
                             LinkifyText(stringResource(R.string.open_source_text1), style = MaterialTheme.typography.body1)
+
+                            BottomSpacer()
                         }
                     }
                 }
