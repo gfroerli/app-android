@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -83,19 +85,25 @@ class AboutActivity : ComponentActivity() {
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(stringResource(R.string.version_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.version_text1, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), style = MaterialTheme.typography.body1)
+
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             Text(stringResource(R.string.about_project_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_project_text1), style = MaterialTheme.typography.body1)
                             Text(stringResource(R.string.about_project_text2), style = MaterialTheme.typography.body1)
                             LinkifyText(stringResource(R.string.about_project_text3), style = MaterialTheme.typography.body1)
 
+                            Spacer(modifier = Modifier.height(4.dp))
+
                             Text(stringResource(R.string.about_us_heading), style = MaterialTheme.typography.h2)
                             Text(stringResource(R.string.about_us_text1), style = MaterialTheme.typography.body1)
                             LinkifyText(stringResource(R.string.about_us_text2), style = MaterialTheme.typography.body1)
+
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             Text(stringResource(R.string.open_source_heading), style = MaterialTheme.typography.h2)
                             LinkifyText(stringResource(R.string.open_source_text1), style = MaterialTheme.typography.body1)
