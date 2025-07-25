@@ -315,6 +315,9 @@ class MapActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Remove all sensor markers and recreate them.
+     */
     private fun updateMarkers() {
         // Clear old markers
         this.symbolManager!!.deleteAll()
@@ -323,16 +326,7 @@ class MapActivity : ComponentActivity() {
         val locations = ArrayList<LatLng>()
         for (sensorMeasurement in sensors.values) {
             val sensor = sensorMeasurement.sensor
-            val measurements = sensorMeasurement.measurements
             Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
-
-            // Sort measurements by ID
-            // See https://github.com/gfroerli/gfroerli-api/issues/40
-            measurements.sortWith { lhs, rhs ->
-                val leftId = lhs.id
-                val rightId = rhs.id
-                leftId.compareTo(rightId)
-            }
 
             // Create location object
             val lat = sensor.latitude
