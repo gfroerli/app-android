@@ -10,3 +10,4 @@
 secrets.properties
 apk/
 releases/
+.kotlin/

@@ -9,17 +9,17 @@ import ch.coredump.watertemp.rest.models.ApiSensor;
 /**
  * A class that bundles a sensor together with its measurements.
  */
-public class SensorMeasurements {
+public class SensorWithMeasurements {
 
     private final ApiSensor apiSensor;
     private final List<ApiMeasurement> apiMeasurements;
 
-    public SensorMeasurements(ApiSensor apiSensor) {
+    public SensorWithMeasurements(ApiSensor apiSensor) {
         this.apiSensor = apiSensor;
         this.apiMeasurements = new ArrayList<>();
     }
 
-    public SensorMeasurements(ApiSensor apiSensor, List<ApiMeasurement> apiMeasurements) {
+    public SensorWithMeasurements(ApiSensor apiSensor, List<ApiMeasurement> apiMeasurements) {
         this.apiSensor = apiSensor;
         this.apiMeasurements = apiMeasurements;
     }

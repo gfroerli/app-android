@@ -1,10 +1,7 @@
 package ch.coredump.watertemp.activities.map
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.SparseArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -30,16 +27,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -64,17 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 import ch.coredump.watertemp.BuildConfig
-import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
-import ch.coredump.watertemp.activities.AboutActivity
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
-import ch.coredump.watertemp.rest.SensorMeasurements
-import ch.coredump.watertemp.rest.models.ApiMeasurement
-import ch.coredump.watertemp.rest.models.ApiSensor
-import ch.coredump.watertemp.rest.models.ApiSensorDetails
-import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.ui.viewmodels.Measurement
@@ -108,20 +92,20 @@ import org.maplibre.android.plugins.annotation.Symbol
 import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
 import org.ocpsoft.prettytime.PrettyTime
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
-// Log tag
-private const val TAG = "MapActivity"
-
 @ExperimentalMaterialApi
 class MapActivity : ComponentActivity() {
+
+    companion object {
+        // Log tag
+        private const val TAG = "MapActivity"
+    }
+
     // The map instance
     private var map: MapLibreMap? = null
     private var symbolManager: SymbolManager? = null
@@ -129,18 +113,14 @@ class MapActivity : ComponentActivity() {
     // Access the API service
     private var apiService: ApiService? = null
 
-    // Mapping from sensor IDs to `SensorMeasurements` instances
-    @SuppressLint("UseSparseArrays")
-    private val sensors = HashMap<Int, SensorMeasurements>()
-
-    // Mapping from sponsor IDs to `Sponsor` instances
-    private val sponsors = SparseArray<ApiSponsor>()
-
     // The currently active marker
     private var activeMarker: Symbol? = null
 
-    // View model including the currently active sensor and its data
-    private lateinit var viewModel: SensorBottomSheetViewModel
+    // Data holder for sensors and sponsors
+    private lateinit var mapData: MapData
+
+    // View model for bottom sheet UI state
+    private lateinit var bottomSheetViewModel: SensorBottomSheetViewModel
 
     // Activity indicator
     private lateinit var progressCounter: ProgressCounter
@@ -149,6 +129,12 @@ class MapActivity : ComponentActivity() {
     private var shortAnimationDuration: Int = 0
     private var colorAccentAlpha: Int? = null
     private lateinit var labelTemperature: String
+
+    // Menu handler
+    private lateinit var menu: MapActivityMenu
+
+    // API response handler
+    private lateinit var apiHandler: MapActivityApiHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,15 +145,24 @@ class MapActivity : ComponentActivity() {
         this.labelTemperature = getString(R.string.temperature)
 
         // Initialize viewmodel
-        viewModel = ViewModelProvider(this)[SensorBottomSheetViewModel::class.java]
+        bottomSheetViewModel = ViewModelProvider(this)[SensorBottomSheetViewModel::class.java]
+
+        // Initialize data holder
+        mapData = MapData()
 
         // Initialize the layout
         setContent {
-            RootComposable(this.viewModel)
+            RootComposable(bottomSheetViewModel)
         }
 
         // Progress counter
         this.progressCounter = ProgressCounter()
+
+        // Initialize menu handler
+        menu = MapActivityMenu(this)
+
+        // Initialize API handler
+        apiHandler = MapActivityApiHandler(this, progressCounter, mapData, bottomSheetViewModel, ::updateMarkers)
 
         // Get API client
         // TODO: Use singleton dependency injection using something like dagger 2
@@ -229,11 +224,20 @@ class MapActivity : ComponentActivity() {
         settings.isCompassEnabled = false
 
         // Fetch initial data only after everything is set up
-        if (sensors.isEmpty()) {
+        if (!mapData.hasSensors()) {
             this.fetchInitialData()
         } else {
             // If we already have sensor data, just update the markers
             updateMarkers()
+        }
+    }
+
+    /**
+     * Public method to refresh data, called by menu
+     */
+    fun refreshData() {
+        if (this.map != null) {
+            fetchInitialData()
         }
     }
 
@@ -246,73 +250,12 @@ class MapActivity : ComponentActivity() {
         // Fetch sensors
         val sensorCall = apiService!!.listSensors()
         this.progressCounter.increment()
-        sensorCall.enqueue(this.onSensorsFetched())
+        sensorCall.enqueue(apiHandler.onSensorsFetched())
 
         // TODO: Do we need to re-fetch sensor-details of currently showing sensor?
     }
 
-    private fun onSensorsFetched(): Callback<List<ApiSensor>> {
-        return object : Callback<List<ApiSensor>> {
-            override fun onResponse(call: Call<List<ApiSensor>>, response: Response<List<ApiSensor>>) {
-                this@MapActivity.progressCounter.decrement()
 
-                // Handle unsuccessful response
-                if (!response.isSuccessful) {
-                    val error = ApiClient.parseError(response)
-                    Log.e(TAG, "Could not fetch sensors (HTTP " + error.statusCode + "): " + error.message)
-                    Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_sensor_data_failed, error.statusCode, Config.SUPPORT_EMAIL)
-                    )
-                    return
-                }
-
-                // Success!
-                Log.d(TAG, "Sensors response successful")
-
-                // Ensure bottom sheet is hidden
-                // TODO(#6): Don't hide, but update data!
-                viewModel.hideBottomSheet()
-
-                // Clear old sensor data
-                sensors.clear()
-                viewModel.clearData()
-
-                // Prepare list for sensor IDs
-                val idList = ArrayList<String>()
-
-                // Extract sensor information
-                val now = ZonedDateTime.now();
-                for (sensor in response.body()!!) {
-                    if (sensor.latestMeasurementAt != null && ChronoUnit.DAYS.between(sensor.latestMeasurementAt, now) < 3) {
-                        Log.d(TAG, "Adding sensor " + sensor.id);
-                        sensors[sensor.id] = SensorMeasurements(sensor)
-                        idList.add(sensor.id.toString())
-                    } else {
-                        Log.d(TAG, "Ignoring sensor " + sensor.id + " (missing or outdated measurement)");
-                    }
-                }
-
-                updateMarkers()
-
-                // Fetch measurements
-                // TODO: Fetch aggregations instead
-//                val ids = Utils.join(",", idList)
-//                val measurementCall = apiService!!.listMeasurements(ids, idList.size * 5)
-//                measurementCall.enqueue(onMeasurementsFetched())
-            }
-
-            override fun onFailure(call: Call<List<ApiSensor>>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
-                Log.e(TAG, "Fetching sensors failed: $t")
-                Utils.showError(
-                    this@MapActivity,
-                    getString(R.string.fetching_data_failed, getString(R.string.data_sensors)
-                )
-                )
-            }
-        }
-    }
 
     /**
      * Remove all sensor markers and recreate them.
@@ -323,8 +266,7 @@ class MapActivity : ComponentActivity() {
 
         // Process sensors
         val locations = ArrayList<LatLng>()
-        for (sensorMeasurement in sensors.values) {
-            val sensor = sensorMeasurement.sensor
+        for (sensor in mapData.getAllSensors()) {
             Log.i(TAG, "Add sensor ${sensor.deviceName} (id=${sensor.id})")
 
             // Create location object
@@ -378,7 +320,7 @@ class MapActivity : ComponentActivity() {
             this.deselectMarkers()
 
             // Hide the details pane
-            viewModel.hideBottomSheet()
+            bottomSheetViewModel.hideBottomSheet()
 
             return@OnMapClickListener true
         })
@@ -387,7 +329,7 @@ class MapActivity : ComponentActivity() {
         if (locations.size == 1) {
             val location = locations[0]
             map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13.0))
-        } else if (sensors.size > 1) {
+        } else if (mapData.sensorCount() > 1) {
             val boundingBoxBuilder = LatLngBounds.Builder()
             for (location in locations) {
                 boundingBoxBuilder.include(location)
@@ -432,34 +374,33 @@ class MapActivity : ComponentActivity() {
         this.setMarkerAsActive(marker)
 
         // Lookup sensor for that marker
-        val sensorMeasurements = sensors[sensorId]
-        if (sensorMeasurements == null) {
+        val sensor = mapData.getSensor(sensorId)
+        if (sensor == null) {
             Log.e(TAG, "Sensor with id $sensorId not found")
             Utils.showError(this, "Sensor not found")
             return
         }
-        val sensor = sensorMeasurements.sensor
 
         // Create viewmodel and update UI
-        this.viewModel.setSensor(Sensor.fromApiSensor(sensor))
+        bottomSheetViewModel.setSensor(Sensor.fromApiSensor(sensor))
 
         // Fetch sensor details asynchronously
         Log.i(TAG, "Fetching sensor " + sensor.id)
         this.progressCounter.increment()
-        apiService!!.getSensorDetails(sensor.id).enqueue(onSensorDetailsFetched())
+        apiService!!.getSensorDetails(sensor.id).enqueue(apiHandler.onSensorDetailsFetched())
 
         // Look up sponsor in cache. If not found, fetch it asynchronously.
         if (sensor.sponsorId != null) {
-            val sponsor = sponsors.get(sensor.sponsorId)
+            val sponsor = mapData.getSponsor(sensor.sponsorId)
             if (sponsor == null) {
                 // Not found in cache, fetch it from the API
                 Log.i(TAG, "Fetching sponsor ${sensor.id}")
                 this.progressCounter.increment()
-                apiService!!.getSponsor(sensor.id).enqueue(onSponsorFetched())
+                apiService!!.getSponsor(sensor.id).enqueue(apiHandler.onSponsorFetched())
             } else {
                 // Cache hit!
                 Log.d(TAG, "Sponsor ${sensor.sponsorId} cache hit")
-                this.viewModel.addSponsor(sponsor)
+                bottomSheetViewModel.addSponsor(sponsor)
             }
         }
 
@@ -468,10 +409,10 @@ class MapActivity : ComponentActivity() {
         val since = Instant.now().minus(3, ChronoUnit.DAYS)
         val measurementCall = apiService!!.listMeasurementsSince(sensor.id, since)
         this.progressCounter.increment()
-        measurementCall.enqueue(onMeasurementsFetched())
+        measurementCall.enqueue(apiHandler.onMeasurementsFetched())
 
         // Show the details pane (if not already visible)
-        this.viewModel.showBottomSheet()
+        bottomSheetViewModel.showBottomSheet()
 
         return
     }
@@ -486,109 +427,13 @@ class MapActivity : ComponentActivity() {
         }
     }
 
-    private fun onSensorDetailsFetched(): Callback<ApiSensorDetails> {
-        return object : Callback<ApiSensorDetails> {
-            override fun onResponse(call: Call<ApiSensorDetails>, response: Response<ApiSensorDetails>) {
-                this@MapActivity.progressCounter.decrement()
 
-                Log.i(TAG, "Processing sensor details response")
-                response.body()?.let { details ->
-                    this@MapActivity.viewModel.addDetails(details)
-                }
-            }
 
-            override fun onFailure(call: Call<ApiSensorDetails>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
 
-                Log.e(TAG, "Fetching sensor details failed: $t")
-                Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sensor_details))
-                )
-            }
-        }
-    }
 
-    private fun onSponsorFetched(): Callback<ApiSponsor> {
-        return object : Callback<ApiSponsor> {
-            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
-                progressCounter.decrement()
 
-                Log.i(TAG, "Processing sponsor response")
-                response.body()?.let { sponsor ->
-                    // Update sensor
-                    viewModel.addSponsor(sponsor)
 
-                    // Store in cache
-                    sponsors.put(sponsor.id, sponsor)
-                }
-            }
 
-            override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
-                progressCounter.decrement()
-
-                Log.e(TAG, "Fetching sponsor failed: $t")
-                Utils.showError(
-                        this@MapActivity,
-                        getString(R.string.fetching_data_failed, getString(R.string.data_sponsor))
-                )
-            }
-        }
-    }
-
-    private fun onMeasurementsFetched(): Callback<List<ApiMeasurement>> {
-        return object : Callback<List<ApiMeasurement>> {
-            override fun onResponse(call: Call<List<ApiMeasurement>>, response: Response<List<ApiMeasurement>>) {
-                this@MapActivity.progressCounter.decrement()
-
-                Log.i(TAG, "Processing measurements response")
-                response.body()?.let {
-                    viewModel.setMeasurements(
-                        it.map(Measurement::fromApiMeasurement)
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<List<ApiMeasurement>>, t: Throwable) {
-                this@MapActivity.progressCounter.decrement()
-
-                Log.e(TAG, "Fetching measurements failed: $t")
-                Utils.showError(
-                    this@MapActivity,
-                    getString(R.string.fetching_data_failed, getString(R.string.data_measurements))
-                )
-            }
-        }
-    }
-
-    // Menu
-
-    private enum class MenuItem {
-        REFRESH, ABOUT
-    }
-
-    /**
-     * Called when a menu entry from the app bar dropdown menu has been selected.
-     */
-    private fun onMenuItemSelected(item: MenuItem, showMenu: MutableState<Boolean>?) {
-        Log.d(TAG, "Menu: $item")
-
-        // Hide menu
-        showMenu?.value = false
-
-        // Dispatch item
-        when (item) {
-            MenuItem.REFRESH -> {
-                if (this.map != null) {
-                    fetchInitialData()
-                }
-            }
-            MenuItem.ABOUT -> {
-                val intent = Intent(this, AboutActivity::class.java)
-                startActivity(intent)
-            }
-        }
-    }
 
     // Composable helpers
 
@@ -745,44 +590,8 @@ class MapActivity : ComponentActivity() {
         TopAppBar(
             title = { Text(stringResource(id = R.string.activity_map)) },
             backgroundColor = MaterialTheme.colors.primary,
-            actions = {
-                OverflowMenu({
-                    DropdownMenuItem(
-                        onClick = { onMenuItemSelected(MenuItem.REFRESH, showMenu) }
-                    ) {
-                        Text(stringResource(id = R.string.action_refresh_all))
-                    }
-                    DropdownMenuItem(
-                        onClick = { onMenuItemSelected(MenuItem.ABOUT, showMenu) }
-                    ) {
-                        Text(stringResource(id = R.string.action_about_this_app))
-                    }
-                }, showMenu)
-            },
+            actions = menu.topAppBarActions(showMenu),
         )
-    }
-
-    /**
-     * Simple reusable overflow menu.
-     *
-     * Source: https://stackoverflow.com/a/68354402/284318
-     */
-    @Composable
-    fun OverflowMenu(content: @Composable () -> Unit, show: MutableState<Boolean>) {
-        IconButton(
-            onClick = { show.value = !show.value },
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.MoreVert,
-                contentDescription = "More",
-            )
-        }
-        DropdownMenu(
-            expanded = show.value,
-            onDismissRequest = { show.value = false },
-        ) {
-            content()
-        }
     }
 
     @Composable
