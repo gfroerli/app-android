@@ -10,13 +10,14 @@
     <string name="sponsor_description">Ce capteur est sponsorisé par « %1$s ».</string>
     <string name="about_project_heading">Pourquoi cette app ?</string>
     <string name="about_project_text1">La température de l’eau est importante pour plein de gens : nageurs, plongeurs, pêcheurs, et bien d’autres. Mais jusque-là, c’était galère de trouver des infos fiables en temps réel en Suisse.</string>
-    <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>
-    <string name="about_project_text3">Plus d’infos : https://gfrör.li/</string>
+    <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau gérés par la communauté, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>
+    <string name="about_project_text3">En plus, on intègre des stations de mesure publiques (comme les températures des rivières de l’OFEV suisse) quand la licence nous le permet.</string>
+    <string name="about_project_text4">Plus d’infos : https://gfrör.li/</string>
     <string name="about_us_heading">Qui a créé cette app ?</string>
-    <string name="about_us_text1">L’app, les serveurs et le matos des capteurs sont développés par le hackerspace Coredump à Rapperswil-Jona.</string>
+    <string name="about_us_text1">L’app et l’infrastructure serveur sont développées et gérées par le hackerspace Coredump à Rapperswil-Jona.</string>
     <string name="about_us_text2">Tu peux en savoir plus sur nous ici : https://www.coredump.ch/</string>
     <string name="open_source_heading">Open source</string>
-    <string name="open_source_text1">Cette app est open source ! Le code est sur GitHub : https://github.com/gfroerli/app-android</string>
+    <string name="open_source_text1">Cette app est open source sous licence GPL ! Le code est sur GitHub : https://github.com/gfroerli/app-android Les contributions sont les bienvenues !</string>
     <string name="action_about_this_app">À propos de l’app</string>
     <string name="action_refresh_all">Rafraîchis toutes les données</string>
     <string name="chart_no_data">Aucune donnée dispo</string>
@@ -31,4 +32,6 @@
     <string name="data_measurements">Mesures</string>
     <string name="version_heading">Version</string>
     <string name="version_text1">Version de l’app %1$s (build %2$d).</string>
+    <string name="placement_heading">Placer, demander ou sponsoriser de nouveaux capteurs</string>
+    <string name="placement_text1">Tu aimerais placer un capteur toi-même ? Tu connais un bon endroit potentiel ? Ou tu voudrais sponsoriser un ou plusieurs capteurs pour soutenir ce projet ? Dans ce cas, contacte-nous à gfroerli@coredump.ch !</string>
 </resources>

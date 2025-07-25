@@ -12,12 +12,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,6 +64,7 @@ import ch.coredump.watertemp.ui.viewmodels.Sensor
 import ch.coredump.watertemp.ui.viewmodels.SensorBottomSheetViewModel
 import ch.coredump.watertemp.ui.viewmodels.SensorStats
 import ch.coredump.watertemp.ui.viewmodels.Sponsor
+import ch.coredump.watertemp.utils.BottomSpacer
 import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
 import ch.coredump.watertemp.utils.ProgressCounter
@@ -759,13 +757,7 @@ class MapActivity : ComponentActivity() {
                     }
                 }
 
-                // Bottom spacer to compensate for rounded device corners (avoid clipping)
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
-                        .background(MaterialTheme.colors.background)
-                )
+                BottomSpacer()
             }
         }
     }

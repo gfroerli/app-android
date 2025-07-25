@@ -10,13 +10,14 @@
     <string name="sponsor_description">Dieser Sensor wird von \"%1$s\" gesponsert.</string>
     <string name="about_project_heading">Warum diese App?</string>
     <string name="about_project_text1">Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es kaum verlässliche Möglichkeiten, um in der Schweiz Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten.</string>
-    <string name="about_project_text2">"Wir bauen ein Netzwerk von kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf. Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen.</string>
-    <string name="about_project_text3">Weitere Informationen: https://gfrör.li/</string>
+    <string name="about_project_text2">Wir bauen ein Netzwerk von gemeinschaftlich betriebenen, kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf. Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen.</string>
+    <string name="about_project_text3">Zusätzlich integrieren wir öffentliche Temperatur-Messstationen (wie Flusstemperaturen vom Schweizer BAFU), sofern uns die Lizenz dies erlaubt.</string>
+    <string name="about_project_text4">Weitere Informationen: https://gfrör.li/</string>
     <string name="about_us_heading">Wer hat diese App entwickelt?</string>
-    <string name="about_us_text1">Diese App, die Server-Infrastruktur wie auch die Sensor-Hardware werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt.</string>
+    <string name="about_us_text1">Diese App und die Server-Infrastruktur werden vom Coredump Hackerspace in Rapperswil-Jona entwickelt und betrieben.</string>
     <string name="about_us_text2">Mehr Informationen über uns findest du auf unserer Website: https://www.coredump.ch/</string>
     <string name="open_source_heading">Open Source</string>
-    <string name="open_source_text1">Diese app ist open source! Du findest den Quellcode auf GitHub: https://github.com/gfroerli/app-android</string>
+    <string name="open_source_text1">Diese App ist open source unter der GPL-Lizenz! Du findest den Quellcode auf GitHub: https://github.com/gfroerli/app-android Contributions sind willkommen!</string>
     <string name="action_about_this_app">Über diese App</string>
     <string name="action_refresh_all">Alle Daten aktualisieren</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
@@ -31,4 +32,6 @@
     <string name="data_measurements">Messungen</string>
     <string name="version_heading">Version</string>
     <string name="version_text1">App-Version %1$s (build %2$d).</string>
+    <string name="placement_heading">Neue Sensoren platzieren, vorschlagen oder sponsern</string>
+    <string name="placement_text1">Hast du Interesse daran, selbst einen Sensor zu platzieren? Kennst du einen guten potentiellen Standort? Oder möchtest du einen oder mehrere Sensoren sponsern, um dieses Projekt zu unterstützen? Dann kontaktiere uns bitte unter gfroerli@coredump.ch!</string>
 </resources>
