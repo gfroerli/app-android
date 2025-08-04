@@ -150,7 +150,7 @@ dependencies {
     // Compose: Image loading
     implementation "com.github.skydoves:landscapist-glide:2.5.1"
     // Compose: Various composables (used for scrollbars)
-    implementation "com.composables:core:1.38.1"
+    implementation "com.composables:core:1.39.0"
 
     // MapLibre SDK
     implementation 'org.maplibre.gl:android-sdk:11.12.1'
