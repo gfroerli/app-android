@@ -29,7 +29,7 @@ jobs:
         run: echo -e "gfroerli_api_key_public=testing\nmapbox_access_token=testing\n" > app/secrets.properties
 
       - name: Cache Gradle packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
@@ -93,7 +93,7 @@ jobs:
         run: echo -e "gfroerli_api_key_public=testing\nmapbox_access_token=testing\n" > app/secrets.properties
 
       - name: Cache Gradle packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
