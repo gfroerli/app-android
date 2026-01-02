@@ -153,7 +153,7 @@ dependencies {
     implementation "com.composables:core:1.49.3"
 
     // MapLibre SDK
-    implementation 'org.maplibre.gl:android-sdk:11.13.5'
+    implementation 'org.maplibre.gl:android-sdk:12.3.1'
     implementation 'org.maplibre.gl:android-plugin-annotation-v9:3.0.2'
 
     // REST client
