@@ -13,7 +13,8 @@ Update changelog:
 
     $ vim CHANGELOG.md
 
-Add the changelog to `metadata/{de,en-US}/changelogs/<versioncode>.txt` as well.
+Add the changelog to `metadata/{de,en-US}/changelogs/<versioncode>.txt` as well
+(try to stick to <500 chars).
 
 Commit & tag:
 
