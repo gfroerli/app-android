@@ -11,3 +11,7 @@ secrets.properties
 apk/
 releases/
 .kotlin/
+
+# Release config
+/release.properties
+/release.keystore
