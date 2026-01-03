@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.compose' version "${kotlin_version}"
+    id "app.accrescent.tools.bundletool" version "0.2.4"
 }
 apply plugin: 'project-report'
 
@@ -192,4 +193,15 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4") // Compose BOM
     // Needed for createComposeRule, but not createAndroidComposeRule
     debugImplementation("androidx.compose.ui:ui-test-manifest") // Compose BOM
+}
+
+bundletool {
+    if (properties['keystoreFile'] != null) {
+        signingConfig {
+            storeFile = file(properties['keystoreFile'])
+            storePassword = properties['keystorePassword']
+            keyAlias = properties['keyAlias']
+            keyPassword = properties['keyPassword']
+        }
+    }
 }
