@@ -27,6 +27,20 @@ To install the app to your device:
 
 (Alternatively, do all that stuff through Android Studio.)
 
+### Release APKs
+
+To build a release APK, add the following entries to the `secrets.properties`
+file (see above):
+
+    keystoreFile=release.keystore
+    keystorePassword=***
+    keyAlias=the-key-alias
+    keyPassword=***
+
+Make sure that the `keystoreFile` path exists. Then run:
+
+    ./gradlew clean assembleRelease
+
 ## Development Tips
 
 - If you use the Android Studio emulator, make sure to enable hardware graphics

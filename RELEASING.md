@@ -20,3 +20,9 @@ Commit & tag:
 
     $ git commit -S${GPG_KEY} -m "Release v${VERSION}"
     $ git tag -s -u ${GPG_KEY} v${VERSION} -m "Version ${VERSION}"
+
+Generate a signed APK:
+
+    ./gradlew clean assembleRelease
+
+...and upload it to GitHub releases.
