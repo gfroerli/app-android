@@ -40,8 +40,8 @@ android {
         minSdkVersion 26
         targetSdk 36
         compileSdk 36
-        versionCode 18
-        versionName "1.1.0"
+        versionCode 19
+        versionName "1.1.1"
 
         buildConfigField 'String', 'GFROERLI_API_KEY_PUBLIC', '"' + properties['gfroerli_api_key_public'] + '"'
         buildConfigField 'String', 'MAPBOX_ACCESS_TOKEN', '"' + properties['mapbox_access_token'] + '"'

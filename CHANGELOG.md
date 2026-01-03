@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.1 (2026-01-03)
+
+This is a maintenance release:
+
+- [change] Target Android 16
+- [chore] Update many dependencies
+
 ## v1.1.0 (2025-07-26)
 
 - [feature] Show colored markers with temperature values directly on map (#97)

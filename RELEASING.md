@@ -23,7 +23,15 @@ Commit & tag:
 
 Generate signed release artifacts:
 
-    ./gradlew clean assembleRelease buildApksRelease
+    $ ./gradlew clean assembleRelease buildApksRelease
+
+Test the signed APK.
+
+    $ adb install app/build/outputs/apk/release/app-release.apk
+
+Push the release:
+
+    $ git push --tags
 
 For the releases:
 

@@ -1,0 +1,2 @@
+Maintenance-Release, viele Abhängigkeiten aktualisiert.
+Zudem wird die App Android 16 gebaut.
