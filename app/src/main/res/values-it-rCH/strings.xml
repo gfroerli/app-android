@@ -7,7 +7,8 @@
     <string name="loading_data">Caricamento dei dati…</string>
     <string name="section_header_3days">Misurazioni degli ultimi 3 giorni</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">Questo sensore è sponsorizzato da «%1$s».</string>
+    <string name="section_header_data_source">Fonte dati: %1$s</string>
+    <string name="sponsor_description_sponsor">Questo sensore è sponsorizzato da «%1$s».</string>
     <string name="about_project_heading">Perche quest\'app?</string>
     <string name="about_project_text1">La temperatura dell\'acqua è importante per tanti: chi nuota, chi pesca, chi fa immersioni e altri ancora. Ma finora era difficile trovare info affidabili in tempo reale in Svizzera.</string>
     <string name="about_project_text2">Stiamo creando una rete di sensori economici a basso consumo gestiti dalla comunità. Così possiamo misurare la temperatura dell\'acqua vicino a te e mostrartela quasi in tempo reale – gratis.</string>
@@ -20,6 +21,7 @@
     <string name="open_source_text1">Quest\'app è open source sotto licenza GPL! Trovi il codice su GitHub: https://github.com/gfroerli/app-android I contributi sono benvenuti!</string>
     <string name="action_about_this_app">Info sull\'app</string>
     <string name="action_refresh_all">Rinfresca tutti i dati</string>
+    <string name="sponsor_description_public_data_provider">I dati di questo sensore provengono da una fonte di dati pubblica fornita da «%1$s».</string>
     <string name="chart_no_data">Nessun dato disponibile</string>
     <string name="temperature">Temperatura</string>
     <string name="section_header_summary">Riepilogo (totale)</string>
@@ -34,4 +36,5 @@
     <string name="version_text1">Versione dell\'app %1$s (build %2$d).</string>
     <string name="placement_heading">Posizionare, richiedere o sponsorizzare nuovi sensori</string>
     <string name="placement_text1">Sei interessato a posizionare un sensore tu stesso? Conosci una buona posizione potenziale? O vorresti sponsorizzare uno o più sensori per supportare questo progetto? In tal caso, contattaci a gfroerli@coredump.ch!</string>
+    <string name="sponsor_description_partner">Questo sensore è gestito dal nostro partner «%1$s».</string>
 </resources>

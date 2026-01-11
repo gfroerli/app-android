@@ -7,7 +7,8 @@
     <string name="loading_data">Daten werden geladen…</string>
     <string name="section_header_3days">Messungen der letzten 3 Tage</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">Dieser Sensor wird von \"%1$s\" gesponsert.</string>
+    <string name="section_header_data_source">Datenquelle: %1$s</string>
+    <string name="sponsor_description_sponsor">Dieser Sensor wird von \"%1$s\" gesponsert.</string>
     <string name="about_project_heading">Warum diese App?</string>
     <string name="about_project_text1">Die Wassertemperatur ist für viele Menschen ein wichtiger Wert, zum Beispiel für Schwimmer, Taucher, Fischer und viele mehr. Aber bisher gab es kaum verlässliche Möglichkeiten, um in der Schweiz Echtzeit-Temperaturinformationen in deiner Gegend zu erhalten.</string>
     <string name="about_project_text2">Wir bauen ein Netzwerk von gemeinschaftlich betriebenen, kostengünstigen Wassertemperatur-Sensoren mit sehr geringem Energieverbrauch auf. Dies ermöglicht uns, die Wassertemperatur lokal zu messen und sie dir kostenlos in Quasi-Echtzeit anzuzeigen.</string>
@@ -20,6 +21,7 @@
     <string name="open_source_text1">Diese App ist open source unter der GPL-Lizenz! Du findest den Quellcode auf GitHub: https://github.com/gfroerli/app-android Contributions sind willkommen!</string>
     <string name="action_about_this_app">Über diese App</string>
     <string name="action_refresh_all">Alle Daten aktualisieren</string>
+    <string name="sponsor_description_public_data_provider">Die Daten dieses Sensors stammen aus einer öffentlichen Datenquelle (%1$s).</string>
     <string name="chart_no_data">Keine Daten vorhanden</string>
     <string name="temperature">Temperatur</string>
     <string name="section_header_summary">Zusammenfassung (insgesamt)</string>
@@ -34,4 +36,5 @@
     <string name="version_text1">App-Version %1$s (build %2$d).</string>
     <string name="placement_heading">Neue Sensoren platzieren, vorschlagen oder sponsern</string>
     <string name="placement_text1">Hast du Interesse daran, selbst einen Sensor zu platzieren? Kennst du einen guten potentiellen Standort? Oder möchtest du einen oder mehrere Sensoren sponsern, um dieses Projekt zu unterstützen? Dann kontaktiere uns bitte unter gfroerli@coredump.ch!</string>
+    <string name="sponsor_description_partner">Dieser Sensor wird von unserem Partner \"%1$s\" betrieben.</string>
 </resources>

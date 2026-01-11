@@ -11,6 +11,8 @@ import java.time.ZonedDateTime;
 
 import ch.coredump.watertemp.BuildConfig;
 import ch.coredump.watertemp.rest.models.ApiError;
+import ch.coredump.watertemp.rest.models.SponsorType;
+import ch.coredump.watertemp.rest.models.SponsorTypeAdapter;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,6 +31,7 @@ public class ApiClient {
                 .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'")
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(ZonedDateTime.class, GsonHelper.INSTANCE.getZDT_DESERIALIZER())
+                .registerTypeAdapter(SponsorType.class, new SponsorTypeAdapter())
                 .create();
 
         // Request interceptor (add authentication)
