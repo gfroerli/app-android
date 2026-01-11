@@ -32,13 +32,13 @@ Test the signed APK.
 Collect the release files:
 
     $ export RELEASEDIR=releases/$VERSION-$(grep -oP 'versionCode\s*=?\s*\K\d+' app/build.gradle)
-    $ mkdir -p $RELEASEDIR"
+    $ mkdir -p "$RELEASEDIR"
     $ cp -Rv app/build/outputs/{apk,apkset,bundle}/release/* $RELEASEDIR/
     $ for f in $RELEASEDIR/app-release.*; do mv "$f" "$RELEASEDIR/gfroerli-android-$VERSION.${f##*.}"; done
 
 Push the release:
 
-    $ git push --tags
+    $ git push && git push --tags
 
 For the releases:
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2 (2026-01-11)
+
+- [change] Differentiate between sponsors and public data sources (#147)
+
 ## v1.1.1 (2026-01-03)
 
 This is a maintenance release:

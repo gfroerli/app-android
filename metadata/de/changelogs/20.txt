@@ -1,0 +1,2 @@
+Angepasste Beschreibungstexte abhängig davon, ob ein Sensor von uns selber
+betrieben wird oder von einer öffentlichen Datenquelle stammt.

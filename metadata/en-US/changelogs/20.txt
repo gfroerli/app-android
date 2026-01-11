@@ -1,0 +1,2 @@
+Use appropriate description text depending on whether sensor data is provided
+by one of our own sensors, or whether it is from a public data source.
