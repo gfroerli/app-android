@@ -5,6 +5,9 @@
 Android app written in Kotlin. Displays temperature sensor data on a map
 (MapLibre SDK, map data provided by Mapbox).
 
+<a href="https://accrescent.app/"><img width="200" src="https://githubraw.com/gfroerli/app-android/main/graphics/get-it-on-accrescent.png" alt="Get it on Accrescent"></a>
+<a href="https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh"><img width="200" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play"></a>
+
 ## Building
 
 First, create a file containing the API keys. You can use either:
