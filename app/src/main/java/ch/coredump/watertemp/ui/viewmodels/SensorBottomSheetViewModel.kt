@@ -5,6 +5,7 @@ import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
 import ch.coredump.watertemp.rest.models.ApiSponsor
+import ch.coredump.watertemp.rest.models.SponsorType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.ZonedDateTime
@@ -30,6 +31,7 @@ data class Sponsor(
     val name: String,
     val description: String?,
     val logoUrl: String?,
+    val sponsorType: SponsorType,
 )
 
 data class Sensor(
@@ -114,7 +116,10 @@ class SensorBottomSheetViewModel : ViewModel() {
      */
     fun addSponsor(sponsor: ApiSponsor) {
         this.sensor.value?.let { sensor ->
-            this._sensor.value = sensor.copy(sponsor = Sponsor(sponsor.name, sponsor.description, sponsor.logoUrl))
+            this._sensor.value = sensor.copy(sponsor = Sponsor(
+                sponsor.name, sponsor.description,
+                sponsor.logoUrl, sponsor.sponsorType,
+            ))
         }
     }
 

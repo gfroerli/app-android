@@ -57,6 +57,7 @@ import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
 import ch.coredump.watertemp.rest.ApiService
+import ch.coredump.watertemp.rest.models.SponsorType
 import ch.coredump.watertemp.theme.GfroerliColorsLight
 import ch.coredump.watertemp.theme.GfroerliTypography
 import ch.coredump.watertemp.ui.viewmodels.Measurement
@@ -727,15 +728,27 @@ class MapActivity : ComponentActivity() {
 
                 // Section: Sponsor
                 sensor.sponsor?.let {
+                    val sponsorHeaderId = when (it.sponsorType) {
+                        is SponsorType.Sponsor -> R.string.section_header_sponsor
+                        else -> R.string.section_header_data_source
+                    }
                     Text(
-                        stringResource(R.string.section_header_sponsor, it.name),
+                        stringResource(sponsorHeaderId, it.name),
                         style = MaterialTheme.typography.h3,
                         modifier = Modifier.padding(0.dp, 16.dp, 0.dp, 4.dp),
                     )
+
+                    val sponsorDescriptionId = when (it.sponsorType) {
+                        is SponsorType.Sponsor -> R.string.sponsor_description_sponsor
+                        is SponsorType.Partner -> R.string.sponsor_description_partner
+                        is SponsorType.PublicDataProvider -> R.string.sponsor_description_public_data_provider
+                        is SponsorType.Unknown -> R.string.sponsor_description_sponsor
+                    }
                     Text(
-                        stringResource(R.string.sponsor_description, it.name),
+                        stringResource(sponsorDescriptionId, it.name),
                         style = MaterialTheme.typography.body1,
                     )
+
                     it.logoUrl?.let { url ->
                         GlideImage(
                             imageModel = { url },
@@ -834,7 +847,8 @@ class MapActivity : ComponentActivity() {
             Sponsor(
                 "Reynholm Industries",
                 "Our primary focus is on trending and disruptive technologies and their potential impacts on existing markets!",
-                "https://www.reynholm.industries/images/logo/logo.png"
+                "https://www.reynholm.industries/images/logo/logo.png",
+                sponsorType = SponsorType.Sponsor
             )
         ))
         MaterialTheme(

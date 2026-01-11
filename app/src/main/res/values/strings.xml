@@ -15,7 +15,10 @@
     <string name="section_header_3days">History (last 3 days)</string>
     <string name="section_header_summary">Summary (all time)</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">This sensor is sponsored by \"%1$s\".</string>
+    <string name="section_header_data_source">Data Source: %1$s</string>
+    <string name="sponsor_description_sponsor">This sensor is sponsored by \"%1$s\".</string>
+    <string name="sponsor_description_partner">This sensor is operated by our partner \"%1$s\".</string>
+    <string name="sponsor_description_public_data_provider">This sensor\'s data is obtained from a public data source provided by \"%1$s\".</string>
     <string name="chart_no_data">No data found</string>
 
     <!-- About activity -->

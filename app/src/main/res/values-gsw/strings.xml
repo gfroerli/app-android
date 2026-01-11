@@ -9,7 +9,9 @@
     <string name="section_header_3days">Mässige vode letschte 3 Täg</string>
     <string name="section_header_summary">Zämefassig (isgsamt)</string>
     <string name="section_header_sponsor">Sponsor: %1$s</string>
-    <string name="sponsor_description">Dä Sensor isch vo \"%1$s\" gsponseret.</string>
+    <string name="section_header_data_source">Datequelle: %1$s</string>
+    <string name="sponsor_description_sponsor">Dä Sensor isch vo \"%1$s\" gsponseret.</string>
+    <string name="sponsor_description_public_data_provider">D Date vo däm Sensor chöme usere öffentleche Datequelle (%1$s).</string>
     <string name="chart_no_data">Kei Date vorhande</string>
     <string name="version_heading">Version</string>
     <string name="version_text1">App-Version %1$s (build %2$d).</string>
@@ -34,4 +36,5 @@
     <string name="data_measurements">Mässige</string>
     <string name="placement_heading">Neui Sensore platziere, vorschlah oder sponsere</string>
     <string name="placement_text1">Hesch Interesse dra, säuber e Sensor z platziere? Kennsch e guete potentielle Standort? Oder möchtisch eine oder mehreri Sensore sponsere, zum üses Projekt z ungerstütze? Denn kontaktier üs bitte unger gfroerli@coredump.ch!</string>
+    <string name="sponsor_description_partner">Dä Sensor wird vo üsem Partner \"%1$s\" betriebe.</string>
 </resources>

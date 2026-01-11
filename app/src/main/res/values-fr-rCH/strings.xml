@@ -7,7 +7,8 @@
     <string name="loading_data">Chargement des données…</string>
     <string name="section_header_3days">Mesures des 3 derniers jours</string>
     <string name="section_header_sponsor">Sponsor : %1$s</string>
-    <string name="sponsor_description">Ce capteur est sponsorisé par « %1$s ».</string>
+    <string name="section_header_data_source">Source de données: %1$s</string>
+    <string name="sponsor_description_sponsor">Ce capteur est sponsorisé par « %1$s ».</string>
     <string name="about_project_heading">Pourquoi cette app ?</string>
     <string name="about_project_text1">La température de l’eau est importante pour plein de gens : nageurs, plongeurs, pêcheurs, et bien d’autres. Mais jusque-là, c’était galère de trouver des infos fiables en temps réel en Suisse.</string>
     <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau gérés par la communauté, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>
@@ -20,6 +21,7 @@
     <string name="open_source_text1">Cette app est open source sous licence GPL ! Le code est sur GitHub : https://github.com/gfroerli/app-android Les contributions sont les bienvenues !</string>
     <string name="action_about_this_app">À propos de l’app</string>
     <string name="action_refresh_all">Rafraîchis toutes les données</string>
+    <string name="sponsor_description_public_data_provider">Les données de ce capteur proviennent d\'une source de données publique fournie par « %1$s ».</string>
     <string name="chart_no_data">Aucune donnée dispo</string>
     <string name="temperature">Température</string>
     <string name="section_header_summary">Résumé (total)</string>
@@ -34,4 +36,5 @@
     <string name="version_text1">Version de l’app %1$s (build %2$d).</string>
     <string name="placement_heading">Placer, demander ou sponsoriser de nouveaux capteurs</string>
     <string name="placement_text1">Tu aimerais placer un capteur toi-même ? Tu connais un bon endroit potentiel ? Ou tu voudrais sponsoriser un ou plusieurs capteurs pour soutenir ce projet ? Dans ce cas, contacte-nous à gfroerli@coredump.ch !</string>
+    <string name="sponsor_description_partner">Ce capteur est exploité par notre partenaire « %1$s ».</string>
 </resources>
