@@ -165,7 +165,7 @@ dependencies {
     // Compose: Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0'
     // Compose: Image loading
-    implementation "com.github.skydoves:landscapist-glide:2.8.2"
+    implementation "com.github.skydoves:landscapist-glide:2.9.5"
     // Compose: Various composables (used for scrollbars)
     implementation "com.composables:core:1.49.3"
 
