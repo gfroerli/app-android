@@ -144,9 +144,6 @@ dependencies {
     implementation(platform(libs.compose.bom))
     androidTestImplementation(platform(libs.compose.bom))
 
-    // Kotlin
-    implementation(libs.kotlin.stdlib)
-
     // Support lbiraries
     implementation(libs.appcompat)
     implementation(libs.material)
