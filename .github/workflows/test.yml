@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - api-level: 27 # Note: 26 had issues with missing WebView
+          - api-level: 29 # API 29 is the minimum with reliable SwiftShader Vulkan support (required by MapLibre 13+)
             target: default
             arch: x86_64
           - api-level: 35
