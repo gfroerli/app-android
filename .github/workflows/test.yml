@@ -38,7 +38,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Download dependencies
-        run: ./gradlew androidDependencies
+        run: ./gradlew :app:dependencies
 
       - name: Run tests
         run: ./gradlew lint test

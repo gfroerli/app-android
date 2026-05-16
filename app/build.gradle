@@ -61,11 +61,6 @@ android {
         generateLocaleConfig true
     }
 
-    lintOptions {
-        // Workaround for failing "./gradlew :app:lintDebug"
-        // See https://github.com/bumptech/glide/issues/4940#issuecomment-1507581182
-        lintConfig = file("$rootDir/lint-config.xml")
-    }
 
     signingConfigs {
         if (properties['keystoreFile'] != null) {
@@ -83,7 +78,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             if (properties['keystoreFile'] != null) {
                 signingConfig signingConfigs.release
             }
