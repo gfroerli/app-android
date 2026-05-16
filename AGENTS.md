@@ -104,7 +104,7 @@ This includes:
 
 ### 5. Dependency Updates
 
-- Update `build.gradle` carefully
+- Update `build.gradle.kts` carefully
 - Test thoroughly after updates
 - Check for breaking changes
 - Update documentation if needed
