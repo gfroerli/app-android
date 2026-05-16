@@ -10,7 +10,12 @@ file at <https://github.com/gfroerli/api/>.
 
 Every sensor has a sponsor, that is shown alongside the other data.
 
-Please see the `README.md` file for more information.
+Always read `README.md` file for more information.
+
+## Distribution Targets
+
+The app is distributed via Google Play, Accrescent and GitHub. See
+`RELEASING.md` for more information.
 
 ## Build & Commands
 
@@ -63,6 +68,7 @@ This includes:
 
 - Choosing between two possible architectural approaches
 - Choosing between two libraries to use
+
 ...and similar situations.
 
 ## Common Tasks for AI Assistants
