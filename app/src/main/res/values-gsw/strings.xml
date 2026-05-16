@@ -17,7 +17,7 @@
     <string name="version_text1">App-Version %1$s (build %2$d).</string>
     <string name="about_project_heading">Warum die App?</string>
     <string name="about_project_text1">D Wassertemperatur isch für vili Lüt e wichtige Wärt, zum Bispiu für Schwümmer, Toucher, Fischer und vili meh. Aber bishär hets ider Schwiz chum e zueverlässigi Müglechkeit gä, zum Ächtzit-Temperature i dinere Gägend z gseh.</string>
-    <string name="about_project_text2">Mir boue es Netzwärch vo gmeinschaftlech betribene, günstige Wassertemperatur-Sensore mit sehr gringem Energieverbruuch uf. Das machts müglech, d Wassertemperatur lokau z mässe, und se dir gratis in Quasi-Ächtzit azzeige.</string>
+    <string name="about_project_text2">Mir boue es Netzwärch vo gmeinschaftlech betribene, günstige Wassertemperatur-Sensore mit sehr gringem Energieverbruuch uf. Das machts müglech, d Wassertemperatur lokau z mässe, und se dir gratis in Quasi-Ächtzit azzeige. (Gfrörli isch aber keis offiziells Behördeprojekt, sondern benutzt eifach öffentlech verfüegbari Date.)</string>
     <string name="about_project_text3">Zuesätzlech integriere mir ou öffentlechi Temperatur-Mässstatione (wie d Flusstemperature vom Schwizer BAFU), wenn üs das d Lizänz erloubt.</string>
     <string name="about_project_text4">Meh Informatione: https://gfrör.li/</string>
     <string name="about_us_heading">Wär het die App entwicklet?</string>

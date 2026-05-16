@@ -12,7 +12,7 @@
     <string name="about_project_heading">Pourquoi cette app ?</string>
     <string name="about_project_text1">La température de l’eau est importante pour plein de gens : nageurs, plongeurs, pêcheurs, et bien d’autres. Mais jusque-là, c’était galère de trouver des infos fiables en temps réel en Suisse.</string>
     <string name="about_project_text2">On installe un réseau de capteurs de température de l’eau gérés par la communauté, pas chers et à très basse consommation. Ça nous permet de mesurer localement et de t’afficher la température presque en temps réel, gratuitement.</string>
-    <string name="about_project_text3">En plus, on intègre des stations de mesure publiques (comme les températures des rivières de l’OFEV suisse) quand la licence nous le permet.</string>
+    <string name="about_project_text3">En plus, on intègre des stations de mesure publiques (comme les températures des rivières de l’OFEV suisse) quand la licence nous le permet. (Avertissement : Gfrörli n’est pas un projet étatique, mais un projet communautaire indépendant, sans lien avec les autorités. Nous nous contentons d’utiliser des sources de données publiques.)</string>
     <string name="about_project_text4">Plus d’infos : https://gfrör.li/</string>
     <string name="about_us_heading">Qui a créé cette app ?</string>
     <string name="about_us_text1">L’app et l’infrastructure serveur sont développées et gérées par le hackerspace Coredump à Rapperswil-Jona.</string>
