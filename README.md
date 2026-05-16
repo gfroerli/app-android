@@ -1,6 +1,7 @@
 # Gfrörli: Water Temperatures – Android App
 
-[![GitHub Actions][github-actions-badge]][github-actions]
+<a href="https://github.com/gfroerli/app-android/actions/workflows/test.yml"><img height="20" src="https://github.com/gfroerli/app-android/actions/workflows/test.yml/badge.svg" alt="Build Status"></a>
+<a href="https://shields.rbtlog.dev/ch.coredump.watertemp.zh"><img height="20" src="https://shields.rbtlog.dev/simple/ch.coredump.watertemp.zh?style=for-the-badge" alt="Reproducible Build Status"></a>
 
 The app "Gfrör.li" displays current water temperatures of Swiss lakes and
 rivers in dozends of different locations. Ideal for temperature-sensitive
@@ -72,8 +73,3 @@ should be used (as indicated by the `-rCH` regional qualifier).
 Copyright © 2016–2026 Coredump Hackerspace.
 
 Licensed under the GPLv3 or later, see `LICENSE.txt`.
-
-
-<!-- Badges -->
-[github-actions]: https://github.com/gfroerli/app-android/actions/workflows/test.yml
-[github-actions-badge]: https://github.com/gfroerli/app-android/actions/workflows/test.yml/badge.svg
