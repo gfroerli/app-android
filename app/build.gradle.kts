@@ -42,8 +42,8 @@ android {
         minSdk = 26
         targetSdk = 36
         compileSdk = 36
-        versionCode = 20
-        versionName = "1.1.2"
+        versionCode = 21
+        versionName = "1.1.3"
 
         buildConfigField("String", "GFROERLI_API_KEY_PUBLIC",
             "\"${localProperties.getProperty("gfroerli_api_key_public")}\"")
@@ -89,9 +89,23 @@ android {
 
     splits {
         abi {
-            isEnable = true
+            // Detect app bundle and conditionally disable split abis
+            // This is needed due to a "Sequence contains more than one matching element" error
+            // present since AGP 8.9.0, for more info see:
+            // https://issuetracker.google.com/issues/402800800
+
+            // AppBundle tasks contain "bundle" or "apks" in their name (e.g. buildApksRelease)
+            val isBuildingBundle = gradle.startParameter.taskNames.any {
+                val lower = it.lowercase()
+                lower.contains("bundle") || lower.contains("apks")
+            }
+
+            // Enable split ABIs unless building appBundle
+            isEnable = !isBuildingBundle
+
             reset()
             include("arm64-v8a", "armeabi-v7a", "x86_64")
+
             isUniversalApk = false
         }
     }

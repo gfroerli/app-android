@@ -36,7 +36,8 @@ Clone to a new clean directory:
 
 Generate signed release artifacts:
 
-    $ ./gradlew clean assembleRelease buildApksRelease --no-build-cache --no-configuration-cache --no-daemon
+    $ ./gradlew clean assembleRelease --no-build-cache --no-configuration-cache --no-daemon
+    $ ./gradlew buildApksRelease --no-build-cache --no-configuration-cache --no-daemon
 
 Test the signed APK.
 
