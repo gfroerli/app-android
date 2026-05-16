@@ -27,14 +27,15 @@ Generate signed release artifacts:
 
 Test the signed APK.
 
-    $ adb install app/build/outputs/apk/release/app-release.apk
+    $ adb install app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
 Collect the release files:
 
     $ export RELEASEDIR=releases/$VERSION-$(grep -oP 'versionCode\s*=?\s*\K\d+' app/build.gradle)
     $ mkdir -p "$RELEASEDIR"
     $ cp -Rv app/build/outputs/{apk,apkset,bundle}/release/* $RELEASEDIR/
-    $ for f in $RELEASEDIR/app-release.*; do mv "$f" "$RELEASEDIR/gfroerli-android-$VERSION.${f##*.}"; done
+    $ for abi in arm64-v8a armeabi-v7a x86_64; do mv "$RELEASEDIR/app-${abi}-release.apk" "$RELEASEDIR/gfroerli-android-$VERSION-${abi}.apk"; done
+    $ mv "$RELEASEDIR/app-release.apks" "$RELEASEDIR/gfroerli-android-$VERSION.apks"
 
 Push the release:
 
@@ -42,6 +43,6 @@ Push the release:
 
 For the releases:
 
-- GitHub: Upload the signed release APK file to GitHub releases
-- Google Play: Upload the signed release APK file
+- GitHub: Upload the signed per-ABI release APK files to GitHub releases
+- Google Play: Upload the signed per-ABI release APK files
 - Accrescent: Upload the signed release APKS file
