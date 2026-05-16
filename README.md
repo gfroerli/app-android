@@ -13,8 +13,9 @@ data from public measuring stations (like from the Swiss FOEN) when the license
 permits us to do so. You can find more information about the project at
 [gfrör.li](https://gfrör.li/).
 
-<a href="https://accrescent.app/app/ch.coredump.watertemp.zh"><img alt="Get it on Accrescent" src="https://accrescent.app/badges/get-it-on.png" width="200"></a>
-<a href="https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh"><img width="200" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play"></a>
+<a href="https://accrescent.app/app/ch.coredump.watertemp.zh"><img height="80" src="https://accrescent.app/badges/get-it-on.png" alt="Get it on Accrescent"></a>
+<a href="https://play.google.com/store/apps/details?id=ch.coredump.watertemp.zh"><img height="80" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play"></a>
+<a href="https://apt.izzysoft.de/fdroid/index/apk/ch.coredump.watertemp.zh"><img height="80" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it at IzzyOnDroid"></a>
 
 ## Building
 
