@@ -32,6 +32,7 @@ project should be built in a clean tree.
 Clone to a new clean directory:
 
     $ git clone . ../gfroerli-android-build
+    $ cp local.properties ../gfroerli-android-build/
     $ pushd ../gfroerli-android-build
 
 Generate signed release artifacts:

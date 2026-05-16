@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.3 (2026-05-16)
+
+- [change] Add disclaimer to about screen to state that this is not a government app
+- [change] Enable minification and resource shrinking, reducing app size (#164)
+- [change] Enable split ABI instead of universal APK (#165)
+- [chore] Upgrade many dependencies
+
 ## v1.1.2 (2026-01-11)
 
 - [change] Differentiate between sponsors and public data sources (#147)
