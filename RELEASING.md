@@ -1,5 +1,7 @@
 # Releasing
 
+## Tag Release
+
 Set variables:
 
     $ export VERSION=X.Y.Z
@@ -21,9 +23,20 @@ Commit & tag:
     $ git commit -S${GPG_KEY} -m "Release v${VERSION}"
     $ git tag -s -u ${GPG_KEY} v${VERSION} -m "Version ${VERSION}"
 
+## Build Release
+
+To [get reproducible
+releases](https://izzyondroid.org/docs/reproducibleBuilds/RBDevHints/), the
+project should be built in a clean tree.
+
+Clone to a new clean directory:
+
+    $ git clone . ../gfroerli-android-build
+    $ pushd ../gfroerli-android-build
+
 Generate signed release artifacts:
 
-    $ ./gradlew clean assembleRelease buildApksRelease
+    $ ./gradlew clean assembleRelease buildApksRelease --no-build-cache --no-configuration-cache --no-daemon
 
 Test the signed APK.
 
@@ -36,6 +49,8 @@ Collect the release files:
     $ cp -Rv app/build/outputs/{apk,apkset,bundle}/release/* $RELEASEDIR/
     $ for abi in arm64-v8a armeabi-v7a x86_64; do mv "$RELEASEDIR/app-${abi}-release.apk" "$RELEASEDIR/gfroerli-android-$VERSION-${abi}.apk"; done
     $ mv "$RELEASEDIR/app-release.apks" "$RELEASEDIR/gfroerli-android-$VERSION.apks"
+    $ popd
+    $ mv -v ../gfroerli-android-build/$RELEASEDIR releases/
 
 Push the release:
 
