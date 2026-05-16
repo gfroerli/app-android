@@ -39,3 +39,6 @@
 -keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
   *** rewind();
 }
+
+# GSON model classes: No @SerializedName used; field names drive JSON mapping via LOWER_CASE_WITH_UNDERSCORES policy
+-keep class ch.coredump.watertemp.rest.models.** { *; }
