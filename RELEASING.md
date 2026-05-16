@@ -49,7 +49,7 @@ Collect the release files:
     $ export RELEASEDIR=releases/$VERSION-$(grep -oP 'versionCode\s*=?\s*\K\d+' app/build.gradle.kts)
     $ mkdir -p "$RELEASEDIR"
     $ cp -Rv app/build/outputs/{apk,apkset,bundle}/release/* $RELEASEDIR/
-    $ for abi in arm64-v8a armeabi-v7a x86_64; do mv "$RELEASEDIR/app-${abi}-release.apk" "$RELEASEDIR/gfroerli-android-$VERSION-${abi}.apk"; done
+    $ for abi in arm64-v8a armeabi-v7a x86_64 universal; do mv "$RELEASEDIR/app-${abi}-release.apk" "$RELEASEDIR/gfroerli-android-$VERSION-${abi}.apk"; done
     $ mv "$RELEASEDIR/app-release.apks" "$RELEASEDIR/gfroerli-android-$VERSION.apks"
     $ mv "$RELEASEDIR/app-release.aab" "$RELEASEDIR/gfroerli-android-$VERSION.aab"
     $ popd
