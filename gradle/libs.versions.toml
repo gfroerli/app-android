@@ -17,7 +17,7 @@ maplibre = "13.1.0"
 maplibre-annotation = "3.0.2"
 material = "1.13.0"
 mpandroidchart = "3.1.0"
-okhttp = "5.3.2"
+okhttp = "5.4.0"
 prettytime = "5.0.9.Final"
 retrofit = "3.0.0"
 
