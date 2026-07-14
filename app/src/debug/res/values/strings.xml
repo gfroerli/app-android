@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Debug builds are installable alongside the production app,
+         so use a distinct name to tell them apart. -->
+    <string name="app_name" translatable="false">Gfrör.li (debug)</string>
+</resources>

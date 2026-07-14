@@ -77,6 +77,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Use a separate application ID for debug builds, so that they can be
+            // installed alongside the production app. The app name is overridden
+            // in src/debug/res/values/strings.xml accordingly.
+            applicationIdSuffix = ".debug"
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
