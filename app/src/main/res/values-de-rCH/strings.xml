@@ -40,4 +40,9 @@
     <string name="locate_me">Meinen Standort anzeigen</string>
     <string name="location_unavailable">Dein Standort konnte nicht ermittelt werden</string>
     <string name="location_permission_denied">Ohne Standortberechtigung kann dein Standort nicht angezeigt werden</string>
+    <string name="car_sensor_list_title">Wassertemperaturen</string>
+    <string name="car_no_sensors">Keine Sensoren mit aktuellen Messungen gefunden</string>
+    <string name="car_error_loading_sensors">Sensoren konnten nicht geladen werden. Bitte prüfe deine Internetverbindung.</string>
+    <string name="car_action_retry">Nochmals versuchen</string>
+    <string name="car_action_navigate">Navigieren</string>
 </resources>

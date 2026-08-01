@@ -54,6 +54,22 @@ Make sure that the `keystoreFile` path exists. Then run:
 
     ./gradlew clean assembleRelease
 
+## Android Auto
+
+The app includes an Android Auto integration that shows nearby water
+temperatures and lets you navigate to a sensor location.
+
+Note that Google requires apps built with the Android for Cars App Library to
+be installed through Google Play: If the app was installed through Accrescent,
+GitHub or IzzyOnDroid, it will not show up in Android Auto. Unlike for media
+apps, this cannot be bypassed with the "Unknown sources" developer setting
+([docs](https://developer.android.com/training/cars/testing#unknown-sources)).
+
+For development, test the car app with the [Desktop Head Unit
+(DHU)](https://developer.android.com/training/cars/testing/dhu), which does
+run sideloaded builds. To test in a real car, the app must be installed
+through Google Play (e.g. from the internal testing track).
+
 ## Development Tips
 
 - If you use the Android Studio emulator, make sure to enable hardware graphics

@@ -59,4 +59,11 @@
     <string name="data_sponsors">sponsors</string>
     <!-- Shown in "fetching data failed" error message -->
     <string name="data_measurements">measurements</string>
+
+    <!-- Android Auto -->
+    <string name="car_sensor_list_title">Water Temperatures</string>
+    <string name="car_no_sensors">No sensors with recent measurements found</string>
+    <string name="car_error_loading_sensors">Could not load sensors. Please check your internet connection.</string>
+    <string name="car_action_retry">Retry</string>
+    <string name="car_action_navigate">Navigate</string>
 </resources>

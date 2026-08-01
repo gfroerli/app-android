@@ -6,6 +6,7 @@ import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
 import ch.coredump.watertemp.rest.ApiClient
+import ch.coredump.watertemp.rest.SensorRepository
 import ch.coredump.watertemp.rest.models.ApiMeasurement
 import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSensorDetails
@@ -17,7 +18,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 
 /**
  * Handles API response callbacks for the MapActivity
@@ -65,16 +65,12 @@ class MapActivityApiHandler(
                 // Prepare list for sensor IDs
                 val idList = ArrayList<String>()
 
-                // Extract sensor information
+                // Extract sensor information, ignoring sensors without a fresh measurement
                 val now = ZonedDateTime.now()
-                for (sensor in response.body()!!) {
-                    if (sensor.latestMeasurementAt != null && ChronoUnit.DAYS.between(sensor.latestMeasurementAt, now) < 3) {
-                        Log.d(TAG, "Adding sensor " + sensor.id)
-                        mapData.addSensor(sensor)
-                        idList.add(sensor.id.toString())
-                    } else {
-                        Log.d(TAG, "Ignoring sensor " + sensor.id + " (missing or outdated measurement)")
-                    }
+                for (sensor in SensorRepository.filterFreshSensors(response.body()!!, now)) {
+                    Log.d(TAG, "Adding sensor " + sensor.id)
+                    mapData.addSensor(sensor)
+                    idList.add(sensor.id.toString())
                 }
 
                 updateMapMarkers()

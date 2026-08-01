@@ -40,4 +40,9 @@
     <string name="locate_me">Mi Standort azeige</string>
     <string name="location_unavailable">Di Standort het nid chönne ermittlet wärde</string>
     <string name="location_permission_denied">Ohni Standort-Berächtigung cha dr Standort nid azeigt wärde</string>
+    <string name="car_sensor_list_title">Wassertemperature</string>
+    <string name="car_no_sensors">Kei Sensore mit aktuelle Mässige gfunge</string>
+    <string name="car_error_loading_sensors">D Sensore hei nid chönne glade wärde. Bitte kontrollier dini Internet-Verbindig.</string>
+    <string name="car_action_retry">Nomau probiere</string>
+    <string name="car_action_navigate">Navigiere</string>
 </resources>

@@ -40,4 +40,9 @@
     <string name="locate_me">Afficher ma position</string>
     <string name="location_unavailable">Impossible de déterminer ta position</string>
     <string name="location_permission_denied">Sans autorisation de localisation, ta position ne peut pas être affichée</string>
+    <string name="car_sensor_list_title">Températures de l’eau</string>
+    <string name="car_no_sensors">Aucun capteur avec des mesures récentes</string>
+    <string name="car_error_loading_sensors">On n’a pas réussi à charger les capteurs. Vérifie ta connexion internet.</string>
+    <string name="car_action_retry">Réessayer</string>
+    <string name="car_action_navigate">Naviguer</string>
 </resources>
