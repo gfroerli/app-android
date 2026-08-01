@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -48,6 +49,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -57,7 +59,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
@@ -687,25 +692,62 @@ class MapActivity : ComponentActivity() {
 
     @Composable
     private fun Map(modifier: Modifier = Modifier) {
+        val mapView = rememberMapView()
         AndroidView(
             modifier = modifier,
-            factory = { context ->
-                // Initialize maplibre
-                MapLibre.getInstance(
-                    context,
-                    BuildConfig.MAPBOX_ACCESS_TOKEN,
-                    WellKnownTileServer.Mapbox
-                )
-                val mapOptions = MapLibreMapOptions.createFromAttributes(context)
-                    .logoEnabled(false)
-                    .attributionMargins(intArrayOf(10, 10, 10, 10))
-                MapView(context, mapOptions).apply {
-                    getMapAsync { map ->
-                        onMapReady(map, this)
-                    }
-                }
-            },
+            factory = { mapView },
         )
+    }
+
+    /**
+     * Create the map view and forward the activity lifecycle events to it.
+     *
+     * The map view requires these events. Without them, it tears down and
+     * re-initializes itself (visible as a short flicker and a map reload)
+     * whenever the app returns to the foreground.
+     */
+    @Composable
+    private fun rememberMapView(): MapView {
+        val context = LocalContext.current
+        val mapView = remember {
+            // Initialize maplibre
+            MapLibre.getInstance(
+                context,
+                BuildConfig.MAPBOX_ACCESS_TOKEN,
+                WellKnownTileServer.Mapbox
+            )
+            val mapOptions = MapLibreMapOptions.createFromAttributes(context)
+                .logoEnabled(false)
+                .attributionMargins(intArrayOf(10, 10, 10, 10))
+            MapView(context, mapOptions).apply {
+                getMapAsync { map ->
+                    onMapReady(map, this)
+                }
+            }
+        }
+
+        val lifecycle = LocalLifecycleOwner.current.lifecycle
+        DisposableEffect(lifecycle, mapView) {
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
+                    Lifecycle.Event.ON_START -> mapView.onStart()
+                    Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                    Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                    Lifecycle.Event.ON_STOP -> mapView.onStop()
+                    else -> {}
+                }
+            }
+            lifecycle.addObserver(observer)
+
+            // The map view is destroyed together with the composition
+            onDispose {
+                lifecycle.removeObserver(observer)
+                mapView.onDestroy()
+            }
+        }
+
+        return mapView
     }
 
     /**
