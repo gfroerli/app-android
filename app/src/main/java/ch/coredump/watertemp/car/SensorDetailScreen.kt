@@ -1,7 +1,6 @@
 package ch.coredump.watertemp.car
 
 import android.content.Intent
-import android.net.Uri
 import androidx.car.app.CarContext
 import androidx.core.net.toUri
 import androidx.car.app.Screen
@@ -54,7 +53,7 @@ class SensorDetailScreen(
      * Hand off to the car's navigation app.
      */
     private fun navigateToSensor() {
-        val uri = "geo:0,0?q=${sensor.latitude},${sensor.longitude}(${Uri.encode(sensor.deviceName)})".toUri()
+        val uri = "geo:${sensor.latitude},${sensor.longitude}".toUri()
         carContext.startCarApp(Intent(CarContext.ACTION_NAVIGATE, uri))
     }
 }
