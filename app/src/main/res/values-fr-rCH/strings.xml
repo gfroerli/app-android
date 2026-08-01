@@ -37,4 +37,7 @@
     <string name="placement_heading">Placer, demander ou sponsoriser de nouveaux capteurs</string>
     <string name="placement_text1">Tu aimerais placer un capteur toi-même ? Tu connais un bon endroit potentiel ? Ou tu voudrais sponsoriser un ou plusieurs capteurs pour soutenir ce projet ? Dans ce cas, contacte-nous à gfroerli@coredump.ch !</string>
     <string name="sponsor_description_partner">Ce capteur est exploité par notre partenaire « %1$s ».</string>
+    <string name="locate_me">Afficher ma position</string>
+    <string name="location_unavailable">Impossible de déterminer ta position</string>
+    <string name="location_permission_denied">Sans autorisation de localisation, ta position ne peut pas être affichée</string>
 </resources>

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- [feature] Add a "locate me" button to the map, which shows your position and
+  centers the map on it
+
 ## v1.1.4 (2026-05-16)
 
 - [change] Add disclaimer to about screen to state that this is not a government app

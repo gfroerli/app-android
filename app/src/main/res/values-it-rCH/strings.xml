@@ -37,4 +37,7 @@
     <string name="placement_heading">Posizionare, richiedere o sponsorizzare nuovi sensori</string>
     <string name="placement_text1">Sei interessato a posizionare un sensore tu stesso? Conosci una buona posizione potenziale? O vorresti sponsorizzare uno o più sensori per supportare questo progetto? In tal caso, contattaci a gfroerli@coredump.ch!</string>
     <string name="sponsor_description_partner">Questo sensore è gestito dal nostro partner «%1$s».</string>
+    <string name="locate_me">Mostra la mia posizione</string>
+    <string name="location_unavailable">Non è stato possibile determinare la tua posizione</string>
+    <string name="location_permission_denied">Senza l\'autorizzazione alla posizione, la tua posizione non può essere mostrata</string>
 </resources>

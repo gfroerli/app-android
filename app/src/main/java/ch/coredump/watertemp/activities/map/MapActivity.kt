@@ -2,9 +2,11 @@ package ch.coredump.watertemp.activities.map
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,9 +28,13 @@ import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -135,6 +141,21 @@ class MapActivity : ComponentActivity() {
     // API response handler
     private lateinit var apiHandler: MapActivityApiHandler
 
+    // User location handler
+    private lateinit var mapLocation: MapActivityLocation
+
+    // Permission request for the "locate me" button
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grantResults ->
+        if (grantResults.values.any { it }) {
+            map?.let { mapLocation.locateMe(it) }
+        } else {
+            Log.d(TAG, "Location permission denied")
+            Toast.makeText(this, R.string.location_permission_denied, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -148,6 +169,9 @@ class MapActivity : ComponentActivity() {
 
         // Initialize data holder
         mapData = MapData()
+
+        // Initialize user location handler
+        mapLocation = MapActivityLocation(this)
 
         // Initialize the layout
         setContent {
@@ -171,6 +195,7 @@ class MapActivity : ComponentActivity() {
 
     override fun onDestroy() {
         symbolManager?.onDestroy()
+        mapLocation.cancelPendingFix()
         super.onDestroy()
     }
 
@@ -235,12 +260,33 @@ class MapActivity : ComponentActivity() {
         settings.isTiltGesturesEnabled = false
         settings.isCompassEnabled = false
 
+        // Show the user's position, if the permission was already granted
+        mapLocation.activateLocationComponent(mapLibreMap, style)
+
         // Fetch initial data only after everything is set up
         if (!mapData.hasSensors()) {
             this.fetchInitialData()
         } else {
             // If we already have sensor data, just update the markers
             updateMarkers()
+        }
+    }
+
+    /**
+     * Center the map on the user's position, called by the "locate me" button.
+     *
+     * Asks for the location permission if it was not granted yet.
+     */
+    private fun onLocateMeClicked() {
+        val map = this.map
+        if (map == null) {
+            Log.d(TAG, "Map not ready yet")
+            return
+        }
+        if (mapLocation.hasPermission()) {
+            mapLocation.locateMe(map)
+        } else {
+            locationPermissionLauncher.launch(MapActivityLocation.PERMISSIONS)
         }
     }
 
@@ -524,6 +570,15 @@ class MapActivity : ComponentActivity() {
 
                         // Note: The progress indicator intentionally overlays the content
                         this@MapActivity.progressCounter.Composable()
+
+                        // Button to center the map on the user's position.
+                        // It is shifted up to stay clear of the bottom sheet.
+                        LocateMeButton(
+                            Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp)
+                                .padding(bottom = bottomSheetPeekHeight)
+                        )
                     }
                 },
 
@@ -592,6 +647,24 @@ class MapActivity : ComponentActivity() {
             backgroundColor = MaterialTheme.colors.primary,
             actions = menu.topAppBarActions(showMenu),
         )
+    }
+
+    /**
+     * A floating button that centers the map on the user's position.
+     */
+    @Composable
+    private fun LocateMeButton(modifier: Modifier = Modifier) {
+        FloatingActionButton(
+            onClick = { onLocateMeClicked() },
+            modifier = modifier,
+            backgroundColor = MaterialTheme.colors.surface,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.MyLocation,
+                contentDescription = stringResource(id = R.string.locate_me),
+                tint = MaterialTheme.colors.onSurface,
+            )
+        }
     }
 
     @Composable
