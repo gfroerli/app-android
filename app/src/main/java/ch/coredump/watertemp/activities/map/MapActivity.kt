@@ -144,6 +144,9 @@ class MapActivity : ComponentActivity() {
     // User location handler
     private lateinit var mapLocation: MapActivityLocation
 
+    // Persistence of the map camera position
+    private lateinit var cameraStore: MapCameraStore
+
     // Permission request for the "locate me" button
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -173,6 +176,9 @@ class MapActivity : ComponentActivity() {
         // Initialize user location handler
         mapLocation = MapActivityLocation(this)
 
+        // Initialize camera position store
+        cameraStore = MapCameraStore(this)
+
         // Initialize the layout
         setContent {
             RootComposable(bottomSheetViewModel)
@@ -193,6 +199,12 @@ class MapActivity : ComponentActivity() {
         apiService = apiClient.apiService
     }
 
+    override fun onPause() {
+        // Remember the camera position, to restore it on the next app start
+        map?.let { cameraStore.save(it.cameraPosition) }
+        super.onPause()
+    }
+
     override fun onDestroy() {
         symbolManager?.onDestroy()
         mapLocation.cancelPendingFix()
@@ -208,16 +220,22 @@ class MapActivity : ComponentActivity() {
         mapLibreMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
 
-            // Set up bounding box for Switzerland
-            val boundingBoxBuilder = LatLngBounds.Builder()
-            boundingBoxBuilder.include(LatLng(47.80845, 8.56803)) // CH N
-            boundingBoxBuilder.include(LatLng(46.61296, 10.49219)) // CH E
-            boundingBoxBuilder.include(LatLng(45.81796, 9.01734)) // CH S
-            boundingBoxBuilder.include(LatLng(46.13236, 5.95590)) // CH W
-            val boundingBox = boundingBoxBuilder.build()
+            // Restore the camera position from the previous app run. On the first run,
+            // show all of Switzerland instead.
+            val storedCameraPosition = cameraStore.load()
+            val cameraUpdate = if (storedCameraPosition != null) {
+                CameraUpdateFactory.newCameraPosition(storedCameraPosition)
+            } else {
+                // Set up bounding box for Switzerland
+                val boundingBoxBuilder = LatLngBounds.Builder()
+                boundingBoxBuilder.include(LatLng(47.80845, 8.56803)) // CH N
+                boundingBoxBuilder.include(LatLng(46.61296, 10.49219)) // CH E
+                boundingBoxBuilder.include(LatLng(45.81796, 9.01734)) // CH S
+                boundingBoxBuilder.include(LatLng(46.13236, 5.95590)) // CH W
 
-            // Set camera to fit the bounding box with padding
-            val cameraUpdate = CameraUpdateFactory.newLatLngBounds(boundingBox, 100)
+                // Fit the bounding box with padding
+                CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100)
+            }
             mapLibreMap.moveCamera(cameraUpdate)
 
             initializeMapStyle(mapLibreMap, mapView, style)
