@@ -50,6 +50,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -709,6 +711,7 @@ class MapActivity : ComponentActivity() {
     @Composable
     private fun rememberMapView(): MapView {
         val context = LocalContext.current
+        val mapBackgroundColor = colorResource(R.color.mapBackground).toArgb()
         val mapView = remember {
             // Initialize maplibre
             MapLibre.getInstance(
@@ -719,6 +722,10 @@ class MapActivity : ComponentActivity() {
             val mapOptions = MapLibreMapOptions.createFromAttributes(context)
                 .logoEnabled(false)
                 .attributionMargins(intArrayOf(10, 10, 10, 10))
+                // The surface view loses its surface when the app is sent to the
+                // background, so the map is re-rendered when reopening the app. Use a
+                // background color that matches the map style, to make this less jarring.
+                .foregroundLoadColor(mapBackgroundColor)
             MapView(context, mapOptions).apply {
                 getMapAsync { map ->
                     onMapReady(map, this)
