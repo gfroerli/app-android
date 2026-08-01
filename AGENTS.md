@@ -45,6 +45,7 @@ The app is distributed via Google Play, Accrescent and GitHub. See
 - Keep API models in `rest/models/` package
 - Avoid deeply nested logic by using early returns for error cases
 - Write clean, high-quality code with concise comments and clear variable names
+- When adding explanations for @SuppressLint, add them _after_ the annotation, not above
 
 ## Testing
 

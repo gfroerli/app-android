@@ -1,6 +1,7 @@
 package ch.coredump.watertemp.car
 
 import android.location.Location
+import android.location.LocationListener
 import android.util.Log
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
@@ -15,6 +16,8 @@ import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.PlaceMarker
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.activities.map.MarkerType
 import ch.coredump.watertemp.rest.SensorRepository
@@ -41,6 +44,17 @@ class SensorListScreen(
     private var location: Location? = null
     private var loadFailed = false
 
+    /**
+     * The sensors in the order they are shown. Frozen as soon as the position is
+     * known: Rows that reorder while driving are hard to follow, and every reorder
+     * counts against the number of templates the host allows per task, while
+     * updating only the distances counts as a refresh.
+     */
+    private var displayOrder: List<ApiSensor>? = null
+
+    /** Set while subscribed to position updates. */
+    private var locationListener: LocationListener? = null
+
     init {
         if (CarLocationProvider.hasPermission(carContext)) {
             fetchLocation()
@@ -48,15 +62,28 @@ class SensorListScreen(
             CarLocationProvider.requestPermission(carContext) { granted ->
                 if (granted) {
                     fetchLocation()
+                    startLocationUpdates()
                 }
             }
         }
         loadSensors()
+
+        // Keep the distances up to date while the screen is shown
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                startLocationUpdates()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                stopLocationUpdates()
+            }
+        })
     }
 
     private fun loadSensors() {
         loadFailed = false
         sensors = null
+        displayOrder = null
         invalidate()
         repository.loadFreshSensors { result ->
             result.fold(
@@ -80,6 +107,21 @@ class SensorListScreen(
                 invalidate()
             }
         }
+    }
+
+    private fun startLocationUpdates() {
+        if (locationListener != null || !CarLocationProvider.hasPermission(carContext)) {
+            return
+        }
+        locationListener = CarLocationProvider.startLocationUpdates(carContext) { newLocation ->
+            location = newLocation
+            invalidate()
+        }
+    }
+
+    private fun stopLocationUpdates() {
+        locationListener?.let { CarLocationProvider.stopLocationUpdates(carContext, it) }
+        locationListener = null
     }
 
     override fun onGetTemplate(): Template {
@@ -109,11 +151,7 @@ class SensorListScreen(
 
     private fun sensorListTemplate(sensors: List<ApiSensor>): Template {
         val location = this.location
-        val sorted = if (location != null) {
-            sensors.sortedBy { distanceMeters(location, it) }
-        } else {
-            sensors.sortedBy { it.deviceName.lowercase() }
-        }
+        val sorted = sensorsInDisplayOrder(sensors, location)
 
         // Respect the row limit of the car host
         val limit = carContext.getCarService(ConstraintManager::class.java)
@@ -130,20 +168,33 @@ class SensorListScreen(
         if (location != null) {
             builder.setCurrentLocationEnabled(true)
         }
-        if (shown.isNotEmpty()) {
-            // Anchor the map at the centroid of the shown sensors. The host adapts the
-            // camera to keep the anchor and the visible rows' markers in the viewport,
-            // so without an anchor it may zoom in on a single marker.
-            builder.setAnchor(
-                Place.Builder(
-                    CarLocation.create(
-                        shown.mapNotNull { it.latitude }.average(),
-                        shown.mapNotNull { it.longitude }.average(),
-                    )
-                ).build()
-            )
+
+        // The host keeps the anchor and the markers of the currently visible rows in
+        // the viewport. Anchoring at the user's position keeps the map centered on the
+        // surroundings, also while scrolling through rows.
+        val anchor = when {
+            location != null -> CarLocation.create(location.latitude, location.longitude)
+            // Fall back to the first sensor, so that the map shows an actual location
+            shown.isNotEmpty() -> CarLocation.create(shown[0].latitude!!, shown[0].longitude!!)
+            else -> null
+        }
+        if (anchor != null) {
+            builder.setAnchor(Place.Builder(anchor).build())
         }
         return builder.build()
+    }
+
+    /**
+     * Order the sensors by distance, or by name as long as no position is known.
+     *
+     * The order is remembered as soon as a position is known, see [displayOrder].
+     */
+    private fun sensorsInDisplayOrder(sensors: List<ApiSensor>, location: Location?): List<ApiSensor> {
+        displayOrder?.let { return it }
+        if (location == null) {
+            return sensors.sortedBy { it.deviceName.lowercase() }
+        }
+        return sensors.sortedBy { distanceMeters(location, it) }.also { displayOrder = it }
     }
 
     private fun sensorRow(sensor: ApiSensor, location: Location?, number: Int): Row {

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
@@ -39,6 +40,15 @@ object CarLocationProvider {
     private const val MAX_CACHED_POSITION_AGE_MS = 10 * 60 * 1000L
 
     /**
+     * Minimal time and distance between two position updates.
+     *
+     * Distances to a lake don't need meter precision, so update sparingly. At
+     * highway speed, 500 m are covered in about 15 seconds.
+     */
+    private const val UPDATE_INTERVAL_MS = 15 * 1000L
+    private const val UPDATE_DISTANCE_M = 500f
+
+    /**
      * Whether the user granted permission to access the location.
      */
     fun hasPermission(context: Context): Boolean = PERMISSIONS.any {
@@ -62,8 +72,7 @@ object CarLocationProvider {
      * with an outdated cached position, then with the current one once it is available.
      * It is invoked with null if no position could be determined at all.
      */
-    // Permission is checked through hasPermission() before this is called
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission") // Permission is checked through hasPermission() before this is called
     fun getCurrentLocation(context: Context, onResult: (Location?) -> Unit) {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val providers = PROVIDERS.filter { locationManager.isProviderEnabled(it) }
@@ -104,6 +113,45 @@ object CarLocationProvider {
                 onResult(null)
             }
         }
+    }
+
+    /**
+     * Continuously report the position, to keep the distances up to date while
+     * driving. Returns the listener to pass to [stopLocationUpdates], or null if no
+     * location provider is enabled. Requires the location permission.
+     */
+    @SuppressLint("MissingPermission") // Permission is checked through hasPermission() before this is called
+    fun startLocationUpdates(context: Context, onLocation: (Location) -> Unit): LocationListener? {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val providers = PROVIDERS.filter { locationManager.isProviderEnabled(it) }
+        if (providers.isEmpty()) {
+            Log.w(TAG, "No location provider enabled")
+            return null
+        }
+
+        // Subscribe to all providers, since a single one may not deliver updates
+        // (e.g. no GPS reception in a tunnel)
+        val listener = LocationListener { onLocation(it) }
+        for (provider in providers) {
+            locationManager.requestLocationUpdates(
+                provider,
+                UPDATE_INTERVAL_MS,
+                UPDATE_DISTANCE_M,
+                listener,
+                Looper.getMainLooper(),
+            )
+        }
+        Log.d(TAG, "Started position updates from $providers")
+        return listener
+    }
+
+    /**
+     * Stop the position updates started with [startLocationUpdates].
+     */
+    fun stopLocationUpdates(context: Context, listener: LocationListener) {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.removeUpdates(listener)
+        Log.d(TAG, "Stopped position updates")
     }
 
     /**
