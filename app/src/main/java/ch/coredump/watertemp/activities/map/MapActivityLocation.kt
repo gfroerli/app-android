@@ -31,7 +31,11 @@ class MapActivityLocation(private val activity: ComponentActivity) {
     companion object {
         private const val TAG = "MapActivityLocation"
 
-        /** Zoom level used when centering the map on the user's position. */
+        /**
+         * Zoom level used when centering the map on the user's position.
+         *
+         * If the map is already zoomed in further, the zoom level is kept.
+         */
         private const val LOCATE_ME_ZOOM = 10.0
 
         /** Duration of the camera animation in milliseconds. */
@@ -187,13 +191,16 @@ class MapActivityLocation(private val activity: ComponentActivity) {
 
     private fun moveCameraTo(map: MapLibreMap, location: Location) {
         Log.d(TAG, "Centering map on user position")
-        map.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(location.latitude, location.longitude),
-                LOCATE_ME_ZOOM,
-            ),
-            CAMERA_ANIMATION_MS,
-        )
+        val target = LatLng(location.latitude, location.longitude)
+
+        // Keep the zoom level if the user already zoomed in further
+        val cameraUpdate = if (map.cameraPosition.zoom > LOCATE_ME_ZOOM) {
+            CameraUpdateFactory.newLatLng(target)
+        } else {
+            CameraUpdateFactory.newLatLngZoom(target, LOCATE_ME_ZOOM)
+        }
+
+        map.animateCamera(cameraUpdate, CAMERA_ANIMATION_MS)
     }
 
     private fun showLocationUnavailable() {
