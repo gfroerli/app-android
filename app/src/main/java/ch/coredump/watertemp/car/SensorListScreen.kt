@@ -358,7 +358,9 @@ class SensorListScreen(
         val location = this.location
         val sorted = sensorsInDisplayOrder(sensors, location)
 
-        // Show the closest sensors, but never more rows than the car host allows
+        // Show the closest sensors, but never more rows than the car host allows.
+        // Note that the ConstraintManager requires car API level 2, but falls back to a
+        // default limit on older hosts, so this does not raise our minCarApiLevel.
         val limit = carContext.getCarService(ConstraintManager::class.java)
             .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_PLACE_LIST)
         val showPermissionWarning = !CarLocationProvider.hasPermission(carContext)

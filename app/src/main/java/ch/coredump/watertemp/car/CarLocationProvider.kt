@@ -72,11 +72,15 @@ object CarLocationProvider {
     }
 
     /**
-     * Fetch the current position asynchronously. Requires the location permission.
+     * Fetch the current position. Requires the location permission.
      *
      * To avoid making the user wait for a fix, [onResult] may be invoked twice: First
      * with an outdated cached position, then with the current one once it is available.
      * It is invoked with null if no position could be determined at all.
+     *
+     * Note that [onResult] is invoked synchronously whenever the answer is known right
+     * away (a cached position, or no enabled provider at all), and only asynchronously
+     * on the main thread when a provider has to be queried first.
      */
     @SuppressLint("MissingPermission") // Permission is checked through hasPermission() before this is called
     fun getCurrentLocation(context: Context, onResult: (Location?) -> Unit) {
@@ -159,7 +163,12 @@ object CarLocationProvider {
     }
 
     /**
-     * Request a position from the first provider that returns one.
+     * Request a position from the first provider that returns one, falling back to the
+     * remaining ones otherwise.
+     *
+     * [onResult] is invoked asynchronously on the main thread, once a provider reported
+     * back. The exception is an empty [providers] list, the base case of the recursion,
+     * where it is invoked synchronously with null.
      */
     @SuppressLint("MissingPermission")
     private fun requestPosition(
