@@ -2,9 +2,11 @@ package ch.coredump.watertemp.activities.map
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,12 +28,17 @@ import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -42,6 +49,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -51,7 +61,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import ch.coredump.watertemp.BuildConfig
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.Utils
@@ -135,6 +148,24 @@ class MapActivity : ComponentActivity() {
     // API response handler
     private lateinit var apiHandler: MapActivityApiHandler
 
+    // User location handler
+    private lateinit var mapLocation: MapActivityLocation
+
+    // Persistence of the map camera position
+    private lateinit var cameraStore: MapCameraStore
+
+    // Permission request for the "locate me" button
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grantResults ->
+        if (grantResults.values.any { it }) {
+            map?.let { mapLocation.locateMe(it) }
+        } else {
+            Log.d(TAG, "Location permission denied")
+            Toast.makeText(this, R.string.location_permission_denied, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -148,6 +179,12 @@ class MapActivity : ComponentActivity() {
 
         // Initialize data holder
         mapData = MapData()
+
+        // Initialize user location handler
+        mapLocation = MapActivityLocation(this)
+
+        // Initialize camera position store
+        cameraStore = MapCameraStore(this)
 
         // Initialize the layout
         setContent {
@@ -169,8 +206,15 @@ class MapActivity : ComponentActivity() {
         apiService = apiClient.apiService
     }
 
+    override fun onPause() {
+        // Remember the camera position, to restore it on the next app start
+        map?.let { cameraStore.save(it.cameraPosition) }
+        super.onPause()
+    }
+
     override fun onDestroy() {
         symbolManager?.onDestroy()
+        mapLocation.cancelPendingFix()
         super.onDestroy()
     }
 
@@ -183,16 +227,22 @@ class MapActivity : ComponentActivity() {
         mapLibreMap.setStyle(Style.getPredefinedStyle("OUTDOORS")) { style ->
             Log.d(TAG, "Style loaded")
 
-            // Set up bounding box for Switzerland
-            val boundingBoxBuilder = LatLngBounds.Builder()
-            boundingBoxBuilder.include(LatLng(47.80845, 8.56803)) // CH N
-            boundingBoxBuilder.include(LatLng(46.61296, 10.49219)) // CH E
-            boundingBoxBuilder.include(LatLng(45.81796, 9.01734)) // CH S
-            boundingBoxBuilder.include(LatLng(46.13236, 5.95590)) // CH W
-            val boundingBox = boundingBoxBuilder.build()
+            // Restore the camera position from the previous app run. On the first run,
+            // show all of Switzerland instead.
+            val storedCameraPosition = cameraStore.load()
+            val cameraUpdate = if (storedCameraPosition != null) {
+                CameraUpdateFactory.newCameraPosition(storedCameraPosition)
+            } else {
+                // Set up bounding box for Switzerland
+                val boundingBoxBuilder = LatLngBounds.Builder()
+                boundingBoxBuilder.include(LatLng(47.80845, 8.56803)) // CH N
+                boundingBoxBuilder.include(LatLng(46.61296, 10.49219)) // CH E
+                boundingBoxBuilder.include(LatLng(45.81796, 9.01734)) // CH S
+                boundingBoxBuilder.include(LatLng(46.13236, 5.95590)) // CH W
 
-            // Set camera to fit the bounding box with padding
-            val cameraUpdate = CameraUpdateFactory.newLatLngBounds(boundingBox, 100)
+                // Fit the bounding box with padding
+                CameraUpdateFactory.newLatLngBounds(boundingBoxBuilder.build(), 100)
+            }
             mapLibreMap.moveCamera(cameraUpdate)
 
             initializeMapStyle(mapLibreMap, mapView, style)
@@ -235,12 +285,33 @@ class MapActivity : ComponentActivity() {
         settings.isTiltGesturesEnabled = false
         settings.isCompassEnabled = false
 
+        // Show the user's position, if the permission was already granted
+        mapLocation.activateLocationComponent(mapLibreMap, style)
+
         // Fetch initial data only after everything is set up
         if (!mapData.hasSensors()) {
             this.fetchInitialData()
         } else {
             // If we already have sensor data, just update the markers
             updateMarkers()
+        }
+    }
+
+    /**
+     * Center the map on the user's position, called by the "locate me" button.
+     *
+     * Asks for the location permission if it was not granted yet.
+     */
+    private fun onLocateMeClicked() {
+        val map = this.map
+        if (map == null) {
+            Log.d(TAG, "Map not ready yet")
+            return
+        }
+        if (mapLocation.hasPermission()) {
+            mapLocation.locateMe(map)
+        } else {
+            locationPermissionLauncher.launch(MapActivityLocation.PERMISSIONS)
         }
     }
 
@@ -524,6 +595,15 @@ class MapActivity : ComponentActivity() {
 
                         // Note: The progress indicator intentionally overlays the content
                         this@MapActivity.progressCounter.Composable()
+
+                        // Button to center the map on the user's position.
+                        // It is shifted up to stay clear of the bottom sheet.
+                        LocateMeButton(
+                            Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp)
+                                .padding(bottom = bottomSheetPeekHeight)
+                        )
                     }
                 },
 
@@ -594,27 +674,87 @@ class MapActivity : ComponentActivity() {
         )
     }
 
+    /**
+     * A floating button that centers the map on the user's position.
+     */
+    @Composable
+    private fun LocateMeButton(modifier: Modifier = Modifier) {
+        FloatingActionButton(
+            onClick = { onLocateMeClicked() },
+            modifier = modifier,
+            backgroundColor = MaterialTheme.colors.surface,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.MyLocation,
+                contentDescription = stringResource(id = R.string.locate_me),
+                tint = MaterialTheme.colors.onSurface,
+            )
+        }
+    }
+
     @Composable
     private fun Map(modifier: Modifier = Modifier) {
+        val mapView = rememberMapView()
         AndroidView(
             modifier = modifier,
-            factory = { context ->
-                // Initialize maplibre
-                MapLibre.getInstance(
-                    context,
-                    BuildConfig.MAPBOX_ACCESS_TOKEN,
-                    WellKnownTileServer.Mapbox
-                )
-                val mapOptions = MapLibreMapOptions.createFromAttributes(context)
-                    .logoEnabled(false)
-                    .attributionMargins(intArrayOf(10, 10, 10, 10))
-                MapView(context, mapOptions).apply {
-                    getMapAsync { map ->
-                        onMapReady(map, this)
-                    }
-                }
-            },
+            factory = { mapView },
         )
+    }
+
+    /**
+     * Create the map view and forward the activity lifecycle events to it.
+     *
+     * The map view requires these events. Without them, it tears down and
+     * re-initializes itself (visible as a short flicker and a map reload)
+     * whenever the app returns to the foreground.
+     */
+    @Composable
+    private fun rememberMapView(): MapView {
+        val context = LocalContext.current
+        val mapBackgroundColor = colorResource(R.color.mapBackground).toArgb()
+        val mapView = remember {
+            // Initialize maplibre
+            MapLibre.getInstance(
+                context,
+                BuildConfig.MAPBOX_ACCESS_TOKEN,
+                WellKnownTileServer.Mapbox
+            )
+            val mapOptions = MapLibreMapOptions.createFromAttributes(context)
+                .logoEnabled(false)
+                .attributionMargins(intArrayOf(10, 10, 10, 10))
+                // The surface view loses its surface when the app is sent to the
+                // background, so the map is re-rendered when reopening the app. Use a
+                // background color that matches the map style, to make this less jarring.
+                .foregroundLoadColor(mapBackgroundColor)
+            MapView(context, mapOptions).apply {
+                getMapAsync { map ->
+                    onMapReady(map, this)
+                }
+            }
+        }
+
+        val lifecycle = LocalLifecycleOwner.current.lifecycle
+        DisposableEffect(lifecycle, mapView) {
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_CREATE -> mapView.onCreate(null)
+                    Lifecycle.Event.ON_START -> mapView.onStart()
+                    Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                    Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                    Lifecycle.Event.ON_STOP -> mapView.onStop()
+                    else -> {}
+                }
+            }
+            lifecycle.addObserver(observer)
+
+            // The map view is destroyed together with the composition
+            onDispose {
+                lifecycle.removeObserver(observer)
+                mapView.onDestroy()
+            }
+        }
+
+        return mapView
     }
 
     /**

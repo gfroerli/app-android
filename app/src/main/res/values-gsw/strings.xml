@@ -37,4 +37,7 @@
     <string name="placement_heading">Neui Sensore platziere, vorschlah oder sponsere</string>
     <string name="placement_text1">Hesch Interesse dra, säuber e Sensor z platziere? Kennsch e guete potentielle Standort? Oder möchtisch eine oder mehreri Sensore sponsere, zum üses Projekt z ungerstütze? Denn kontaktier üs bitte unger gfroerli@coredump.ch!</string>
     <string name="sponsor_description_partner">Dä Sensor wird vo üsem Partner \"%1$s\" betriebe.</string>
+    <string name="locate_me">Mi Standort azeige</string>
+    <string name="location_unavailable">Di Standort het nid chönne ermittlet wärde</string>
+    <string name="location_permission_denied">Ohni Standort-Berächtigung cha dr Standort nid azeigt wärde</string>
 </resources>
