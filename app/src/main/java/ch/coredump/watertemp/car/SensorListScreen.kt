@@ -375,8 +375,10 @@ class SensorListScreen(
         val itemList = ItemList.Builder()
             .setNoItemsMessage(carContext.getString(R.string.car_no_sensors))
 
-        // Explain why the sensors are not sorted by distance
-        if (showPermissionWarning) {
+        // Explain why the sensors are not sorted by distance. Not for an empty list,
+        // where the sort order is meaningless and the row would take the place of the
+        // "no sensors" message.
+        if (showPermissionWarning && sorted.isNotEmpty()) {
             itemList.addItem(permissionWarningRow())
         }
 
