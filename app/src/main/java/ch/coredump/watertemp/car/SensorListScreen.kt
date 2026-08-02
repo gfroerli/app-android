@@ -165,7 +165,10 @@ class SensorListScreen(
         }
 
         val builder = listTemplateBuilder().setItemList(itemList.build())
-        if (location != null) {
+
+        // The host shows the current position itself, it only requires the permission.
+        // In particular this does not depend on us having determined a position.
+        if (CarLocationProvider.hasPermission(carContext)) {
             builder.setCurrentLocationEnabled(true)
         }
 
