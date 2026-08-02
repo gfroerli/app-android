@@ -54,7 +54,7 @@ Make sure that the `keystoreFile` path exists. Then run:
 
     ./gradlew clean assembleRelease
 
-## Android Auto
+## Android Auto (Experimental)
 
 The app includes an Android Auto integration that shows nearby water
 temperatures and lets you navigate to a sensor location.
