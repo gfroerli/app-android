@@ -49,6 +49,12 @@ object CarLocationProvider {
     private const val UPDATE_DISTANCE_M = 500f
 
     /**
+     * Whether the position is up to date, as opposed to an outdated cached one.
+     */
+    fun isUpToDate(location: Location): Boolean =
+        System.currentTimeMillis() - location.time < MAX_CACHED_POSITION_AGE_MS
+
+    /**
      * Whether the user granted permission to access the location.
      */
     fun hasPermission(context: Context): Boolean = PERMISSIONS.any {
@@ -87,9 +93,7 @@ object CarLocationProvider {
         val cachedPosition = providers
             .mapNotNull { locationManager.getLastKnownLocation(it) }
             .maxByOrNull { it.time }
-        if (cachedPosition != null &&
-            System.currentTimeMillis() - cachedPosition.time < MAX_CACHED_POSITION_AGE_MS
-        ) {
+        if (cachedPosition != null && isUpToDate(cachedPosition)) {
             Log.d(TAG, "Using cached position from ${cachedPosition.provider}")
             onResult(cachedPosition)
             return

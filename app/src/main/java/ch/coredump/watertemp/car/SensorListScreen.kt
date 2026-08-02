@@ -2,6 +2,8 @@ package ch.coredump.watertemp.car
 
 import android.location.Location
 import android.location.LocationListener
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
@@ -37,6 +39,22 @@ class SensorListScreen(
 
     companion object {
         private const val TAG = "SensorListScreen"
+
+        /**
+         * How many sensors to show at most.
+         *
+         * The host only shows the markers of the currently visible rows, so a long
+         * list means that most sensors are missing from the map. It also keeps the
+         * template small enough to be sent to the host in a single binder
+         * transaction, which is size limited.
+         */
+        private const val MAX_SENSORS = 20
+
+        /**
+         * Give up waiting for a position after this time, and show the list without
+         * distances instead.
+         */
+        private const val LOCATION_TIMEOUT_MS = 20 * 1000L
     }
 
     /** Fetched sensors (only ones with coordinates), or null while loading. */
@@ -55,7 +73,20 @@ class SensorListScreen(
     /** Set while subscribed to position updates. */
     private var locationListener: LocationListener? = null
 
+    /**
+     * Whether we're still waiting for a first position. Until then the list is not
+     * shown, since it could not be sorted by distance yet.
+     */
+    private var waitingForLocation = true
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val locationTimeout = Runnable {
+        Log.d(TAG, "No position determined, showing the list without distances")
+        stopWaitingForLocation()
+    }
+
     init {
+        handler.postDelayed(locationTimeout, LOCATION_TIMEOUT_MS)
         if (CarLocationProvider.hasPermission(carContext)) {
             fetchLocation()
         } else {
@@ -63,6 +94,9 @@ class SensorListScreen(
                 if (granted) {
                     fetchLocation()
                     startLocationUpdates()
+                } else {
+                    // Without permission there is no position to wait for
+                    stopWaitingForLocation()
                 }
             }
         }
@@ -77,7 +111,17 @@ class SensorListScreen(
             override fun onStop(owner: LifecycleOwner) {
                 stopLocationUpdates()
             }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                handler.removeCallbacks(locationTimeout)
+            }
         })
+    }
+
+    private fun stopWaitingForLocation() {
+        handler.removeCallbacks(locationTimeout)
+        waitingForLocation = false
+        invalidate()
     }
 
     private fun loadSensors() {
@@ -101,11 +145,11 @@ class SensorListScreen(
 
     private fun fetchLocation() {
         CarLocationProvider.getCurrentLocation(carContext) { newLocation ->
-            // Show the list without distances if no location is available
+            // Show the list without distances if no position could be determined
             if (newLocation != null) {
                 location = newLocation
-                invalidate()
             }
+            stopWaitingForLocation()
         }
     }
 
@@ -115,7 +159,7 @@ class SensorListScreen(
         }
         locationListener = CarLocationProvider.startLocationUpdates(carContext) { newLocation ->
             location = newLocation
-            invalidate()
+            stopWaitingForLocation()
         }
     }
 
@@ -128,7 +172,13 @@ class SensorListScreen(
         if (loadFailed) {
             return errorTemplate()
         }
-        val sensors = this.sensors ?: return listTemplateBuilder().setLoading(true).build()
+        val sensors = this.sensors
+
+        // Keep loading until the position is known: Without it, the list would show
+        // arbitrary sensors instead of the closest ones.
+        if (sensors == null || (location == null && waitingForLocation)) {
+            return listTemplateBuilder().setLoading(true).build()
+        }
         return sensorListTemplate(sensors)
     }
 
@@ -153,10 +203,10 @@ class SensorListScreen(
         val location = this.location
         val sorted = sensorsInDisplayOrder(sensors, location)
 
-        // Respect the row limit of the car host
+        // Show the closest sensors, but never more than the car host allows
         val limit = carContext.getCarService(ConstraintManager::class.java)
             .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_PLACE_LIST)
-        val shown = sorted.take(limit)
+        val shown = sorted.take(minOf(limit, MAX_SENSORS))
 
         val itemList = ItemList.Builder()
             .setNoItemsMessage(carContext.getString(R.string.car_no_sensors))
@@ -197,7 +247,15 @@ class SensorListScreen(
         if (location == null) {
             return sensors.sortedBy { it.deviceName.lowercase() }
         }
-        return sensors.sortedBy { distanceMeters(location, it) }.also { displayOrder = it }
+
+        val ordered = sensors.sortedBy { distanceMeters(location, it) }
+
+        // Only keep this order if the position is up to date. An outdated cached
+        // position may be far away, which would freeze the wrong sensors into the list.
+        if (CarLocationProvider.isUpToDate(location)) {
+            displayOrder = ordered
+        }
+        return ordered
     }
 
     private fun sensorRow(sensor: ApiSensor, location: Location?, number: Int): Row {
