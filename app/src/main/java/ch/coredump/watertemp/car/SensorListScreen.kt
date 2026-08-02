@@ -19,6 +19,7 @@ import androidx.car.app.model.PlaceMarker
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.activities.map.MarkerType
@@ -122,6 +123,8 @@ class SensorListScreen(
 
             override fun onDestroy(owner: LifecycleOwner) {
                 handler.removeCallbacks(locationTimeout)
+                // Usually already done in onStop(), but not if the screen was never started
+                stopLocationUpdates()
             }
         })
     }
@@ -161,10 +164,25 @@ class SensorListScreen(
         }
     }
 
+    /**
+     * Subscribe to position updates, unless already subscribed.
+     *
+     * Only subscribe while the screen is shown: The permission may be granted after
+     * the screen was stopped, and in that case there is no [stopLocationUpdates] left
+     * to unsubscribe. Position updates are started again in onStart().
+     */
     private fun startLocationUpdates() {
+        // Only start updates if permission was granted
         if (locationListener != null || !CarLocationProvider.hasPermission(carContext)) {
             return
         }
+
+        // Do not subscribe if screen is not shown anymore
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            return
+        }
+
+        // Subscribe to updates
         locationListener = CarLocationProvider.startLocationUpdates(carContext) { newLocation ->
             location = newLocation
             stopWaitingForLocation()
