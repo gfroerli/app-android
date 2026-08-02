@@ -67,6 +67,21 @@ class SensorListScreen(
          * that happened to be closest when the app was started.
          */
         private const val REFRESH_DISTANCE_M = 10 * 1000f
+
+        /** How often the sensor data is reloaded while the screen is shown. */
+        private const val REFRESH_INTERVAL_MS = 60 * 1000L
+    }
+
+    /** How a sensor load affects what is currently on screen. */
+    private enum class LoadMode {
+        /** Initial load or retry: Show the loading indicator, report failures. */
+        INITIAL,
+
+        /** Periodic reload: Only update the values of the rows, keeping their order. */
+        REFRESH,
+
+        /** Reload after moving: Also sort the rows for the new position. */
+        RESORT,
     }
 
     /** Fetched sensors (only ones with coordinates), or null while loading. */
@@ -108,6 +123,14 @@ class SensorListScreen(
         stopWaitingForLocation()
     }
 
+    /** Reloads the sensor data every [REFRESH_INTERVAL_MS] while the screen is shown. */
+    private val refreshTimer = object : Runnable {
+        override fun run() {
+            loadSensors(LoadMode.REFRESH)
+            handler.postDelayed(this, REFRESH_INTERVAL_MS)
+        }
+    }
+
     init {
         handler.postDelayed(locationTimeout, LOCATION_TIMEOUT_MS)
         if (CarLocationProvider.hasPermission(carContext)) {
@@ -132,18 +155,21 @@ class SensorListScreen(
         }
         loadSensors()
 
-        // Keep the distances up to date while the screen is shown
+        // Keep the distances and the sensor data up to date while the screen is shown
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 startLocationUpdates()
+                handler.postDelayed(refreshTimer, REFRESH_INTERVAL_MS)
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 stopLocationUpdates()
+                handler.removeCallbacks(refreshTimer)
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
                 handler.removeCallbacks(locationTimeout)
+                handler.removeCallbacks(refreshTimer)
                 // Usually already done in onStop(), but not if the screen was never started
                 stopLocationUpdates()
             }
@@ -159,15 +185,22 @@ class SensorListScreen(
     /**
      * Fetch the sensors and show them sorted by distance.
      *
-     * A [background] reload keeps the current list on screen until the new sensors
-     * arrive, and keeps it on failure as well: The list is useful even when slightly
-     * outdated, and losing it to a dropped connection (e.g. in a tunnel) would be
-     * more annoying than helpful while driving.
+     * A reload in the background (any [mode] other than [LoadMode.INITIAL]) keeps the
+     * current list on screen until the new sensors arrive, and keeps it on failure as
+     * well: The list is useful even when slightly outdated, and losing it to a dropped
+     * connection (e.g. in a tunnel) would be more annoying than helpful while driving.
+     * The template is rebuilt in any case, so the relative measurement times keep
+     * counting up even while the data cannot be reloaded.
      */
-    private fun loadSensors(background: Boolean = false) {
-        loadFailed = false
-        refreshing = background
-        if (!background) {
+    private fun loadSensors(mode: LoadMode = LoadMode.INITIAL) {
+        // Don't pile up requests if one is already on its way
+        if (mode != LoadMode.INITIAL && refreshing) {
+            return
+        }
+
+        refreshing = mode != LoadMode.INITIAL
+        if (mode == LoadMode.INITIAL) {
+            loadFailed = false
             sensors = null
             displayOrder = null
             displayOrderLocation = null
@@ -177,20 +210,42 @@ class SensorListScreen(
             refreshing = false
             result.fold(
                 onSuccess = { fresh ->
-                    sensors = fresh.filter { it.latitude != null && it.longitude != null }
-                    // Sort the new sensors for the current position
-                    displayOrder = null
-                    displayOrderLocation = null
+                    val loaded = fresh.filter { it.latitude != null && it.longitude != null }
+                    sensors = loaded
+                    // A background reload recovers from a failed initial load
+                    loadFailed = false
+                    if (mode == LoadMode.REFRESH) {
+                        applyToDisplayOrder(loaded)
+                    } else {
+                        // Sort the new sensors for the current position
+                        displayOrder = null
+                        displayOrderLocation = null
+                    }
                 },
                 onFailure = { t ->
                     Log.e(TAG, "Fetching sensors failed: $t")
-                    if (!background) {
+                    if (mode == LoadMode.INITIAL) {
                         loadFailed = true
                     }
                 },
             )
             invalidate()
         }
+    }
+
+    /**
+     * Update the frozen [displayOrder] with the reloaded sensors, so that the rows show
+     * the new values without jumping around.
+     *
+     * Sensors whose measurements went stale drop out of the list. Newly added ones are
+     * appended, they are sorted in with the next re-sort.
+     */
+    private fun applyToDisplayOrder(loaded: List<ApiSensor>) {
+        val order = displayOrder ?: return
+        val loadedById = loaded.associateBy { it.id }
+        val ordered = order.mapNotNull { loadedById[it.id] }
+        val orderedIds = ordered.mapTo(HashSet()) { it.id }
+        displayOrder = ordered + loaded.filter { it.id !in orderedIds }
     }
 
     /**
@@ -213,7 +268,7 @@ class SensorListScreen(
             return
         }
         Log.d(TAG, "Moved ${moved.roundToInt()} m since sorting the list, reloading sensors")
-        loadSensors(background = true)
+        loadSensors(LoadMode.RESORT)
     }
 
     private fun fetchLocation() {

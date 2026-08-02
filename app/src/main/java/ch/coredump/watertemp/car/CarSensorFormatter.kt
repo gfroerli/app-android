@@ -51,10 +51,10 @@ object CarSensorFormatter {
         }
 
     /**
-     * Build the secondary text line of a sensor list row, e.g. "1.2 km · 21.3 °C · 2 hours ago".
+     * Build the secondary text line of a sensor list row, e.g. "21.3 °C · 1.2 km".
      *
-     * The distance part is omitted if [distanceMeters] is null, the temperature part is
-     * colored based on the temperature and the measurement age part uses relative time.
+     * The temperature comes first and is colored based on its value, falling back to a
+     * "no measurement" text. The distance is omitted if [distanceMeters] is null.
      */
     fun rowText(context: Context, sensor: ApiSensor, distanceMeters: Float?): CharSequence {
         val builder = SpannableStringBuilder()
