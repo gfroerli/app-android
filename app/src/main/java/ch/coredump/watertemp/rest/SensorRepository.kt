@@ -2,6 +2,7 @@ package ch.coredump.watertemp.rest
 
 import ch.coredump.watertemp.Config
 import ch.coredump.watertemp.rest.models.ApiSensor
+import ch.coredump.watertemp.rest.models.ApiSponsor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,6 +37,29 @@ class SensorRepository(private val apiService: ApiService) {
             }
 
             override fun onFailure(call: Call<List<ApiSensor>>, t: Throwable) {
+                onResult(Result.failure(t))
+            }
+        })
+    }
+
+    /**
+     * Fetch the sponsor of a sensor.
+     *
+     * The [onResult] callback is invoked on the main thread.
+     */
+    fun loadSponsor(sensorId: Int, onResult: (Result<ApiSponsor>) -> Unit) {
+        apiService.getSponsor(sensorId).enqueue(object : Callback<ApiSponsor> {
+            override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
+                val sponsor = response.body()
+                if (!response.isSuccessful || sponsor == null) {
+                    val error = ApiClient.parseError(response)
+                    onResult(Result.failure(ApiException(error.statusCode, error.message)))
+                    return
+                }
+                onResult(Result.success(sponsor))
+            }
+
+            override fun onFailure(call: Call<ApiSponsor>, t: Throwable) {
                 onResult(Result.failure(t))
             }
         })

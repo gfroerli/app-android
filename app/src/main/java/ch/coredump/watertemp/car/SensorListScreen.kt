@@ -224,7 +224,9 @@ class SensorListScreen(
                     )
                     .build()
             )
-            .setOnClickListener { screenManager.push(SensorDetailScreen(carContext, sensor)) }
+            .setOnClickListener {
+                screenManager.push(SensorDetailScreen(carContext, sensor, repository))
+            }
 
         // Second text line: how old the measurement is. The template allows two.
         CarSensorFormatter.measuredAt(sensor.latestMeasurementAt)?.let {
