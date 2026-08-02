@@ -25,6 +25,7 @@ import ch.coredump.watertemp.R
 import ch.coredump.watertemp.activities.map.MarkerType
 import ch.coredump.watertemp.rest.SensorRepository
 import ch.coredump.watertemp.rest.models.ApiSensor
+import kotlin.math.roundToInt
 
 /**
  * Main Android Auto screen: a map with the sensor locations, next to a list of
@@ -59,6 +60,13 @@ class SensorListScreen(
          * distances instead.
          */
         private const val LOCATION_TIMEOUT_MS = 20 * 1000L
+
+        /**
+         * Reload the sensors once the user moved this far from the position the list
+         * was sorted for. Without that, a long drive would keep showing the sensors
+         * that happened to be closest when the app was started.
+         */
+        private const val REFRESH_DISTANCE_M = 10 * 1000f
     }
 
     /** Fetched sensors (only ones with coordinates), or null while loading. */
@@ -71,8 +79,16 @@ class SensorListScreen(
      * known: Rows that reorder while driving are hard to follow, and every reorder
      * counts against the number of templates the host allows per task, while
      * updating only the distances counts as a refresh.
+     *
+     * The order is renewed after moving [REFRESH_DISTANCE_M], see [refreshIfMovedFar].
      */
     private var displayOrder: List<ApiSensor>? = null
+
+    /** The position that [displayOrder] was sorted for. */
+    private var displayOrderLocation: Location? = null
+
+    /** Whether sensors are currently being reloaded in the background. */
+    private var refreshing = false
 
     /** Set while subscribed to position updates. */
     private var locationListener: LocationListener? = null
@@ -140,23 +156,64 @@ class SensorListScreen(
         invalidate()
     }
 
-    private fun loadSensors() {
+    /**
+     * Fetch the sensors and show them sorted by distance.
+     *
+     * A [background] reload keeps the current list on screen until the new sensors
+     * arrive, and keeps it on failure as well: The list is useful even when slightly
+     * outdated, and losing it to a dropped connection (e.g. in a tunnel) would be
+     * more annoying than helpful while driving.
+     */
+    private fun loadSensors(background: Boolean = false) {
         loadFailed = false
-        sensors = null
-        displayOrder = null
-        invalidate()
+        refreshing = background
+        if (!background) {
+            sensors = null
+            displayOrder = null
+            displayOrderLocation = null
+            invalidate()
+        }
         repository.loadFreshSensors { result ->
+            refreshing = false
             result.fold(
                 onSuccess = { fresh ->
                     sensors = fresh.filter { it.latitude != null && it.longitude != null }
+                    // Sort the new sensors for the current position
+                    displayOrder = null
+                    displayOrderLocation = null
                 },
                 onFailure = { t ->
                     Log.e(TAG, "Fetching sensors failed: $t")
-                    loadFailed = true
+                    if (!background) {
+                        loadFailed = true
+                    }
                 },
             )
             invalidate()
         }
+    }
+
+    /**
+     * Reload the sensors once the user moved [REFRESH_DISTANCE_M] from the position
+     * the list was sorted for, so that the list keeps showing the sensors nearby (with
+     * up-to-date temperatures) instead of the ones near the start of the drive.
+     */
+    private fun refreshIfMovedFar(newLocation: Location) {
+        // Return if already refreshing
+        if (refreshing) {
+            return
+        }
+
+        // Only relevant once a position was determined and the list sorted for it
+        val sortedFor = displayOrderLocation ?: return
+
+        // Reload sensors when having moved
+        val moved = sortedFor.distanceTo(newLocation)
+        if (moved < REFRESH_DISTANCE_M) {
+            return
+        }
+        Log.d(TAG, "Moved ${moved.roundToInt()} m since sorting the list, reloading sensors")
+        loadSensors(background = true)
     }
 
     private fun fetchLocation() {
@@ -191,6 +248,7 @@ class SensorListScreen(
         locationListener = CarLocationProvider.startLocationUpdates(carContext) { newLocation ->
             location = newLocation
             stopWaitingForLocation()
+            refreshIfMovedFar(newLocation)
         }
     }
 
@@ -365,6 +423,7 @@ class SensorListScreen(
         // position may be far away, which would freeze the wrong sensors into the list.
         if (CarLocationProvider.isUpToDate(location)) {
             displayOrder = ordered
+            displayOrderLocation = location
         }
         return ordered
     }
