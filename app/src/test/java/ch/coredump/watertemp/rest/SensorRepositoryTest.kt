@@ -16,7 +16,7 @@ import java.time.ZonedDateTime
 class SensorRepositoryTest {
     private val now: ZonedDateTime = ZonedDateTime.of(2026, 7, 14, 12, 0, 0, 0, ZoneOffset.UTC)
 
-    private fun sensor(id: Int, latestMeasurementAt: ZonedDateTime?) = ApiSensor(
+    private fun sensor(id: Int, latestMeasurementAt: ZonedDateTime?, sponsorId: Int? = null) = ApiSensor(
         id = id,
         deviceName = "Sensor $id",
         caption = null,
@@ -24,7 +24,15 @@ class SensorRepositoryTest {
         longitude = 8.8184,
         latestTemperature = 20.5f,
         latestMeasurementAt = latestMeasurementAt,
-        sponsorId = null,
+        sponsorId = sponsorId,
+    )
+
+    private fun sponsor() = ApiSponsor(
+        id = 1,
+        name = "Coredump",
+        description = null,
+        logoUrl = null,
+        sponsorType = SponsorType.Sponsor,
     )
 
     @Test
@@ -64,7 +72,8 @@ class SensorRepositoryTest {
      */
     private fun loadSponsor(response: Response<ApiSponsor>): Result<ApiSponsor> {
         var result: Result<ApiSponsor>? = null
-        SensorRepository(FakeApiService(Calls.response(response))).loadSponsor(1) {
+        val sensor = sensor(1, now, sponsorId = 9)
+        SensorRepository(FakeApiService(Calls.response(response))).loadSponsor(sensor) {
             result = it
         }
         return checkNotNull(result) { "The callback was not invoked" }
@@ -95,26 +104,44 @@ class SensorRepositoryTest {
 
     @Test
     fun `sponsor is returned on success`() {
-        val sponsor = ApiSponsor(
-            id = 1,
-            name = "Coredump",
-            description = null,
-            logoUrl = null,
-            sponsorType = SponsorType.Sponsor,
-        )
-
-        val result = loadSponsor(Response.success(sponsor))
+        val result = loadSponsor(Response.success(sponsor()))
 
         Assert.assertEquals("Coredump", result.getOrNull()?.name)
+    }
+
+    @Test
+    fun `sponsor is queried with the sensor id, not the sponsor id`() {
+        val service = FakeApiService(Calls.response(Response.success(sponsor())))
+
+        SensorRepository(service).loadSponsor(sensor(7, now, sponsorId = 42)) {}
+
+        Assert.assertEquals(listOf(7), service.requestedSensorIds)
+    }
+
+    @Test
+    fun `sensor without a sponsor is not requested`() {
+        val service = FakeApiService(Calls.response(Response.success(sponsor())))
+        var called = false
+
+        SensorRepository(service).loadSponsor(sensor(1, now, sponsorId = null)) { called = true }
+
+        Assert.assertTrue(service.requestedSensorIds.isEmpty())
+        Assert.assertFalse("The callback should not be invoked", called)
     }
 }
 
 /**
- * An [ApiService] that returns a canned sponsor call. The other endpoints are not
- * used by these tests.
+ * An [ApiService] that returns a canned sponsor call and records the IDs it was queried
+ * with. The other endpoints are not used by these tests.
  */
 private class FakeApiService(private val call: Call<ApiSponsor>) : ApiService {
-    override fun getSponsor(sensorId: Int) = call
+    val requestedSensorIds = mutableListOf<Int>()
+
+    override fun getSponsor(sensorId: Int): Call<ApiSponsor> {
+        requestedSensorIds += sensorId
+        return call
+    }
+
     override fun listSensors() = TODO()
     override fun getSensorDetails(sensorId: Int) = TODO()
     override fun listMeasurementsSince(sensorId: Int, createdAfter: Instant) = TODO()

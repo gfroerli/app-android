@@ -43,12 +43,15 @@ class SensorRepository(private val apiService: ApiService) {
     }
 
     /**
-     * Fetch the sponsor of a sensor.
+     * Fetch the sponsor of a [sensor]. Does nothing for sensors without a sponsor.
      *
      * The [onResult] callback is invoked on the main thread.
      */
-    fun loadSponsor(sensorId: Int, onResult: (Result<ApiSponsor>) -> Unit) {
-        apiService.getSponsor(sensorId).enqueue(object : Callback<ApiSponsor> {
+    fun loadSponsor(sensor: ApiSensor, onResult: (Result<ApiSponsor>) -> Unit) {
+        if (sensor.sponsorId == null) {
+            return
+        }
+        apiService.getSponsor(sensor.id).enqueue(object : Callback<ApiSponsor> {
             override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
                 // Handle non-success status codes
                 if (!response.isSuccessful) {

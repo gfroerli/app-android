@@ -38,12 +38,7 @@ class SensorDetailScreen(
     }
 
     private fun loadSponsor() {
-        // Skip the request for sensors without a sponsor. Note that the endpoint is
-        // queried with the sensor ID, not with the sponsor ID.
-        if (sensor.sponsorId == null) {
-            return
-        }
-        repository.loadSponsor(sensor.id) { result ->
+        repository.loadSponsor(sensor) { result ->
             result.fold(
                 onSuccess = {
                     sponsor = it
