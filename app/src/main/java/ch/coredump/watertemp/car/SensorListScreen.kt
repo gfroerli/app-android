@@ -99,7 +99,12 @@ class SensorListScreen(
         } else {
             requestingPermission = true
             CarLocationProvider.requestPermission(carContext) { granted ->
+                // Replace the hint telling the user to grant the permission. Fetching
+                // the position usually reports back immediately (and invalidates), but
+                // not if the system has no cached position yet, e.g. after a reboot.
                 requestingPermission = false
+                invalidate()
+
                 if (granted) {
                     fetchLocation()
                     startLocationUpdates()
