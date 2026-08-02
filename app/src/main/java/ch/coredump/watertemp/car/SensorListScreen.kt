@@ -41,14 +41,17 @@ class SensorListScreen(
         private const val TAG = "SensorListScreen"
 
         /**
-         * How many sensors to show at most.
+         * How many rows to show at most.
          *
          * The host only shows the markers of the currently visible rows, so a long
          * list means that most sensors are missing from the map. It also keeps the
          * template small enough to be sent to the host in a single binder
          * transaction, which is size limited.
+         *
+         * Note that the hint rows count towards this limit, so usually 20 sensors
+         * are shown next to the hint about the remaining ones.
          */
-        private const val MAX_SENSORS = 20
+        private const val MAX_ROWS = 21
 
         /**
          * Give up waiting for a position after this time, and show the list without
@@ -79,6 +82,9 @@ class SensorListScreen(
      */
     private var waitingForLocation = true
 
+    /** Whether the permission dialog is currently shown on the phone. */
+    private var requestingPermission = false
+
     private val handler = Handler(Looper.getMainLooper())
     private val locationTimeout = Runnable {
         Log.d(TAG, "No position determined, showing the list without distances")
@@ -90,7 +96,9 @@ class SensorListScreen(
         if (CarLocationProvider.hasPermission(carContext)) {
             fetchLocation()
         } else {
+            requestingPermission = true
             CarLocationProvider.requestPermission(carContext) { granted ->
+                requestingPermission = false
                 if (granted) {
                     fetchLocation()
                     startLocationUpdates()
@@ -172,6 +180,11 @@ class SensorListScreen(
         if (loadFailed) {
             return errorTemplate()
         }
+        // The permission dialog is shown on the phone, so tell the user to look there
+        if (requestingPermission && waitingForLocation) {
+            return permissionHintTemplate()
+        }
+
         val sensors = this.sensors
 
         // Keep loading until the position is known: Without it, the list would show
@@ -186,6 +199,12 @@ class SensorListScreen(
         PlaceListMapTemplate.Builder()
             .setTitle(carContext.getString(R.string.car_sensor_list_title))
             .setHeaderAction(Action.APP_ICON)
+
+    private fun permissionHintTemplate(): Template =
+        MessageTemplate.Builder(carContext.getString(R.string.car_location_permission_hint))
+            .setTitle(carContext.getString(R.string.car_sensor_list_title))
+            .setHeaderAction(Action.APP_ICON)
+            .build()
 
     private fun errorTemplate(): Template =
         MessageTemplate.Builder(carContext.getString(R.string.car_error_loading_sensors))
@@ -203,15 +222,34 @@ class SensorListScreen(
         val location = this.location
         val sorted = sensorsInDisplayOrder(sensors, location)
 
-        // Show the closest sensors, but never more than the car host allows
+        // Show the closest sensors, but never more rows than the car host allows
         val limit = carContext.getCarService(ConstraintManager::class.java)
             .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_PLACE_LIST)
-        val shown = sorted.take(minOf(limit, MAX_SENSORS))
+        val showPermissionWarning = !CarLocationProvider.hasPermission(carContext)
+        val maxRows = minOf(limit, MAX_ROWS)
+        val availableRows = (maxRows - if (showPermissionWarning) 1 else 0).coerceAtLeast(1)
+
+        // If not all sensors fit, keep a row free for the hint about the missing ones
+        val shown = if (sorted.size > availableRows) {
+            sorted.take(availableRows - 1)
+        } else {
+            sorted
+        }
 
         val itemList = ItemList.Builder()
             .setNoItemsMessage(carContext.getString(R.string.car_no_sensors))
+
+        // Explain why the sensors are not sorted by distance
+        if (showPermissionWarning) {
+            itemList.addItem(permissionWarningRow())
+        }
+
         for ((index, sensor) in shown.withIndex()) {
             itemList.addItem(sensorRow(sensor, location, number = index + 1))
+        }
+
+        if (shown.size < sorted.size) {
+            itemList.addItem(moreSensorsRow(shown.size, sorted.size))
         }
 
         val builder = listTemplateBuilder().setItemList(itemList.build())
@@ -236,6 +274,56 @@ class SensorListScreen(
         }
         return builder.build()
     }
+
+    /**
+     * A row warning that the location permission is missing, leading to a screen
+     * that explains the consequences.
+     *
+     * Note that the row must be browsable: The template requires a distance on all
+     * other rows, which we cannot show without the permission.
+     */
+    private fun permissionWarningRow(): Row =
+        Row.Builder()
+            .setTitle(carContext.getString(R.string.car_location_permission_denied))
+            .addText(carContext.getString(R.string.car_location_permission_denied_short))
+            .setBrowsable(true)
+            .setOnClickListener {
+                screenManager.push(
+                    MessageScreen(
+                        carContext,
+                        title = carContext.getString(R.string.car_location_permission_denied),
+                        message = carContext.getString(R.string.car_location_permission_denied_text),
+                    )
+                )
+            }
+            .build()
+
+    /**
+     * A row telling that the list was shortened, leading to a screen that explains
+     * where the remaining sensors can be seen.
+     *
+     * Like [permissionWarningRow], this row must be browsable, since it has no
+     * distance to show.
+     */
+    private fun moreSensorsRow(shownCount: Int, totalCount: Int): Row =
+        Row.Builder()
+            .setTitle(carContext.getString(R.string.car_more_sensors))
+            .addText(carContext.getString(R.string.car_more_sensors_short, shownCount, totalCount))
+            .setBrowsable(true)
+            .setOnClickListener {
+                screenManager.push(
+                    MessageScreen(
+                        carContext,
+                        title = carContext.getString(R.string.car_more_sensors),
+                        message = carContext.getString(
+                            R.string.car_more_sensors_text,
+                            shownCount,
+                            totalCount,
+                        ),
+                    )
+                )
+            }
+            .build()
 
     /**
      * Order the sensors by distance, or by name as long as no position is known.

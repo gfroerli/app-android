@@ -63,6 +63,13 @@
     <!-- Android Auto -->
     <string name="car_sensor_list_title">Water Temperatures</string>
     <string name="car_no_sensors">No sensors with recent measurements found</string>
+    <string name="car_location_permission_hint">Please allow access to your location on your phone</string>
+    <string name="car_location_permission_denied">No location permission</string>
+    <string name="car_location_permission_denied_short">Sensors cannot be sorted by distance</string>
+    <string name="car_location_permission_denied_text">Grant the location permission on your phone to sort sensors by distance.</string>
+    <string name="car_more_sensors">Not all sensors shown</string>
+    <string name="car_more_sensors_short">%1$d of %2$d sensors</string>
+    <string name="car_more_sensors_text">Only the first %1$d of %2$d sensors are shown. The phone app shows all of them.</string>
     <string name="car_error_loading_sensors">Could not load sensors. Please check your internet connection.</string>
     <string name="car_action_retry">Retry</string>
     <string name="car_action_navigate">Navigate</string>
