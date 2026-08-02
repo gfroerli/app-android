@@ -50,10 +50,17 @@ class SensorRepository(private val apiService: ApiService) {
     fun loadSponsor(sensorId: Int, onResult: (Result<ApiSponsor>) -> Unit) {
         apiService.getSponsor(sensorId).enqueue(object : Callback<ApiSponsor> {
             override fun onResponse(call: Call<ApiSponsor>, response: Response<ApiSponsor>) {
-                val sponsor = response.body()
-                if (!response.isSuccessful || sponsor == null) {
+                // Handle non-success status codes
+                if (!response.isSuccessful) {
                     val error = ApiClient.parseError(response)
                     onResult(Result.failure(ApiException(error.statusCode, error.message)))
+                    return
+                }
+
+                // Handle success status codes
+                val sponsor = response.body()
+                if (sponsor == null) {
+                    onResult(Result.failure(ApiException(response.code(), "Empty response body")))
                     return
                 }
                 onResult(Result.success(sponsor))
