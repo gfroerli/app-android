@@ -42,8 +42,8 @@ android {
         minSdk = 26
         targetSdk = 36
         compileSdk = 36
-        versionCode = 22
-        versionName = "1.1.4"
+        versionCode = 23
+        versionName = "1.2.0"
 
         buildConfigField("String", "GFROERLI_API_KEY_PUBLIC",
             "\"${localProperties.getProperty("gfroerli_api_key_public")}\"")

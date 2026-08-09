@@ -1,12 +1,12 @@
 # Changelog
 
-## Unreleased
+## v1.2.0 (2026-08-10)
 
 - [feature] Add a "locate me" button to the map, which shows your position and
   centers the map on it
 - [feature] Remember the map position and restore it when reopening the app
 - [feature] Add experimental Android Auto support: Browse nearby water
-  temperatures and navigate to a sensor location
+  temperatures and navigate to a sensor location (Google Play only)
 
 ## v1.1.4 (2026-05-16)
 

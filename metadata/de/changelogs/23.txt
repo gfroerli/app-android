@@ -1,0 +1,3 @@
+- Lokalisierungs-Button auf der Karte, um eigene Position anzuzeigen
+- Kartenposition speichern und beim erneuten Öffnen der App wiederherstellen
+- Experimenteller Android Auto Support (nur via Google Play)
