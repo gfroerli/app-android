@@ -98,8 +98,8 @@ class SensorListState(
     /** The position that [displayOrder] was sorted for. */
     private var displayOrderLocation: Location? = null
 
-    /** Whether sensors are currently being reloaded in the background. */
-    private var refreshing = false
+    /** Whether a request for the sensor data is currently in flight. */
+    private var loading = false
 
     /** Set while subscribed to position updates. */
     private var locationListener: LocationListener? = null
@@ -229,12 +229,13 @@ class SensorListState(
      * counting up even while the data cannot be reloaded.
      */
     private fun loadSensors(mode: LoadMode = LoadMode.INITIAL) {
-        // Don't pile up requests if one is already on its way
-        if (mode != LoadMode.INITIAL && refreshing) {
+        // Don't pile up requests if one is already on its way. A retry is exempt from
+        // this, since the user explicitly asked for it.
+        if (mode != LoadMode.INITIAL && loading) {
             return
         }
 
-        refreshing = mode != LoadMode.INITIAL
+        loading = true
         if (mode == LoadMode.INITIAL) {
             loadFailed = false
             sensors = null
@@ -243,7 +244,7 @@ class SensorListState(
             onChanged()
         }
         repository.loadFreshSensors { result ->
-            refreshing = false
+            loading = false
             result.fold(
                 onSuccess = { fresh ->
                     val loaded = fresh.filter { it.canBeShownInCar() }
@@ -260,7 +261,10 @@ class SensorListState(
                 },
                 onFailure = { t ->
                     Log.e(TAG, "Fetching sensors failed: $t")
-                    if (mode == LoadMode.INITIAL) {
+                    // Only show the error if there is nothing to show instead: A
+                    // concurrent reload may have delivered a usable list in the
+                    // meantime, which is more useful than an error screen.
+                    if (mode == LoadMode.INITIAL && sensors == null) {
                         loadFailed = true
                     }
                 },
@@ -290,8 +294,8 @@ class SensorListState(
      * up-to-date temperatures) instead of the ones near the start of the drive.
      */
     private fun refreshIfMovedFar(newLocation: Location) {
-        // Return if already refreshing
-        if (refreshing) {
+        // Return if a reload is already on its way
+        if (loading) {
             return
         }
 
