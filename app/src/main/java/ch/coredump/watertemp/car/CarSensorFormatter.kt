@@ -28,17 +28,16 @@ object CarSensorFormatter {
     private const val SEPARATOR = " · "
 
     /**
-     * Format a temperature like "21.3 °C". Return null if the temperature is missing.
+     * Format a temperature like "21.3 °C".
      */
-    fun formatTemperature(temperature: Float?, locale: Locale = Locale.getDefault()): String? =
-        temperature?.let { String.format(locale, "%.1f °C", it) }
+    fun formatTemperature(temperature: Float, locale: Locale = Locale.getDefault()): String =
+        String.format(locale, "%.1f °C", temperature)
 
     /**
-     * Format the measurement age like "2 hours ago". Return null if the timestamp
-     * is missing.
+     * Format the measurement age like "2 hours ago".
      */
-    fun measuredAt(timestamp: ZonedDateTime?): String? =
-        timestamp?.let { PrettyTime().format(it) }
+    fun measuredAt(timestamp: ZonedDateTime): String =
+        PrettyTime().format(timestamp)
 
     /**
      * Convert a distance in meters to a car [Distance] for display.
@@ -61,11 +60,11 @@ object CarSensorFormatter {
 
         // The temperature comes first, since that's the value a driver is looking for.
         // It is colored like the corresponding map marker.
-        val temperature = formatTemperature(sensor.latestTemperature)
+        val temperature = sensor.latestTemperature
         if (temperature != null) {
             builder.append(
-                temperature,
-                ForegroundCarColorSpan.create(MarkerType.forTemperature(sensor.latestTemperature).toCarColor()),
+                formatTemperature(temperature),
+                ForegroundCarColorSpan.create(MarkerType.forTemperature(temperature).toCarColor()),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         } else {

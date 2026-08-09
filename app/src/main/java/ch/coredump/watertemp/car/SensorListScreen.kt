@@ -226,8 +226,8 @@ class SensorListScreen(
             }
 
         // Second text line: how old the measurement is. The template allows two.
-        CarSensorFormatter.measuredAt(sensor.latestMeasurementAt)?.let {
-            row.addText(it)
+        sensor.latestMeasurementAt?.let {
+            row.addText(CarSensorFormatter.measuredAt(it))
         }
 
         return row.build()

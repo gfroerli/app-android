@@ -20,8 +20,4 @@ class CarSensorFormatterTest {
         Assert.assertEquals("21,3 °C", CarSensorFormatter.formatTemperature(21.32f, Locale.GERMAN))
     }
 
-    @Test
-    fun `format missing temperature`() {
-        Assert.assertNull(CarSensorFormatter.formatTemperature(null))
-    }
 }

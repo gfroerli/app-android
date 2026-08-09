@@ -54,11 +54,11 @@ class SensorDetailScreen(
         val temperatureRow = Row.Builder()
             .setTitle(carContext.getString(R.string.temperature))
             .addText(
-                CarSensorFormatter.formatTemperature(sensor.latestTemperature)
+                sensor.latestTemperature?.let { CarSensorFormatter.formatTemperature(it) }
                     ?: carContext.getString(R.string.no_measurement)
             )
-        CarSensorFormatter.measuredAt(sensor.latestMeasurementAt)?.let {
-            temperatureRow.addText(it)
+        sensor.latestMeasurementAt?.let {
+            temperatureRow.addText(CarSensorFormatter.measuredAt(it))
         }
 
         val pane = Pane.Builder().addRow(temperatureRow.build())
