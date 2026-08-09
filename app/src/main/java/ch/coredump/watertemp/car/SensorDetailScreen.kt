@@ -62,7 +62,8 @@ class SensorDetailScreen(
         }
 
         val pane = Pane.Builder().addRow(temperatureRow.build())
-        sensor.caption?.let {
+        // Note that the caption may be an empty string, which the row would reject
+        sensor.caption?.takeIf { it.isNotBlank() }?.let {
             pane.addRow(Row.Builder().setTitle(it).build())
         }
         sponsorRow()?.let { pane.addRow(it) }

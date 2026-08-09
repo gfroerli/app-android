@@ -80,7 +80,7 @@ class SensorListState(
         RESORT,
     }
 
-    /** Fetched sensors (only ones with coordinates), or null while loading. */
+    /** Fetched sensors (only ones that can be shown), or null while loading. */
     private var sensors: List<ApiSensor>? = null
     private var location: Location? = null
     private var loadFailed = false
@@ -246,7 +246,7 @@ class SensorListState(
             refreshing = false
             result.fold(
                 onSuccess = { fresh ->
-                    val loaded = fresh.filter { it.latitude != null && it.longitude != null }
+                    val loaded = fresh.filter { it.canBeShownInCar() }
                     sensors = loaded
                     // A background reload recovers from a failed initial load
                     loadFailed = false
@@ -370,6 +370,15 @@ class SensorListState(
         return ordered
     }
 }
+
+/**
+ * Whether a sensor can be shown in the car.
+ *
+ * Sensors without coordinates cannot be placed on the map, and the car templates
+ * reject rows with an empty title (which an empty device name would produce).
+ */
+internal fun ApiSensor.canBeShownInCar(): Boolean =
+    latitude != null && longitude != null && deviceName.isNotBlank()
 
 /**
  * The distance between a position and a sensor, in meters.
