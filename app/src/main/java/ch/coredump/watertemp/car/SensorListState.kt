@@ -274,18 +274,19 @@ class SensorListState(
     }
 
     /**
-     * Update the frozen [displayOrder] with the reloaded sensors, so that the rows show
-     * the new values without jumping around.
-     *
-     * Sensors whose measurements went stale drop out of the list. Newly added ones are
-     * appended, they are sorted in with the next re-sort.
+     * Update the frozen [displayOrder] with the reloaded sensors, see
+     * [mergeIntoDisplayOrder].
      */
     private fun applyToDisplayOrder(loaded: List<ApiSensor>) {
         val order = displayOrder ?: return
-        val loadedById = loaded.associateBy { it.id }
-        val ordered = order.mapNotNull { loadedById[it.id] }
-        val orderedIds = ordered.mapTo(HashSet()) { it.id }
-        displayOrder = ordered + loaded.filter { it.id !in orderedIds }
+        val merged = mergeIntoDisplayOrder(order, loaded)
+        if (merged == null) {
+            // Sort the reloaded sensors for the current position instead
+            displayOrder = null
+            displayOrderLocation = null
+            return
+        }
+        displayOrder = merged
     }
 
     /**
@@ -373,6 +374,31 @@ class SensorListState(
         }
         return ordered
     }
+}
+
+/**
+ * Merge the reloaded sensors into the frozen display [order], so that the rows show the
+ * new values without jumping around.
+ *
+ * Sensors whose measurements went stale drop out of the list. Newly added ones are
+ * appended, they are sorted in with the next re-sort.
+ *
+ * Returns null if the order needs to be rebuilt from scratch, which is the case when
+ * none of the previously shown sensors are left. That happens when the API temporarily
+ * reports no fresh measurements at all: Appending all sensors would then show the
+ * entire list in API order instead of by distance.
+ */
+internal fun mergeIntoDisplayOrder(
+    order: List<ApiSensor>,
+    loaded: List<ApiSensor>,
+): List<ApiSensor>? {
+    val loadedById = loaded.associateBy { it.id }
+    val ordered = order.mapNotNull { loadedById[it.id] }
+    if (ordered.isEmpty()) {
+        return null
+    }
+    val orderedIds = ordered.mapTo(HashSet()) { it.id }
+    return ordered + loaded.filter { it.id !in orderedIds }
 }
 
 /**
