@@ -40,4 +40,16 @@
     <string name="locate_me">Mi Standort azeige</string>
     <string name="location_unavailable">Di Standort het nid chönne ermittlet wärde</string>
     <string name="location_permission_denied">Ohni Standort-Berächtigung cha dr Standort nid azeigt wärde</string>
+    <string name="car_sensor_list_title">Wassertemperature</string>
+    <string name="car_no_sensors">Kei Sensore mit aktuelle Mässige gfunge</string>
+    <string name="car_location_permission_hint">Bitte erloub ufem Händy de Zuegriff uf di Standort</string>
+    <string name="car_location_permission_denied">Kei Standort-Berächtigung</string>
+    <string name="car_location_permission_denied_short">D Sensore chöi nid nach Distanz sortiert wärde</string>
+    <string name="car_location_permission_denied_text">Gib d Standort-Berächtigung ufem Händy, zum nach Distanz z sortiere.</string>
+    <string name="car_more_sensors">Nid aui Sensore azeigt</string>
+    <string name="car_more_sensors_short">%1$d vo %2$d Sensore</string>
+    <string name="car_more_sensors_text">Nume di erschte %1$d vo %2$d Sensore wärde azeigt. Aui fingsch ir App.</string>
+    <string name="car_error_loading_sensors">D Sensore hei nid chönne glade wärde. Bitte kontrollier dini Internet-Verbindig.</string>
+    <string name="car_action_retry">Nomau probiere</string>
+    <string name="car_action_navigate">Navigiere</string>
 </resources>

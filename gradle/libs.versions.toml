@@ -5,6 +5,7 @@ androidx-junit = "1.3.0"
 androidx-test-rules = "1.7.0"
 appcompat = "1.7.1"
 bundletool = "0.2.4"
+car-app = "1.7.0"
 compose-bom = "2026.05.00"
 composables-core = "1.49.6"
 desugar-jdk-libs = "2.1.5"
@@ -26,6 +27,7 @@ activity-compose = { group = "androidx.activity", name = "activity-compose", ver
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx-test-rules" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+car-app = { group = "androidx.car.app", name = "app", version.ref = "car-app" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-material = { group = "androidx.compose.material", name = "material" }
@@ -47,6 +49,7 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref = "prettytime" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-mock = { group = "com.squareup.retrofit2", name = "retrofit-mock", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -40,4 +40,16 @@
     <string name="locate_me">Meinen Standort anzeigen</string>
     <string name="location_unavailable">Dein Standort konnte nicht ermittelt werden</string>
     <string name="location_permission_denied">Ohne Standortberechtigung kann dein Standort nicht angezeigt werden</string>
+    <string name="car_sensor_list_title">Wassertemperaturen</string>
+    <string name="car_no_sensors">Keine Sensoren mit aktuellen Messungen gefunden</string>
+    <string name="car_location_permission_hint">Bitte erlaube den Zugriff auf deinen Standort auf dem Mobilgerät</string>
+    <string name="car_location_permission_denied">Keine Standortberechtigung</string>
+    <string name="car_location_permission_denied_short">Sensoren können nicht nach Distanz sortiert werden</string>
+    <string name="car_location_permission_denied_text">Erteile die Standortberechtigung auf dem Handy, um nach Distanz zu sortieren.</string>
+    <string name="car_more_sensors">Nicht alle Sensoren angezeigt</string>
+    <string name="car_more_sensors_short">%1$d von %2$d Sensoren</string>
+    <string name="car_more_sensors_text">Nur die ersten %1$d von %2$d Sensoren werden angezeigt. Alle findest du in der App.</string>
+    <string name="car_error_loading_sensors">Sensoren konnten nicht geladen werden. Bitte prüfe deine Internetverbindung.</string>
+    <string name="car_action_retry">Nochmals versuchen</string>
+    <string name="car_action_navigate">Navigieren</string>
 </resources>

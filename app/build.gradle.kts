@@ -186,6 +186,9 @@ dependencies {
     // Compose: Various composables (used for scrollbars)
     implementation(libs.composables.core)
 
+    // Android Auto (Car App Library)
+    implementation(libs.car.app)
+
     // MapLibre SDK
     implementation(libs.maplibre)
     implementation(libs.maplibre.annotation)
@@ -203,6 +206,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.retrofit.mock)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.espresso)

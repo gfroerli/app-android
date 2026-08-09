@@ -65,3 +65,22 @@ For the releases:
 - GitHub: Upload the signed per-ABI release APK files to GitHub releases
 - Google Play: Upload the signed per-ABI release APK files
 - Accrescent: Upload the signed release APKS file
+
+## Android Auto
+
+The app includes an Android Auto integration (POI category). For Google Play,
+this requires a one-time opt-in in the Play Console (_Advanced settings >
+Release types > Android Auto_).
+
+Releases touching the car app go through Google's [car app quality
+review](https://developer.android.com/docs/quality-guidelines/car-app-quality),
+which may delay the review of the first Android Auto release.
+
+Note that car apps built with the Android for Cars App Library only run in a
+real car when installed through Google Play — sideloaded builds are rejected
+by Android Auto, regardless of the "unknown sources" developer setting. To
+verify a release in a real car before promoting it to production, publish it
+to the internal testing track first and install it from there. During
+development, use the [Desktop Head Unit
+(DHU)](https://developer.android.com/training/cars/testing/dhu) instead, which
+runs sideloaded builds.
