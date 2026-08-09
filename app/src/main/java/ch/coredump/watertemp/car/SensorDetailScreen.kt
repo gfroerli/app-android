@@ -12,7 +12,6 @@ import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.rest.SensorRepository
-import ch.coredump.watertemp.rest.models.ApiSensor
 import ch.coredump.watertemp.rest.models.ApiSponsor
 import ch.coredump.watertemp.rest.models.SponsorType
 
@@ -22,7 +21,7 @@ import ch.coredump.watertemp.rest.models.SponsorType
  */
 class SensorDetailScreen(
     carContext: CarContext,
-    private val sensor: ApiSensor,
+    private val sensor: CarSensor,
     private val repository: SensorRepository,
 ) : Screen(carContext) {
 
@@ -38,7 +37,7 @@ class SensorDetailScreen(
     }
 
     private fun loadSponsor() {
-        repository.loadSponsor(sensor) { result ->
+        repository.loadSponsor(sensor.api) { result ->
             result.fold(
                 onSuccess = {
                     sponsor = it

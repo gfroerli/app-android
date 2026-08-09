@@ -32,7 +32,7 @@ sealed interface ListState {
      * [location] is null if no position could be determined, in which case the sensors
      * are sorted by name instead of by distance.
      */
-    data class Ready(val sensors: List<ApiSensor>, val location: Location?) : ListState
+    data class Ready(val sensors: List<CarSensor>, val location: Location?) : ListState
 }
 
 /**
@@ -81,7 +81,7 @@ class SensorListState(
     }
 
     /** Fetched sensors (only ones that can be shown), or null while loading. */
-    private var sensors: List<ApiSensor>? = null
+    private var sensors: List<CarSensor>? = null
     private var location: Location? = null
     private var loadFailed = false
 
@@ -93,7 +93,7 @@ class SensorListState(
      *
      * The order is renewed after moving [REFRESH_DISTANCE_M], see [refreshIfMovedFar].
      */
-    private var displayOrder: List<ApiSensor>? = null
+    private var displayOrder: List<CarSensor>? = null
 
     /** The position that [displayOrder] was sorted for. */
     private var displayOrderLocation: Location? = null
@@ -247,7 +247,7 @@ class SensorListState(
             loading = false
             result.fold(
                 onSuccess = { fresh ->
-                    val loaded = fresh.filter { it.canBeShownInCar() }
+                    val loaded = fresh.mapNotNull { CarSensor.of(it) }
                     sensors = loaded
                     // A background reload recovers from a failed initial load
                     loadFailed = false
@@ -277,7 +277,7 @@ class SensorListState(
      * Update the frozen [displayOrder] with the reloaded sensors, see
      * [mergeIntoDisplayOrder].
      */
-    private fun applyToDisplayOrder(loaded: List<ApiSensor>) {
+    private fun applyToDisplayOrder(loaded: List<CarSensor>) {
         val order = displayOrder ?: return
         val merged = mergeIntoDisplayOrder(order, loaded)
         if (merged == null) {
@@ -358,7 +358,7 @@ class SensorListState(
      *
      * The order is remembered as soon as a position is known, see [displayOrder].
      */
-    private fun sensorsInDisplayOrder(sensors: List<ApiSensor>, location: Location?): List<ApiSensor> {
+    private fun sensorsInDisplayOrder(sensors: List<CarSensor>, location: Location?): List<CarSensor> {
         displayOrder?.let { return it }
         if (location == null) {
             return sensors.sortedBy { it.deviceName.lowercase() }
@@ -389,9 +389,9 @@ class SensorListState(
  * entire list in API order instead of by distance.
  */
 internal fun mergeIntoDisplayOrder(
-    order: List<ApiSensor>,
-    loaded: List<ApiSensor>,
-): List<ApiSensor>? {
+    order: List<CarSensor>,
+    loaded: List<CarSensor>,
+): List<CarSensor>? {
     val loadedById = loaded.associateBy { it.id }
     val ordered = order.mapNotNull { loadedById[it.id] }
     if (ordered.isEmpty()) {
@@ -402,24 +402,15 @@ internal fun mergeIntoDisplayOrder(
 }
 
 /**
- * Whether a sensor can be shown in the car.
- *
- * Sensors without coordinates cannot be placed on the map, and the car templates
- * reject rows with an empty title (which an empty device name would produce).
- */
-internal fun ApiSensor.canBeShownInCar(): Boolean =
-    latitude != null && longitude != null && deviceName.isNotBlank()
-
-/**
  * The distance between a position and a sensor, in meters.
  */
-internal fun distanceMeters(location: Location, sensor: ApiSensor): Float {
+internal fun distanceMeters(location: Location, sensor: CarSensor): Float {
     val results = FloatArray(1)
     Location.distanceBetween(
         location.latitude,
         location.longitude,
-        sensor.latitude!!,
-        sensor.longitude!!,
+        sensor.latitude,
+        sensor.longitude,
         results,
     )
     return results[0]

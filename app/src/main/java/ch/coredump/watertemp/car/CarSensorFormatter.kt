@@ -10,7 +10,6 @@ import androidx.car.app.model.ForegroundCarColorSpan
 import androidx.compose.ui.graphics.toArgb
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.activities.map.MarkerType
-import ch.coredump.watertemp.rest.models.ApiSensor
 import org.ocpsoft.prettytime.PrettyTime
 import java.time.ZonedDateTime
 import java.util.Locale
@@ -55,7 +54,7 @@ object CarSensorFormatter {
      * The temperature comes first and is colored based on its value, falling back to a
      * "no measurement" text. The distance is omitted if [distanceMeters] is null.
      */
-    fun rowText(context: Context, sensor: ApiSensor, distanceMeters: Float?): CharSequence {
+    fun rowText(context: Context, sensor: CarSensor, distanceMeters: Float?): CharSequence {
         val builder = SpannableStringBuilder()
 
         // The temperature comes first, since that's the value a driver is looking for.

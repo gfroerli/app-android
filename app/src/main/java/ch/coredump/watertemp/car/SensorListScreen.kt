@@ -17,7 +17,6 @@ import androidx.car.app.model.Template
 import ch.coredump.watertemp.R
 import ch.coredump.watertemp.activities.map.MarkerType
 import ch.coredump.watertemp.rest.SensorRepository
-import ch.coredump.watertemp.rest.models.ApiSensor
 
 /**
  * Main Android Auto screen: a map with the sensor locations, next to a list of
@@ -89,7 +88,7 @@ class SensorListScreen(
      * The list of sensors, next to the map. The sensors are expected to be in the
      * order they should be shown in, see [SensorListState.current].
      */
-    private fun sensorListTemplate(sorted: List<ApiSensor>, location: Location?): Template {
+    private fun sensorListTemplate(sorted: List<CarSensor>, location: Location?): Template {
         // Show the closest sensors, but never more rows than the car host allows.
         // Note that the ConstraintManager requires car API level 2, but falls back to a
         // default limit on older hosts, so this does not raise our minCarApiLevel.
@@ -138,7 +137,7 @@ class SensorListScreen(
         val anchor = when {
             location != null -> CarLocation.create(location.latitude, location.longitude)
             // Fall back to the first sensor, so that the map shows an actual location
-            shown.isNotEmpty() -> CarLocation.create(shown[0].latitude!!, shown[0].longitude!!)
+            shown.isNotEmpty() -> CarLocation.create(shown[0].latitude, shown[0].longitude)
             else -> null
         }
         if (anchor != null) {
@@ -197,7 +196,7 @@ class SensorListScreen(
             }
             .build()
 
-    private fun sensorRow(sensor: ApiSensor, location: Location?, number: Int): Row {
+    private fun sensorRow(sensor: CarSensor, location: Location?, number: Int): Row {
         val marker = PlaceMarker.Builder()
             .setColor(MarkerType.forTemperature(sensor.latestTemperature).toCarColor())
             // The marker is shown both on the map and in the list, so the number
@@ -215,7 +214,7 @@ class SensorListScreen(
             .setMetadata(
                 Metadata.Builder()
                     .setPlace(
-                        Place.Builder(CarLocation.create(sensor.latitude!!, sensor.longitude!!))
+                        Place.Builder(CarLocation.create(sensor.latitude, sensor.longitude))
                             .setMarker(marker)
                             .build()
                     )

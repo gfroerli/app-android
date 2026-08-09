@@ -6,7 +6,7 @@ import org.junit.Test
 import java.time.ZonedDateTime
 
 class SensorListStateTest {
-    private fun sensor(
+    private fun apiSensor(
         id: Int = 1,
         deviceName: String = "Zürichsee",
         latitude: Double? = 47.2266,
@@ -22,15 +22,23 @@ class SensorListStateTest {
         sponsorId = null,
     )
 
+    /** A sensor that can be shown, for the merge tests below. */
+    private fun sensor(id: Int) = CarSensor.of(apiSensor(id = id))!!
+
     @Test
     fun `complete sensor can be shown`() {
-        Assert.assertTrue(sensor().canBeShownInCar())
+        val carSensor = CarSensor.of(apiSensor())
+
+        Assert.assertNotNull(carSensor)
+        Assert.assertEquals(47.2266, carSensor!!.latitude, 0.0)
+        Assert.assertEquals(8.8184, carSensor.longitude, 0.0)
+        Assert.assertEquals("Zürichsee", carSensor.deviceName)
     }
 
     @Test
     fun `sensor without coordinates cannot be shown`() {
-        Assert.assertFalse(sensor(latitude = null).canBeShownInCar())
-        Assert.assertFalse(sensor(longitude = null).canBeShownInCar())
+        Assert.assertNull(CarSensor.of(apiSensor(latitude = null)))
+        Assert.assertNull(CarSensor.of(apiSensor(longitude = null)))
     }
 
     /**
@@ -39,15 +47,15 @@ class SensorListStateTest {
      */
     @Test
     fun `sensor without a device name cannot be shown`() {
-        Assert.assertFalse(sensor(deviceName = "").canBeShownInCar())
-        Assert.assertFalse(sensor(deviceName = "   ").canBeShownInCar())
+        Assert.assertNull(CarSensor.of(apiSensor(deviceName = "")))
+        Assert.assertNull(CarSensor.of(apiSensor(deviceName = "   ")))
     }
 
     @Test
     fun `merge keeps the frozen order`() {
-        val order = listOf(sensor(id = 3), sensor(id = 1), sensor(id = 2))
+        val order = listOf(sensor(3), sensor(1), sensor(2))
         // The reload returns the same sensors in a different order
-        val loaded = listOf(sensor(id = 1), sensor(id = 2), sensor(id = 3))
+        val loaded = listOf(sensor(1), sensor(2), sensor(3))
 
         val merged = mergeIntoDisplayOrder(order, loaded)
 
@@ -56,9 +64,9 @@ class SensorListStateTest {
 
     @Test
     fun `merge drops sensors that are gone and appends new ones`() {
-        val order = listOf(sensor(id = 3), sensor(id = 1))
+        val order = listOf(sensor(3), sensor(1))
         // Sensor 1 went stale, sensor 4 appeared
-        val loaded = listOf(sensor(id = 4), sensor(id = 3))
+        val loaded = listOf(sensor(4), sensor(3))
 
         val merged = mergeIntoDisplayOrder(order, loaded)
 
@@ -71,8 +79,8 @@ class SensorListStateTest {
      */
     @Test
     fun `merge requires a rebuild if no shown sensor is left`() {
-        val order = listOf(sensor(id = 3), sensor(id = 1))
-        val loaded = listOf(sensor(id = 7), sensor(id = 8))
+        val order = listOf(sensor(3), sensor(1))
+        val loaded = listOf(sensor(7), sensor(8))
 
         Assert.assertNull(mergeIntoDisplayOrder(order, loaded))
         // The same applies to an order that was frozen while nothing was fresh
@@ -81,7 +89,7 @@ class SensorListStateTest {
 
     @Test
     fun `merge requires a rebuild if nothing was loaded`() {
-        val order = listOf(sensor(id = 3), sensor(id = 1))
+        val order = listOf(sensor(3), sensor(1))
 
         Assert.assertNull(mergeIntoDisplayOrder(order, emptyList()))
     }
