@@ -69,7 +69,7 @@ For the releases:
 
 The app includes an Android Auto integration (POI category). For Google Play,
 this requires a one-time opt-in in the Play Console (_Advanced settings >
-Release types > Android Auto_).
+Form factors > Android Auto_).
 
 Releases touching the car app go through Google's [car app quality
 review](https://developer.android.com/docs/quality-guidelines/car-app-quality),
