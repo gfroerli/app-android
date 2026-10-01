@@ -812,7 +812,7 @@ class MapActivity : ComponentActivity() {
         val sensor by viewModel.sensor.collectAsState()
         val measurements by viewModel.measurements.collectAsState()
 
-        Column() {
+        Column {
             sensor?.let { sensor ->
                 // Section: History (last 3 days)
                 Text(

@@ -12,8 +12,8 @@ import androidx.core.graphics.toColorInt
 import org.maplibre.android.maps.Style
 
 // Marker data keys
-val MARKER_DATA_SENSOR_ID = "sensorId"
-val MARKER_DATA_ICON_IMAGE_NAME = "iconImageName"
+const val MARKER_DATA_SENSOR_ID = "sensorId"
+const val MARKER_DATA_ICON_IMAGE_NAME = "iconImageName"
 
 /**
  * Enum of the different marker types, depending on temperature.
@@ -39,7 +39,7 @@ enum class MarkerType(val color: Color) {
     companion object {
         fun forTemperature(temperature: Float?): MarkerType {
             if (temperature == null) {
-                return UNKNOWN;
+                return UNKNOWN
             }
             if (temperature < 10f) {
                 return FREEZING

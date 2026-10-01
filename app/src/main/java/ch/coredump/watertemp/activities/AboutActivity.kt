@@ -38,10 +38,10 @@ import ch.coredump.watertemp.utils.BottomSpacer
 import ch.coredump.watertemp.utils.GfroerliThemeWrapper
 import ch.coredump.watertemp.utils.LinkifyText
 import ch.coredump.watertemp.utils.bottomSpacerHeight
-import com.composables.core.ScrollArea
 import com.composables.core.Thumb
 import com.composables.core.VerticalScrollbar
-import com.composables.core.rememberScrollAreaState
+import com.composeunstyled.UnstyledScrollArea
+import com.composeunstyled.rememberScrollAreaState
 
 private const val TAG = "AboutActivity"
 
@@ -91,7 +91,7 @@ class AboutActivity : ComponentActivity() {
 
                 // Main content
                 content = { innerPadding ->
-                    ScrollArea(
+                    UnstyledScrollArea(
                         state = scrollAreaState,
                         modifier = Modifier.padding(innerPadding),
                     ) {

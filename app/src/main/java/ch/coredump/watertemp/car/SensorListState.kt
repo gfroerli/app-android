@@ -10,7 +10,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import ch.coredump.watertemp.rest.SensorRepository
-import ch.coredump.watertemp.rest.models.ApiSensor
 import kotlin.math.roundToInt
 
 /**
